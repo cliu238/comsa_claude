@@ -1,0 +1,1095 @@
+icd_code,champs_icd_group_desc
+ J16.8,Lower respiratory infections
+1A02,NA
+1A20,Diarrheal Diseases
+1A22,Diarrheal Diseases
+1A40.0,Diarrheal Diseases
+1B53,Meningitis/Encephalitis
+1C41,Sepsis
+1C62.3,NA
+1D01.00,Meningitis/Encephalitis
+1D82.0,Other infections
+1F03,NA
+1F04,NA
+1F40,Malaria
+1F40.0,Malaria
+1G40,Sepsis
+3A50.2,NA
+3A51.0,Sickle cell disorders
+3A51.1,Sickle cell disorders
+3A51.2,Sickle cell disorders
+3A9Z,NA
+4A4Z,Other
+5B52,Malnutrition
+5B7Z,Other nutritional deficiencies
+5C64.10,NA
+5C78,NA
+8D2Z,NA
+A 41.5,Sepsis
+A 41.9,Sepsis
+A00,Diarrheal Diseases
+A00.0,Diarrheal Diseases
+A01.1,Other infections
+A02,Other infections
+A02.1,Sepsis
+A03,Diarrheal Diseases
+A04,Diarrheal Diseases
+A04.0,Diarrheal Diseases
+A04.1,Diarrheal Diseases
+A04.2,Diarrheal Diseases
+A04.4,Diarrheal Diseases
+A04.5,Diarrheal Diseases
+A04.8,Diarrheal Diseases
+A07.1,Diarrheal Diseases
+A08,Diarrheal Diseases
+A08.0,Diarrheal Diseases
+A08.1,Diarrheal Diseases
+A08.2,Diarrheal Diseases
+A08.3,Diarrheal Diseases
+A08.4,Other infections
+A08.5,Diarrheal Diseases
+A09,Diarrheal Diseases
+A09.0,Diarrheal Diseases
+A09.9,Diarrheal Diseases
+A15.0,Tuberculosis
+A15.2,Tuberculosis
+A15.6,Tuberculosis
+A15.7 ,Tuberculosis
+A17.0,Tuberculosis
+A17.8,Tuberculosis
+A18.8,Tuberculosis
+A19,Tuberculosis
+A19.0,Tuberculosis
+A19.1,Tuberculosis
+A19.9,Tuberculosis
+A23,Other infections
+A32.1,Other infections
+A32.9,Other infections
+A36.8,Other infections
+A37,Lower respiratory infections
+A37.0,Lower respiratory infections
+A37.9,Lower respiratory infections
+A39.0,Meningitis/Encephalitis
+A39.2,Other infections
+A40,Sepsis
+A40.0,Sepsis
+A40.1,Sepsis
+A40.2,Sepsis
+A40.3,Sepsis
+A40.8,Sepsis
+A40.9,Sepsis
+A41,Sepsis
+A41.0,Sepsis
+A41.01,Sepsis
+A41.02,Sepsis
+A41.1,Sepsis
+A41.2,Sepsis
+A41.3,Sepsis
+A41.4,Sepsis
+A41.5,Sepsis
+A41.50,Sepsis
+A41.51,Sepsis
+A41.52,Sepsis
+A41.53,Sepsis
+A41.59,Sepsis
+A41.6,Sepsis
+A41.8,Sepsis
+A41.81,Sepsis
+A41.89,Sepsis
+A41.9,Sepsis
+A42,Sepsis
+A42.0,Sepsis
+A42.1,Sepsis
+A42.2,Sepsis
+A42.7,Sepsis
+A42.8,Sepsis
+A42.81,Sepsis
+A42.82,Sepsis
+A42.89,Sepsis
+A42.9,Sepsis
+A43,Sepsis
+A43.0,Sepsis
+A43.1,Sepsis
+A43.8,Sepsis
+A43.9,Sepsis
+A44,Sepsis
+A44.0,Sepsis
+A44.1,Sepsis
+A44.8,Sepsis
+A44.9,Sepsis
+A45,Sepsis
+A45.9,Sepsis
+A46,Sepsis
+A46.0,Sepsis
+A47,Sepsis
+A48,Sepsis
+A48.0,Sepsis
+A48.1,Sepsis
+A48.2,Sepsis
+A48.3,Sepsis
+A48.4,Sepsis
+A48.5,Sepsis
+A48.51,Sepsis
+A48.52,Sepsis
+A48.8,Sepsis
+A49,Sepsis
+A49.0,Sepsis
+A49.01,Sepsis
+A49.02,Sepsis
+A49.1,Sepsis
+A49.2,Sepsis
+A49.3,Sepsis
+A49.8,Sepsis
+A49.9,Sepsis
+A50,Syphilis
+A50.0,Syphilis
+A50.2,Syphilis
+A50.9,Syphilis
+A51.0,Syphilis
+A51.5,Syphilis
+A51.9,Syphilis
+A52.9,Syphilis
+A53.9,Syphilis
+A74.9,Other infections
+A82.1,Meningitis/Encephalitis
+A82.9,Rabies
+A85.1,Meningitis/Encephalitis
+A85.8,Meningitis/Encephalitis
+A86,Meningitis/Encephalitis
+A87.8,Meningitis/Encephalitis
+A96.2,Other infections
+A97,Other infections
+A97.9,Other infections
+B 50.0,Malaria
+B 50.8,Malaria
+B00.4,Meningitis/Encephalitis
+B00.7,Other infections
+B02.0,Meningitis/Encephalitis
+B05,Measles
+B05.2,Measles
+B05.8,Measles
+B05.9,Measles
+B06.9,Other infections
+B18,Liver disease
+B18.2,Liver disease
+B20,HIV
+B20.0,HIV
+B20.1,HIV
+B20.2,HIV
+B20.3,HIV
+B20.6,HIV
+B20.7,HIV
+B20.8,HIV
+B20.9,HIV
+B21.9,HIV
+B22,HIV
+B22.1,HIV
+B22.2,HIV
+B22.7,HIV
+B23,HIV
+B23.0,HIV
+B23.8,HIV
+B24,HIV
+B25,Other infections
+B25.0,Lower respiratory infections
+B25.1,Other infections
+B25.8,Other infections
+B25.9,Other infections
+B33.2,Other infections
+B33.22,Other infections
+B33.8,Other infections
+B34,Other infections
+B34.0,Other infections
+B34.1,Other infections
+B34.3,Other infections
+B37,Other infections
+B37.0,Other infections
+B37.1,Other infections
+B37.5,Meningitis/Encephalitis
+B37.7,Sepsis
+B37.8,Other infections
+B37.9,Other infections
+B44.0,Other infections
+B44.7,Other infections
+B45.7,Other infections
+B50,Malaria
+B50.0,Malaria
+B50.10,Malaria
+B50.5,Plasmodium falciparum malaria
+B50.8,Malaria
+B50.9,Malaria
+B51.8,Malaria
+B54,Malaria
+B55.0,Other infections
+B58.2,Meningitis/Encephalitis
+B58.8,Other infections
+B59,Other infections
+B77,Other infections
+B77.8,Other infections
+B89,Other infections
+B96.0,Other infections
+B96.2,Other infections
+B96.4,Other infections
+B96.5,Other infections
+B99,Other infections
+C22.0,Cancer
+C22.2,Cancer
+C34.9,Cancer
+C49,Cancer
+C49.9,Cancer
+C50.9,Cancer
+C69.9,Cancer
+C74.9,Cancer
+C91.0,Cancer
+C91.9,Cancer
+C92.9,Cancer
+C94.0,Cancer
+C95.0,Cancer
+C95.9,Cancer
+CA40.07,Lower respiratory infections
+CA40.12,Lower respiratory infections
+CA71.0,Other respiratory disease
+D46.4,Anemias
+D48.0,Other
+D50,Anemias
+D50 - D64,Anemias
+D53.8,Anemias
+D53.9,Anemias
+D57,Sickle cell disorders
+D57.0,Sickle cell disorders
+D57.1,Sickle cell disorders
+D57.2,Sickle cell disorders
+D57.3,Sickle cell disorders
+D57.8,Sickle cell disorders
+D58.2,"Other endocrine, metabolic, blood, and immune disorders"
+D59.8,Anemias
+D61.1,Anemias
+D63.0,Anemias
+D64,Anemias
+D64.9,Anemias
+D65,"Other endocrine, metabolic, blood, and immune disorders"
+D66,"Other endocrine, metabolic, blood, and immune disorders"
+D68.6,"Other endocrine, metabolic, blood, and immune disorders"
+D68.9,"Other endocrine, metabolic, blood, and immune disorders"
+D69.6,"Other endocrine, metabolic, blood, and immune disorders"
+D69.9,"Other endocrine, metabolic, blood, and immune disorders"
+D82.1,Other immunodeficiencies
+D84.9,Other immunodeficiencies
+D89.9,"Other endocrine, metabolic, blood, and immune disorders"
+E 41 & E43,Malnutrition
+E10,Diabetes
+E10.1,Diabetes
+E11.8,Diabetes
+E14,"Other endocrine, metabolic, blood, and immune disorders"
+E14.8,Diabetes
+E16.2,"Other endocrine, metabolic, blood, and immune disorders"
+E22.2,"Other endocrine, metabolic, blood, and immune disorders"
+E27.2,"Other endocrine, metabolic, blood, and immune disorders"
+E40,Malnutrition
+E40.3,Malnutrition
+E41,Malnutrition
+E41 & E43,Malnutrition
+E42,Malnutrition
+E43,Malnutrition
+E44,Malnutrition
+E44.0,Malnutrition
+E44.1,Malnutrition
+E45,Malnutrition
+E46,Malnutrition
+E53.8,Other nutritional deficiencies
+E55.0,Other nutritional deficiencies
+E66,Obesity
+E66.8,Obesity
+E83.1,"Other disorders of fluid, electrolyte and acid-base balance"
+E86,"Other disorders of fluid, electrolyte and acid-base balance"
+E87.0,"Other disorders of fluid, electrolyte and acid-base balance"
+E87.5,"Other disorders of fluid, electrolyte and acid-base balance"
+E88.8,"Other endocrine, metabolic, blood, and immune disorders"
+E88.9,"Other endocrine, metabolic, blood, and immune disorders"
+F55,Other
+F55.1,Other
+F89,Other
+F99,Other
+G00.0,Meningitis/Encephalitis
+G00.1,Meningitis/Encephalitis
+G00.2,Meningitis/Encephalitis
+G00.3,Meningitis/Encephalitis
+G00.8,Meningitis/Encephalitis
+G00.9,Meningitis/Encephalitis
+G01,Meningitis/Encephalitis
+G02.0,Meningitis/Encephalitis
+G03.8,Meningitis/Encephalitis
+G03.9,Meningitis/Encephalitis
+G04,Meningitis/Encephalitis
+G04.2,Meningitis/Encephalitis
+G04.8,Meningitis/Encephalitis
+G04.9,Meningitis/Encephalitis
+G05.1,Meningitis/Encephalitis
+G05.2,Meningitis/Encephalitis
+G06.0,Other infections
+G12.9,Motor neuron disease
+G31.9,Other neurological disorders
+G40.9,Other neurological disorders
+G41.9,Epilepsy
+G71.2,Congenital birth defects
+G80,Congenital birth defects
+G80.0,Congenital birth defects
+G80.1,Congenital birth defects
+G80.9,Congenital birth defects
+G91,Other neurological disorders
+G91.0,Other neurological disorders
+G91.8,Other neurological disorders
+G91.9,Other neurological disorders
+G93.1,Other neurological disorders
+G93.4,Other neurological disorders
+G93.5,Other neurological disorders
+G93.9,Other neurological disorders
+G96.9,Other neurological disorders
+G97.8,Other neurological disorders
+G98,Other neurological disorders
+GA15.6,NA
+GB61,NA
+GC08,Other infections
+H66.3,Other infections
+H66.4,Other infections
+I10,Heart Diseases
+I11.0,Heart Diseases
+I11.9,Heart Diseases
+I21.3,Heart Diseases
+I26.9,Other respiratory disease
+I27,Heart Diseases
+I27.2,Other respiratory disease
+I33.0,Heart Diseases
+I40.0,Heart Diseases
+I40.9,Heart Diseases
+I41.1,Other infections
+I42.0,Heart Diseases
+I42.9,Heart Diseases
+I50,Heart Diseases
+I50.0,Heart Diseases
+I50.9,Heart Diseases
+I51.4,Other infections
+I51.9,Heart Diseases
+I61.9,Cerebrovascular disease
+I62.9,Other
+I63.9,Cerebrovascular disease
+I67.9,Cerebrovascular disease
+I81,Other
+I85.0,"Diseases of veins, lymphatic vessels and lymph nodes"
+J 13,Lower respiratory infections
+J 69.0,Other respiratory disease
+J05.0,Upper respiratory infections
+J06.9,Upper respiratory infections
+J10.0,Lower respiratory infections
+J12,Lower respiratory infections
+J12.0,Lower respiratory infections
+J12.1,Lower respiratory infections
+J12.2,Lower respiratory infections
+J12.3,Lower respiratory infections
+J12.8,Lower respiratory infections
+J12.9,Lower respiratory infections
+J13,Lower respiratory infections
+J14,Lower respiratory infections
+J14.8,Lower respiratory infections
+J15,Lower respiratory infections
+J15.0,Lower respiratory infections
+J15.1,Lower respiratory infections
+J15.2,Lower respiratory infections
+J15.3,Lower respiratory infections
+J15.4,Lower respiratory infections
+J15.5,Lower respiratory infections
+J15.6,Lower respiratory infections
+J15.8,Lower respiratory infections
+J15.9,Lower respiratory infections
+J16.8,Lower respiratory infections
+J17,Lower respiratory infections
+J17.1,Lower respiratory infections
+J17.2,Lower respiratory infections
+J17.3,Lower respiratory infections
+J17.8,Lower respiratory infections
+J18,Lower respiratory infections
+J18.0,Lower respiratory infections
+J18.8,Lower respiratory infections
+J18.9,Lower respiratory infections
+J21.0,Lower respiratory infections
+J21.8,Lower respiratory infections
+J21.9,Lower respiratory infections
+J35.3,Other respiratory disease
+J39.0,Other respiratory disease
+J39.8,Other respiratory disease
+J44,Other respiratory disease
+J44.8,Other respiratory disease
+J44.9,Other respiratory disease
+J45.9,Other respiratory disease
+J46,Other respiratory disease
+J47,Other respiratory disease
+J68,Other respiratory disease
+J69,Other respiratory disease
+J69.0,Other respiratory disease
+J69.8,Other respiratory disease
+J80,Other respiratory disease
+J81,Other respiratory disease
+J84.0,Other respiratory disease
+J84.1,Other respiratory disease
+J84.8,Other respiratory disease
+J84.9,Other respiratory disease
+J85.0,Other respiratory disease
+J85.1,Lower respiratory infections
+J86.9,Lower respiratory infections
+J93,Other respiratory disease
+J93.9,Other respiratory disease
+J95.5,Other
+J98.4,Other respiratory disease
+JA21,Maternal hypertension
+JA23,Maternal hypertension
+JA24.1,Maternal hypertension
+JA62.4,NA
+JA63.2,Maternal diabetes
+JA80.0,Multiple gestation
+JA87,NA
+JA88.0,NA
+JA88.1,Chorioamnionitis and membrane complications
+JA8C.0,NA
+JA8E,Other labor and delivery complications
+JB00,Other labor and delivery complications
+JB00.1,Preterm labor or delivery
+JB04.1,Obstructed labor and fetal malpresentation
+JB06,Obstructed labor
+JB64.0,Other maternal factor
+K04.7,Other infections
+K12.2,Other infections
+K35.3,Other infections
+K42.0,Other
+K52.9,Diarrheal Diseases
+K55.0,Other gastrointestinal disease
+K56.1,Paralytic ileus and intestinal obstruction
+K56.2,Paralytic ileus and intestinal obstruction
+K56.6,Paralytic ileus and intestinal obstruction
+K56.7,Paralytic ileus and intestinal obstruction
+K63.1,Other
+K65.0,Other infections
+K70.9,Liver disease
+K71.1,Liver disease
+K71.6,Liver disease
+K71.9,Liver disease
+K72.0,Liver disease
+K72.1,Liver disease
+K72.9,Liver disease
+K73.9,Liver disease
+K74,Liver disease
+K74.5,Liver disease
+K74.6,Liver disease
+K75.9,Liver disease
+K76.5,Liver disease
+K76.6,Liver disease
+K76.9,Liver disease
+K83.1,Liver disease
+K83.9,Other
+K91.2,Other
+K91.4,Other
+K92.0,Other
+K92.2,Other
+K92.9,Other
+KA00.0,Maternal hypertension
+KA01,Other maternal factor
+KA01.1,Premature Rupture of membranes
+KA01.2,Uterine fluid disorders
+KA01.3,Uterine fluid disorders
+KA01.6,Other maternal factor
+KA02,Placental complications
+KA02.4,Placental complications
+KA03.0,Umbilical cord complications
+KA03.1,Umbilical cord complications
+KA04.0,Chorioamnionitis and membrane complications
+KA05.0,Obstructed labor and fetal malpresentation
+KA05.1,Obstructed labor and fetal malpresentation
+KA21.4,Neonatal preterm birth complications
+KA22.0,Other neonatal disorders
+KA22.2,Other neonatal disorders
+KA60,Neonatal sepsis
+KA65.1,Congenital infection
+KB20,Perinatal asphyxia/hypoxia
+KB21,Perinatal asphyxia/hypoxia
+KB23.0,Neonatal preterm birth complications
+KB24,NA
+KB26.0,Neonatal aspiration syndromes
+KB60.1,Other neonatal disorders
+KB87,Other neonatal disorders
+L01,Other skin and subcutaneous diseases
+L01.0,Other infections
+L02,Other skin and subcutaneous diseases
+L02.0,Other skin and subcutaneous diseases
+L02.1,Other infections
+L02.4,Other skin and subcutaneous diseases
+L03,Other infections
+L03.1,Other infections
+L12.2,Other skin and subcutaneous diseases
+L26,Other skin and subcutaneous diseases
+L51.2,Other skin and subcutaneous diseases
+L89,Other skin and subcutaneous diseases
+L98.4,Other skin and subcutaneous diseases
+LA8Z,Other neonatal disorders
+LB20.21,Congenital birth defects
+LD2Z,Congenital birth defects
+M00,Other infections
+M35.9,Other
+M72.6,Other infections
+M79.8,Other
+M86.9,Other infections
+MG48,Undetermined
+MH14,Undetermined
+N10,Other
+N11.9,Kidney Disease
+N17.9,Kidney Disease
+N18,Kidney Disease
+N18.9,Kidney Disease
+N19,Other
+N28.9,Kidney Disease
+N39.0,Other infections
+N76.0,Maternal infection
+N93,Other maternal factor
+N96,Other maternal factor
+O00.9,Other maternal factor
+O03,Spontaneous abortion
+O04,Other maternal factor
+O04.4,Other maternal factor
+O05,Other maternal factor
+O06.1,Other maternal factor
+O08.9,Other maternal factor
+O10,Maternal hypertension
+O10.0,Maternal hypertension
+O10.9,Maternal hypertension
+O11,Maternal hypertension
+O13,Maternal hypertension
+O14,Maternal hypertension
+O14.0,Maternal hypertension
+O14.1,Maternal hypertension
+O14.2,Maternal hypertension
+O14.9,Maternal hypertension
+O15,Maternal hypertension
+O15.0,Maternal hypertension
+O15.2,Maternal hypertension
+O15.9,Maternal hypertension
+O16,Maternal hypertension
+O22.3,Other maternal factor
+O23.5,Maternal infection
+O23.9,Other maternal factor
+O24,Maternal diabetes
+O24.0,Maternal diabetes
+O24.1,Maternal diabetes
+O24.3,Maternal diabetes
+O24.4,Maternal diabetes
+O24.41,Maternal diabetes
+O24.9,Maternal diabetes
+O26.1,Maternal nutritional disorders
+O26.8,Other maternal factor
+O30,Multiple gestation
+O30.0,Multiple gestation
+O30.1,Multiple gestation
+O30.9,Multiple gestation
+O31.8,Multiple gestation
+O32.1,Obstructed labor and fetal malpresentation
+O33.9,Obstructed labor and fetal malpresentation
+O34.1,Other maternal factor
+O34.3,Cervical insufficiency and pelvic anomalies
+O36.0,Other maternal factor
+O41.0,Chorioamnionitis and membrane complications
+O41.1,Chorioamnionitis and membrane complications
+O41.9,Other maternal factor
+O42.0,Premature Rupture of membranes
+O42.1,Premature Rupture of membranes
+O42.2,Premature Rupture of membranes
+O42.9,Premature Rupture of membranes
+O43.0,Placental complications
+O43.1,Placental complications
+O43.8,Placental complications
+O43.9,Placental complications
+O44,Placental complications
+O44.0,Placental complications
+O44.1,Placental complications
+O45,Placental complications
+O45.0,Placental complications
+O45.8,Placental complications
+O45.9,Placental complications
+O46,Other labor and delivery complications
+O46.9,Other labor and delivery complications
+O48,Other labor and delivery complications
+O60,Other labor and delivery complications
+O60.1,Preterm labor or delivery
+O60.2,Preterm labor or delivery
+O62.0,Other labor and delivery complications
+O63,Other labor and delivery complications
+O63.0,Other labor and delivery complications
+O63.1,Other labor and delivery complications
+O63.2,Other labor and delivery complications
+O63.9,Other labor and delivery complications
+O64,Obstructed labor and fetal malpresentation
+O64.1,Obstructed labor and fetal malpresentation
+O64.9,Obstructed labor and fetal malpresentation
+O65.4,Obstructed labor and fetal malpresentation
+O65.9,Obstructed labor and fetal malpresentation
+O66,Obstructed labor
+O66.0,Obstructed labor
+O66.3,Obstructed labor
+O66.9,Obstructed labor
+O68,Other labor and delivery complications
+O69.0,Prolapsed cord
+O69.1,Umbilical cord complications
+O69.2,Umbilical cord complications
+O69.9,Other labor and delivery complications
+O71,Other labor and delivery complications
+O71.0,Uterine rupture
+O71.1,Uterine rupture
+O71.9,Other labor and delivery complications
+O72,Other labor and delivery complications
+O72.0,Other labor and delivery complications
+O75.6,Other labor and delivery complications
+O75.9,Other labor and delivery complications
+O80.1,Other labor and delivery complications
+O85,Other maternal factor
+O88.1,Other labor and delivery complications
+O90.0,Other maternal factor
+O95,Other maternal factor
+O98,Maternal infection
+O98.0,Maternal infection
+O98.3,Maternal infection
+O98.6,Maternal infection
+O98.7,HIV
+O99.0,Other maternal factor
+P 20.1,Perinatal asphyxia/hypoxia
+P 36.4,Neonatal sepsis
+P00.0,Maternal hypertension
+P00.1,Other maternal factor
+P00.2,Maternal infection
+P00.3,Maternal circulatory and respiratory diseases
+P00.4,Maternal nutritional disorders
+P00.5,Maternal injury and accident
+P00.6,Maternal surgical and medical procedures
+P00.7,Other maternal factor
+P00.8,Other maternal factor
+P00.9,Other maternal factor
+P01,Cervical insufficiency and pelvic anomalies
+P01.0,Cervical insufficiency and pelvic anomalies
+P01.1,Premature Rupture of membranes
+P01.2,Uterine fluid disorders
+P01.3,Uterine fluid disorders
+P01.4,Other maternal factor
+P01.5,Multiple gestation
+P01.6,Other maternal factor
+P01.7,Malpresentation before labor
+P01.8,Other maternal factor
+P01.9,Other maternal factor
+P02,Placental complications
+P02.0,Placental complications
+P02.1,Placental complications
+P02.2,Placental complications
+P02.3,Placental complications
+P02.4,Umbilical cord complications
+P02.5,Umbilical cord complications
+P02.6,Umbilical cord complications
+P02.7,Chorioamnionitis and membrane complications
+P02.8,Chorioamnionitis and membrane complications
+P02.9,Chorioamnionitis and membrane complications
+P03.0,Obstructed labor and fetal malpresentation
+P03.1,Obstructed labor and fetal malpresentation
+P03.2,Other labor and delivery complications
+P03.3,Other labor and delivery complications
+P03.4,Cesarean delivery
+P03.5,Other labor and delivery complications
+P03.6,Other labor and delivery complications
+P03.8,Other labor and delivery complications
+P03.9,Other labor and delivery complications
+P04.1,Maternal medication or toxic exposure
+P04.2,Maternal medication or toxic exposure
+P04.4,Maternal medication or toxic exposure
+P05.0,Other neonatal disorders
+P05.1,Other neonatal disorders
+P05.2,Other neonatal disorders
+P05.9,Other neonatal disorders
+P07.0,Neonatal preterm birth complications
+P07.1,Neonatal preterm birth complications
+P07.14,Neonatal preterm birth complications
+P07.15,Neonatal preterm birth complications
+P07.18,Neonatal preterm birth complications
+P07.2,Neonatal preterm birth complications
+P07.3,Neonatal preterm birth complications
+P08,Other neonatal disorders
+P08.0,Other neonatal disorders
+P08.1,Other neonatal disorders
+P08.2,Other neonatal disorders
+P10.3,Birth trauma
+P12.2,Birth trauma
+P13,Birth trauma
+P15,Birth trauma
+P15.8,Birth trauma
+P15.9,Birth trauma
+P20,Perinatal asphyxia/hypoxia
+P20.0,Perinatal asphyxia/hypoxia
+P20.1,Perinatal asphyxia/hypoxia
+P20.9,Perinatal asphyxia/hypoxia
+P21,Perinatal asphyxia/hypoxia
+P21.0,Perinatal asphyxia/hypoxia
+P21.1,Perinatal asphyxia/hypoxia
+P21.9,Perinatal asphyxia/hypoxia
+P22,Neonatal preterm birth complications
+P22.0,Neonatal preterm birth complications
+P22.1,Neonatal preterm birth complications
+P22.9,Neonatal preterm birth complications
+P23,Congenital infection
+P23.0,Congenital infection
+P23.2,Congenital infection
+P23.3,Congenital infection
+P23.4,Congenital infection
+P23.6,Congenital infection
+P23.8,Congenital infection
+P23.9,Congenital infection
+P24,Neonatal aspiration syndromes
+P24.0,Neonatal aspiration syndromes
+P24.1,Neonatal aspiration syndromes
+P24.8,Neonatal aspiration syndromes
+P24.9,Neonatal aspiration syndromes
+P25.1,Neonatal preterm birth complications
+P25.2,Neonatal preterm birth complications
+P26,Neonatal preterm birth complications
+P26.0,Other neonatal disorders
+P26.8,Neonatal preterm birth complications
+P26.9,Neonatal preterm birth complications
+P27.1,Neonatal preterm birth complications
+P28.0,Neonatal preterm birth complications
+P28.4,Other neonatal disorders
+P29.0,Other neonatal disorders
+P29.2,Other neonatal disorders
+P29.3,Other neonatal disorders
+P29.8,Other neonatal disorders
+P35.1,Congenital infection
+P35.2,Congenital infection
+P35.8,Congenital infection
+P36,Neonatal sepsis
+P36.0,Neonatal sepsis
+P36.1,Neonatal sepsis
+P36.2,Neonatal sepsis
+P36.3,Neonatal sepsis
+P36.4,Neonatal sepsis
+P36.5,Neonatal sepsis
+P36.8,Neonatal sepsis
+P36.9,Neonatal sepsis
+P37.0,Congenital infection
+P37.1,Congenital infection
+P37.2,Congenital infection
+P37.3,Congenital infection
+P37.4,Congenital infection
+P37.5,Congenital infection
+P37.8,Congenital infection
+P38,Congenital infection
+P39.2,Congenital infection
+P39.8,Other infections
+P39.9,Congenital infection
+P50.0,Other neonatal disorders
+P51.0,Other neonatal disorders
+P51.9,Other neonatal disorders
+P52.0,Other neonatal disorders
+P52.1,Other neonatal disorders
+P52.2,Other neonatal disorders
+P52.3,Other neonatal disorders
+P52.4,Other neonatal disorders
+P52.8,Other neonatal disorders
+P52.9,Other neonatal disorders
+P54,Other neonatal disorders
+P54.2,Other
+P54.8,Other neonatal disorders
+P55.0,Other neonatal disorders
+P55.1,Other neonatal disorders
+P55.9,Other neonatal disorders
+P56.9,Other neonatal disorders
+P57.0,Other neonatal disorders
+P57.8,Other neonatal disorders
+P57.9,Other neonatal disorders
+P59,Other neonatal disorders
+P59.0,Other neonatal disorders
+P59.2,Other neonatal disorders
+P59.9,Other neonatal disorders
+P60,Other neonatal disorders
+P61.0,Other neonatal disorders
+P61.4,Other neonatal disorders
+P70.1,Other neonatal disorders
+P70.4,Other neonatal disorders
+P74.1,Other neonatal disorders
+P76,Other neonatal disorders
+P76.9,Other neonatal disorders
+P77,Other neonatal disorders
+P78.0,Other neonatal disorders
+P78.1,Other neonatal disorders
+P80,Other neonatal disorders
+P80.9,Other neonatal disorders
+P83.2,Other neonatal disorders
+P83.3,Other neonatal disorders
+P90,Other neonatal disorders
+P91,Neonatal encephalopathy
+P91.0,Neonatal encephalopathy
+P91.2,Neonatal encephalopathy
+P91.6,Neonatal encephalopathy
+P91.8,Neonatal encephalopathy
+P92.0,Other neonatal disorders
+P95,Undetermined
+P96.4,Other 
+PA9Z,NA
+Q00,Congenital birth defects
+Q00.0,Congenital birth defects
+Q00.1,Congenital birth defects
+Q00.2,Congenital birth defects
+Q01.2,Congenital birth defects
+Q01.8,Congenital birth defects
+Q02,Congenital birth defects
+Q03,Congenital birth defects
+Q03.1,Congenital birth defects
+Q03.9,Congenital birth defects
+Q04.2,Congenital birth defects
+Q04.3,Congenital birth defects
+Q04.6,Congenital birth defects
+Q04.9,Congenital birth defects
+Q05,Congenital birth defects
+Q05.0,Congenital birth defects
+Q05.1,Congenital birth defects
+Q05.2,Congenital birth defects
+Q05.3,Congenital birth defects
+Q05.4,Congenital birth defects
+Q05.6,Congenital birth defects
+Q05.7,Congenital birth defects
+Q05.9,Congenital birth defects
+Q07,Congenital birth defects
+Q07.9,Congenital birth defects
+Q11.1,Congenital birth defects
+Q17,Congenital birth defects
+Q18,Congenital birth defects
+Q18.9,Congenital birth defects
+Q20.0,Congenital birth defects
+Q21,Congenital birth defects
+Q21.0,Congenital birth defects
+Q21.1,Congenital birth defects
+Q21.3,Congenital birth defects
+Q23.4,Congenital birth defects
+Q24,Congenital birth defects
+Q24.8,Congenital birth defects
+Q24.9,Congenital birth defects
+Q25.0,Congenital birth defects
+Q25.1,Congenital birth defects
+Q28.8,Congenital birth defects
+Q31.0,Congenital birth defects
+Q31.1,Congenital birth defects
+Q33.0,Congenital birth defects
+Q35,Congenital birth defects
+Q35.9,Congenital birth defects
+Q37.8,Congenital birth defects
+Q37.9,Congenital birth defects
+Q38.0,Congenital birth defects
+Q39.1,Congenital birth defects
+Q39.2,Congenital birth defects
+Q41.0,Congenital birth defects
+Q41.1,Congenital birth defects
+Q41.2,Congenital birth defects
+Q42.0,Congenital birth defects
+Q42.2,Congenital birth defects
+Q42.3,Congenital birth defects
+Q42.9,Congenital birth defects
+Q43,Congenital birth defects
+Q43.1,Congenital birth defects
+Q43.3,Congenital birth defects
+Q43.8,Congenital birth defects
+Q44.2,Congenital birth defects
+Q44.7,Congenital birth defects
+Q56.4,Congenital birth defects
+Q60.1,Congenital birth defects
+Q61.3,Congenital birth defects
+Q61.9,Congenital birth defects
+Q62.0,Congenital birth defects
+Q63.9,Congenital birth defects
+Q64,Congenital birth defects
+Q64.2,Congenital birth defects
+Q64.9,Congenital birth defects
+Q67.8,Congenital birth defects
+Q68.1,Congenital birth defects
+Q69.9,Congenital birth defects
+Q71.0,Congenital birth defects
+Q73.0,Congenital birth defects
+Q73.8,Congenital birth defects
+Q75.3,Congenital birth defects
+Q77,Congenital birth defects
+Q77.1,Congenital birth defects
+Q78.0,Congenital birth defects
+Q78.9,Congenital birth defects
+Q79,Congenital birth defects
+Q79.0,Congenital birth defects
+Q79.2,Congenital birth defects
+Q79.3,Congenital birth defects
+Q79.4,Congenital birth defects
+Q79.5,Congenital birth defects
+Q80.4,Congenital birth defects
+Q80.9,Congenital birth defects
+Q81.9,Congenital birth defects
+Q86.2,Congenital birth defects
+Q87,Congenital birth defects
+Q87.0,Congenital birth defects
+Q87.1,Congenital birth defects
+Q87.2,Congenital birth defects
+Q87.8,Congenital birth defects
+Q89,Congenital birth defects
+Q89.4,Congenital birth defects
+Q89.7,Congenital birth defects
+Q89.9,Congenital birth defects
+Q90,Congenital birth defects
+Q90.9,Congenital birth defects
+Q91.1,Congenital birth defects
+Q91.3,Congenital birth defects
+Q91.7,Congenital birth defects
+Q93.2,Congenital birth defects
+Q98.0,Congenital birth defects
+Q99,Congenital birth defects
+Q99.9,Congenital birth defects
+QA46.J,NA
+QA4A,Multiple gestation
+QC90.6,HIV exposure
+R04.8,Other respiratory disease
+R06.8,Other respiratory disease
+R10.0,Other
+R11,Diarrheal Diseases
+R14,Other
+R19.8,Other
+R22,Other
+R29.8,Other
+R45.6,Other
+R50.9,Other
+R56.0,Other
+R56.8,Other neurological disorders
+R57.1,"Other disorders of fluid, electrolyte and acid-base balance"
+R57.2,Sepsis
+R62.0,Other
+R62.8,Other
+R63.3,Other
+R65.9,Other
+R69,Undetermined
+R73.9,Other
+R90.0,Other
+R95,Sudden infant death syndrome
+R95.0,Sudden infant death syndrome
+R96,Undetermined
+R99,Undetermined
+S06.2,Other neurological disorders
+S06.5,Injury
+S06.8,Injury
+S06.9,Injury
+S07,Injury
+S09.8,Injury
+S09.9,Injury
+S37.6,Other labor and delivery complications
+S71.1,Other
+S91.3,Injury
+T02.9,Injury
+T07,Injury
+T14.9,Injury
+T17.4,Injury
+T17.810A,Injury
+T17.9,Injury
+T20,Injury
+T21,Injury
+T21.0,Injury
+T21.3,Injury
+T28.3,Injury
+T29,Injury
+T29.0,Injury
+T29.2,Injury
+T29.3,Injury
+T30,Injury
+T30.0,Injury
+T31.0,Injury
+T31.1,Injury
+T31.2,Injury
+T31.3,Injury
+T31.5,Injury
+T31.6,Injury
+T41.2,Poisoning
+T45.1,Poisoning
+T47.4,Poisoning
+T50.9,Poisoning
+T55,Poisoning
+T58,Poisoning
+T60.0,Poisoning
+T65,Poisoning
+T65.9,Poisoning
+T68,Other
+T69,Other
+T71,Injury
+T73.0,Other
+T74.1,Injury
+T74.8,Injury
+T75.1,Injury
+T75.4,Injury
+T80.2,Other
+T81,Other
+T81.4,Other
+T81.9,Other
+T85.0,Other
+T85.5,Other
+T85.6,Other
+T85.7,Other
+T88.3,Other
+T88.8,Other
+T88.9,Other
+U04.9,Lower respiratory infections
+U07.1,Other infections
+UO7.1,Other
+V03.9,Injury
+V09,Injury
+V09.2,Injury
+V09.3,Road injuries
+V09.9,Injury
+V89.2,Injury
+W22,Injury
+W65,Injury
+W70,injury
+W73,Injury
+W74,injury
+W75,Injury
+W78,Other respiratory disease
+W79,Other respiratory disease
+W80,Injury
+X11,Injury
+X12,Injury
+X47,Poisoning
+X48,Poisoning
+X49,Poisoning
+X68,Poisoning
+X95,Injury
+XN3NM,NA
+XN6P4,Other infections
+XN741,NA
+Y07.9,Injury
+Y44.2,Other
+Y60.0,Other
+Y63.0,Other
+Y63.8,Other
+Y65.2,Other
+Y66,Other
+Y83.3,Other
+Y84.0,Other
+Y84.4,Other
+Y88.1,Other
+Y88.3,Other
+Z20.6,HIV exposure
+Z21,HIV
+Z22.3,Other
+Z22.8,Other
+Z35.2,Other maternal factor
+Z35.3,Other maternal factor
+Z35.4,Other maternal factor
+Z35.5,Other maternal factor
+Z35.6,Other maternal factor
+Z38.1,Other maternal factor
+Z53.2,Other
+Z55.9,Other
+Z62.4,Other
+Z64.0,Other maternal factor
+Z64.1,Multiple gestation
+Z75.8,Other
+Z87.0,Other respiratory disease
+Z87.5,Other maternal factor
+Z91.7,Other
