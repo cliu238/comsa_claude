@@ -80,27 +80,6 @@ poetry run
   - Bug fixes: `fix/issue-123-brief-description`
   - Hotfixes: `hotfix/critical-issue-description`
   - Always include issue number when applicable
-- **Pull Request Guidelines**:
-
-  - **PR Title**: Clear, descriptive summary (e.g., "Add user authentication with JWT")
-  - **PR Description Template**:
-    ```
-    ## Summary
-    Brief description of changes
-
-    ## Related Issue
-    Fixes #123 (or Closes #123, Resolves #123)
-
-    ## Changes Made
-    - List key changes
-    - Include any breaking changes
-
-    ## Testing
-    - How to test the changes
-    - Any specific test cases covered
-    ```
-  - **Draft PRs**: Use for work-in-progress to get early feedback
-  - **Reviews**: Wait for at least one approval before merging
 - **Commit Message Standards**:
 
   - Follow conventional commits: `type(scope): description`
@@ -139,10 +118,6 @@ poetry run
 - **Update `README.md`** when new features are added, dependencies change, or setup steps are modified.
 - **Comment non-obvious code** and ensure everything is understandable to a mid-level developer.
 - When writing complex logic, **add an inline `# Reason:` comment** explaining the why, not just the what.
-- **For each pipeline component**, maintain separate documentation:
-  - `baseline_benchmark.md` - Baseline methodology and results
-  - `transfer_learning.md` - Transfer learning approach
-  - `active_learning.md` - Active learning strategy
 
 ### 🧠 AI Behavior Rules
 
