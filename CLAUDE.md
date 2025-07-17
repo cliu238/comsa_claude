@@ -50,33 +50,34 @@
 ### 🔄 Development Workflow
 
 - **Branch Naming Conventions**:
+
   - Feature branches: `feature/issue-123-brief-description`
   - Bug fixes: `fix/issue-123-brief-description`
   - Hotfixes: `hotfix/critical-issue-description`
   - Always include issue number when applicable
-
 - **Pull Request Guidelines**:
+
   - **PR Title**: Clear, descriptive summary (e.g., "Add user authentication with JWT")
   - **PR Description Template**:
     ```
     ## Summary
     Brief description of changes
-    
+
     ## Related Issue
     Fixes #123 (or Closes #123, Resolves #123)
-    
+
     ## Changes Made
     - List key changes
     - Include any breaking changes
-    
+
     ## Testing
     - How to test the changes
     - Any specific test cases covered
     ```
   - **Draft PRs**: Use for work-in-progress to get early feedback
   - **Reviews**: Wait for at least one approval before merging
-
 - **Commit Message Standards**:
+
   - Follow conventional commits: `type(scope): description`
   - Types: `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`
   - Example: `feat(auth): add JWT token validation`
@@ -89,7 +90,11 @@
 - **Follow PEP8**, use type hints, and format with `black`.
 - **Use `pydantic` for data validation**.
 - **Use `pandas` for data manipulation** and `scikit-learn` for ML utilities.
-- **For VA-specific algorithms**, use the OpenVA library via Docker when needed.
+- **For VA-specific algorithms (openVA, InSilicoVA, InterVA)**:
+  - Use the Docker image provided at `models/insilico/Dockerfile`
+  - Keep R code isolated within Docker containers
+  - Use Python to orchestrate Docker container calls
+  - Document any new R dependencies in the Dockerfile
 - Write **docstrings for every function** using the Google style:
   ```python
   def example():
@@ -152,6 +157,35 @@
 - **Always confirm file paths and module names** exist before referencing them in code or tests.
 - **Never delete or overwrite existing code** unless explicitly instructed to or if part of a documented GitHub Issue.
 - **For VA-specific terms**, use standard terminology (COD, CSMF, VA, etc.) consistently.
+
+### ⏱️ Execution Time Constraints
+
+- **Claude Code has a 5-minute execution timeout** for any single command.
+- **For long-running computations** (e.g., extensive model training, large-scale cross-validation):
+
+  - Create standalone Python scripts that users can run manually
+  - Make scripts executable with proper shebang (`#!/usr/bin/env python`)
+  - Include clear usage instructions at the top of the script:
+    ```python
+    """
+    Long-running VA model training script
+
+    Usage: python train_models.py --data path/to/data.csv
+
+    Expected runtime: ~2 hours for full cross-validation
+    Progress will be saved to checkpoints/ directory
+    """
+    ```
+  - Implement checkpointing to allow resuming interrupted runs
+  - Add progress indicators using `tqdm` or logging
+  - Log intermediate results for debugging
+- **Design considerations for manual execution scripts**:
+
+  - Use argparse for command-line arguments
+  - Provide sensible defaults
+  - Include `--dry-run` option for testing
+  - Save outputs incrementally, not just at the end
+  - Add verbose logging with timestamps
 
 ### 🔒 Data Privacy & Security
 
