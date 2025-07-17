@@ -5,7 +5,32 @@
 - **For VA pipeline tasks**, check the appropriate documentation base on the task, either `baseline_benchmark.md`, `transfer_learning.md`, or `active_learning.md`.
 - **Use consistent naming conventions, file structure, and architecture patterns** as described in this document.
 - **Use venv_linux** (the virtual environment) whenever executing Python commands, including for unit tests.
-- **Poetry is used for dependency management** - use `poetry install` and `poetry add` for package management.
+- ****CRITICAL:** **Poetry is used for dependency management** - use `poetry install` and `poetry add` for package management.
+
+## Core Principles
+
+**IMPORTANT: You MUST follow these principles in all code changes and PRP generations:**
+
+### KISS (Keep It Simple, Stupid)
+
+- Simplicity should be a key goal in design
+- Choose straightforward solutions over complex ones whenever possible
+- Simple solutions are easier to understand, maintain, and debug
+
+### YAGNI (You Aren't Gonna Need It)
+
+- Avoid building functionality on speculation
+- Implement features only when they are needed, not when you anticipate they might be useful in the future
+
+### Open/Closed Principle
+
+- Software entities should be open for extension but closed for modification
+- Design systems so that new functionality can be added with minimal changes to existing code
+
+
+### Essential poetry Commands
+
+poetry run
 
 ### 🧱 Code Structure & Modularity
 
@@ -17,7 +42,6 @@
   - `active/` - Active learning modules
   - `models/` - Model implementations
   - `data/` - Data processing utilities
-  - `evaluation/` - Metrics and evaluation functions
 - **Use clear, consistent imports** (prefer relative imports within packages).
 - **Use python_dotenv and load_env()** for environment variables.
 
@@ -109,37 +133,6 @@
       """
   ```
 
-### 📊 VA Pipeline Specific Guidelines
-
-- **Data Handling**:
-
-  - Always validate VA data format before processing
-  - Use standardized column names across all datasets
-  - Implement age-group and site stratification for splits
-  - Handle missing data appropriately for each algorithm
-- **Model Training**:
-
-  - Use 5-fold cross-validation for hyperparameter tuning
-  - Implement stratified train/test splits
-  - Save trained models with versioning
-  - Log all hyperparameters and results
-- **Evaluation**:
-
-  - Always calculate CSMF accuracy, Top-1/Top-3 COD accuracy
-  - Generate confusion matrices for cause assignments
-  - Create comparison tables across all models
-  - Export results in standardized CSV format
-- **Transfer Learning**:
-
-  - Document source and target domain mappings
-  - Implement domain adaptation techniques from ADAPT library
-  - Track performance degradation/improvement
-- **Active Learning**:
-
-  - Implement uncertainty sampling strategies
-  - Track annotation budget and efficiency
-  - Document query selection criteria
-
 ### 📚 Documentation & Explainability
 
 - **Update `README.md`** when new features are added, dependencies change, or setup steps are modified.
@@ -189,7 +182,7 @@
 
 ### 🔒 Data Privacy & Security
 
-- **Never commit raw VA data** containing personal identifiers
-- **Use anonymized IDs** for all data processing
-- **Store sensitive data** only in designated secure directories
-- **Document data access requirements** in README
+- **Never assume missing context. Ask questions if uncertain.**
+- **Never hallucinate libraries or functions** – only use known, verified Python packages.
+- **Always confirm file paths and module names** exist before referencing them in code or tests.
+- **Never delete or overwrite existing code** unless explicitly instructed to or if part of a task
