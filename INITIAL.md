@@ -7,16 +7,8 @@
 
 ## EXAMPLES:
 
-In the `models/` folder, there are existing model implementations:
-- `models/base.py` - Base model interface for all VA models
-- `models/xgboost_model.py` - XGBoost implementation for baseline benchmark
-- `models/logistic_regression_model.py` - Logistic regression baseline
-- `models/random_forest_model.py` - Random forest baseline
-- `models/ebm_model.py` - Explainable Boosting Machine implementation
-- `models/insilico_va_model.py` - InSilicoVA wrapper
-- `models/representation_learning.py` - Tabular representation learning utilities
-
 Data samples available in `data/`:
+
 - `data/raw/PHMRC/` - PHMRC gold standard VA data (adult, child, neonate)
 - `data/raw/MITS/` - MITS VA data files
 - `data/raw/COMSA/` - COMSA WHO-2016 VA files
@@ -26,9 +18,6 @@ Data samples available in `data/`:
 
 - OpenVA library: https://github.com/verbal-autopsy-software/openVA
 - VA data preprocessing: https://github.com/JH-DSAI/va-data
-- ADAPT transfer learning: https://github.com/adapt-python/adapt
-- TransTab documentation: https://github.com/RyanWangZf/transtab
-- PHMRC dataset: https://www.healthdata.org/research-analysis/diseases-injuries/phmrc
 
 ## OTHER CONSIDERATIONS:
 
