@@ -51,7 +51,9 @@
       "Bash(timeout:*)",
       "Bash(mkdir:*)",
       "Bash(mv:*)",
-      "Bash(poetry:*)"
+      "Bash(poetry:*)",
+      "Bash(gh repo view:*)",
+      "Bash(gh repo clone:*)"
     ],
     "deny": []
   }
