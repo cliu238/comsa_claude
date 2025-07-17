@@ -6,6 +6,7 @@
 - **Use consistent naming conventions, file structure, and architecture patterns** as described in this document.
 - **Use venv_linux** (the virtual environment) whenever executing Python commands, including for unit tests.
 - ****CRITICAL:** **Poetry is used for dependency management** - use `poetry install` and `poetry add` for package management.
+- ****CRITICAL:** **Do NOT use mock model/lib/data expect testing**
 
 ## Core Principles
 
