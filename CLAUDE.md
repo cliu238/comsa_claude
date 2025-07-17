@@ -1,9 +1,9 @@
 ### 🔄 Project Awareness & Context
 
-- **Always read `PLANNING.md`** at the start of a new conversation to understand the project's architecture, goals, style, and constraints.
-- **Check `TASK.md`** before starting a new task. If the task isn't listed, add it with a brief description and today's date.
+- **This CLAUDE.md file serves as the central planning document** containing the project's architecture, goals, style, and constraints.
+- **Use GitHub Issues/Projects for task management** - Check existing issues before starting a new task. Create new issues for tasks that aren't tracked.
 - **For VA pipeline tasks**, check the appropriate documentation base on the task, either `baseline_benchmark.md`, `transfer_learning.md`, or `active_learning.md`.
-- **Use consistent naming conventions, file structure, and architecture patterns** as described in `PLANNING.md`.
+- **Use consistent naming conventions, file structure, and architecture patterns** as described in this document.
 - **Use venv_linux** (the virtual environment) whenever executing Python commands, including for unit tests.
 - **Poetry is used for dependency management** - use `poetry install` and `poetry add` for package management.
 
@@ -38,12 +38,50 @@
 
 ### ✅ Task Completion
 
-- **Mark completed tasks in `TASK.md`** immediately after finishing them.
-- Add new sub-tasks or TODOs discovered during development to `TASK.md` under a "Discovered During Work" section.
+- **Update GitHub Issues with progress** - Add brief comments about approach and any blockers encountered during development.
+- **Link PRs to Issues** - Use keywords like `Fixes #123` in PR descriptions to auto-close issues when merged.
+- **Create new GitHub Issues** for any sub-tasks or TODOs discovered during development, linking them to the parent issue when applicable.
+- **Follow team's issue closing policy** - Issues typically close on PR merge, not immediately after code completion.
 - **For pipeline deliverables**, ensure output files are saved in appropriate directories:
   - `results/baseline/benchmark_results.csv`
   - `results/transfer/transfer_results.csv`
   - `results/active/active_learning_results.csv`
+
+### 🔄 Development Workflow
+
+- **Branch Naming Conventions**:
+  - Feature branches: `feature/issue-123-brief-description`
+  - Bug fixes: `fix/issue-123-brief-description`
+  - Hotfixes: `hotfix/critical-issue-description`
+  - Always include issue number when applicable
+
+- **Pull Request Guidelines**:
+  - **PR Title**: Clear, descriptive summary (e.g., "Add user authentication with JWT")
+  - **PR Description Template**:
+    ```
+    ## Summary
+    Brief description of changes
+    
+    ## Related Issue
+    Fixes #123 (or Closes #123, Resolves #123)
+    
+    ## Changes Made
+    - List key changes
+    - Include any breaking changes
+    
+    ## Testing
+    - How to test the changes
+    - Any specific test cases covered
+    ```
+  - **Draft PRs**: Use for work-in-progress to get early feedback
+  - **Reviews**: Wait for at least one approval before merging
+
+- **Commit Message Standards**:
+  - Follow conventional commits: `type(scope): description`
+  - Types: `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`
+  - Example: `feat(auth): add JWT token validation`
+  - Keep first line under 72 characters
+  - Add detailed description after blank line if needed
 
 ### 📎 Style & Conventions
 
@@ -112,7 +150,7 @@
 - **Never assume missing context. Ask questions if uncertain.**
 - **Never hallucinate libraries or functions** – only use known, verified Python packages.
 - **Always confirm file paths and module names** exist before referencing them in code or tests.
-- **Never delete or overwrite existing code** unless explicitly instructed to or if part of a task from `TASK.md`.
+- **Never delete or overwrite existing code** unless explicitly instructed to or if part of a documented GitHub Issue.
 - **For VA-specific terms**, use standard terminology (COD, CSMF, VA, etc.) consistently.
 
 ### 🔒 Data Privacy & Security
