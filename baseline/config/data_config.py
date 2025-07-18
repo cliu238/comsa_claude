@@ -2,7 +2,7 @@
 
 import logging
 from pathlib import Path
-from typing import List, Optional, Literal
+from typing import List, Optional
 
 from pydantic import BaseModel, Field, field_validator
 
@@ -23,21 +23,6 @@ class DataConfig(BaseModel):
         default_factory=list, description="Columns to drop during processing"
     )
     stratify_by_site: bool = Field(True, description="Enable site-based stratification")
-    
-    # Data splitting configuration
-    split_strategy: Literal["train_test", "cross_site", "stratified_site"] = Field(
-        "train_test", description="Data splitting strategy"
-    )
-    test_size: float = Field(0.3, description="Test size ratio (0.0-1.0)")
-    random_state: int = Field(42, description="Random seed for reproducibility")
-    site_column: str = Field("site", description="Column name containing site information")
-    label_column: str = Field("va34", description="Column name containing target labels")
-    train_sites: Optional[List[str]] = Field(
-        None, description="Specific sites to use for training (cross_site mode)"
-    )
-    test_sites: Optional[List[str]] = Field(
-        None, description="Specific sites to use for testing (cross_site mode)"
-    )
 
     @field_validator("data_path")
     @classmethod
@@ -58,14 +43,6 @@ class DataConfig(BaseModel):
         if not path.exists():
             path.mkdir(parents=True, exist_ok=True)
             logging.info(f"Created output directory: {v}")
-        return v
-
-    @field_validator("test_size")
-    @classmethod
-    def validate_test_size(cls, v: float) -> float:
-        """Validate test size is between 0.0 and 1.0."""
-        if not 0.0 < v < 1.0:
-            raise ValueError(f"test_size must be between 0.0 and 1.0, got: {v}")
         return v
 
     def get_output_path(self, dataset_name: str, encoding_type: str) -> Path:

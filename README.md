@@ -335,16 +335,7 @@ config = DataConfig(
     output_dir="results/baseline/",
     openva_encoding=False,  # True for InSilicoVA, False for ML
     drop_columns=[],        # Optional columns to exclude
-    stratify_by_site=True,  # Enable site-based stratification
-    
-    # Data splitting configuration
-    split_strategy="train_test",  # Options: "train_test", "cross_site", "stratified_site"
-    test_size=0.3,               # Test set ratio (0.0-1.0)
-    random_state=42,             # Random seed for reproducibility
-    site_column="site",          # Column containing site information
-    label_column="va34",         # Column containing target labels
-    train_sites=None,            # Sites for training (cross_site mode)
-    test_sites=None              # Sites for testing (cross_site mode)
+    stratify_by_site=True   # Enable site-based stratification
 )
 ```
 
@@ -359,74 +350,6 @@ The pipeline generates two files per processing run in `results/baseline/process
 2. **Metadata JSON Files**
    - Contains processing configuration, timestamp, data shape, column names, and cause-of-death distribution
    - Example: `adult_numeric_20250717_163737.metadata.json`
-
-### Data Splitting
-
-The pipeline includes a flexible data splitting module for creating train/test splits suitable for various VA analysis scenarios:
-
-#### Quick Start
-
-```bash
-# Run the data splitting example
-poetry run python baseline/example_data_splitting.py
-```
-
-#### Split Strategies
-
-**1. Standard Train/Test Split**
-- Standard scikit-learn style split across all sites
-- Maintains overall label distribution (stratified)
-- Best for: General ML model evaluation
-
-```python
-from baseline.data.data_splitter import VADataSplitter
-
-config = DataConfig(
-    data_path="path/to/data.csv",
-    split_strategy="train_test",
-    test_size=0.3,
-    random_state=42
-)
-
-splitter = VADataSplitter(config)
-splits = splitter.split_data(data)
-# Returns: {"train": DataFrame, "test": DataFrame}
-```
-
-**2. Cross-Site Split**
-- Train on specific sites, test on others
-- Tests model generalization across geographic regions
-- Best for: Domain adaptation and generalization studies
-
-```python
-config = DataConfig(
-    data_path="path/to/data.csv",
-    split_strategy="cross_site",
-    train_sites=["Site_A", "Site_B"],
-    test_sites=["Site_C", "Site_D"]
-)
-```
-
-**3. Stratified Site Split**
-- Maintains label distribution within each site
-- Ensures balanced representation across all sites
-- Best for: Site-specific analysis and comparison
-
-```python
-config = DataConfig(
-    data_path="path/to/data.csv",
-    split_strategy="stratified_site",
-    test_size=0.25  # 25% from each site goes to test
-)
-```
-
-#### Key Features
-
-- **Reproducible**: Same random seed produces identical splits
-- **Validated**: Comprehensive error handling and validation
-- **Flexible**: Works with any VA dataset with site and label columns
-- **Documented**: Detailed statistics and logging for each split
-- **Tested**: >92% test coverage with comprehensive unit tests
 
 ### Testing
 
@@ -459,18 +382,15 @@ context-engineering-intro/
 │   │   └── data_config.py    # Configuration management
 │   ├── data/
 │   │   ├── __init__.py
-│   │   ├── data_loader_preprocessor.py  # Core processing logic
-│   │   └── data_splitter.py  # Data splitting utilities
-│   ├── example_usage.py      # Data processing demonstration
-│   └── example_data_splitting.py  # Data splitting demonstration
+│   │   └── data_loader_preprocessor.py  # Core processing logic
+│   └── example_usage.py      # Usage demonstration
 ├── examples/                  # Your code examples
 │   └── data_validation.py    # Reference VA data processing
 ├── tests/
 │   ├── __init__.py
 │   └── baseline/
 │       ├── __init__.py
-│       ├── test_data_loader.py  # Data processing unit tests
-│       └── test_data_splitter.py  # Data splitting unit tests
+│       └── test_data_loader.py  # Unit tests
 ├── results/
 │   └── baseline/
 │       ├── processed_data/   # Output CSV and metadata files
