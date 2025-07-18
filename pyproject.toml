@@ -53,3 +53,12 @@ disallow_incomplete_defs = true
 [[tool.mypy.overrides]]
 module = "va_data.*"
 ignore_missing_imports = true
+
+[tool.ruff]
+line-length = 88
+target-version = "py312"
+
+[tool.ruff.lint]
+ignore = [
+    "E402",  # Module level import not at top of file (needed for sys.path modifications)
+]
