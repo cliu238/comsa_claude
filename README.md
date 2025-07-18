@@ -34,6 +34,7 @@ cd Context-Engineering-Intro
 - [What is Context Engineering?](#what-is-context-engineering)
 - [Template Structure](#template-structure)
 - [Step-by-Step Guide](#step-by-step-guide)
+- [Docker Setup for InSilicoVA](#docker-setup-for-insilicova)
 - [Writing Effective INITIAL.md Files](#writing-effective-initialmd-files)
 - [The PRP Workflow](#the-prp-workflow)
 - [Using Examples Effectively](#using-examples-effectively)
@@ -160,6 +161,52 @@ The AI coding assistant will:
 3. Execute each step with validation
 4. Run tests and fix any issues
 5. Ensure all success criteria are met
+
+## Docker Setup for InSilicoVA
+
+This project includes a complete Docker environment for running InSilicoVA verbal autopsy evaluations. The Docker setup is essential for reproducible research and ensures all R packages and Java dependencies are properly configured.
+
+### 🐳 Quick Docker Setup
+
+```bash
+# 1. Build and test your Docker setup
+./build-docker.sh
+
+# 2. Build the image manually (if needed)
+# For Apple Silicon (M1/M2):
+docker build -t insilicova-arm64:latest --platform linux/arm64 .
+
+# For Intel/AMD:
+docker build -t insilicova-amd64:latest --platform linux/amd64 .
+
+# 3. Run InSilicoVA evaluations
+poetry run python baseline/run_ap_only_insilico.py
+poetry run python baseline/run_full_insilico.py
+```
+
+### 📋 What's Included
+
+- **Base**: Ubuntu 22.04 with R 4.4.3
+- **Java 11**: Required for InSilicoVA backend
+- **R Packages**: openVA, InSilicoVA, dplyr, and analysis tools
+- **Validated**: Against R Journal 2023 benchmarks
+
+### 🔧 Key Files
+
+- `Dockerfile` - Complete Docker image definition
+- `DOCKER_USAGE.md` - Detailed usage guide
+- `build-docker.sh` - Automated build and testing script
+- **Working SHA**: `sha256:61df64731dec9b9e188b2b5a78000dd81e63caf78957257872b9ac1ba947efa4`
+
+### 📊 Research Validation
+
+The Docker setup has been validated against:
+- **R Journal 2023** InSilicoVA methodology
+- **PHMRC dataset** (7,582 adult samples)
+- **AP-only testing**: 0.695 CSMF accuracy
+- **Cross-platform** compatibility (ARM64/AMD64)
+
+For complete Docker documentation, see `DOCKER_USAGE.md`.
 
 ## Writing Effective INITIAL.md Files
 

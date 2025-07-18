@@ -54,7 +54,12 @@
       "Bash(poetry:*)",
       "Bash(gh repo view:*)",
       "Bash(gh repo clone:*)",
-      "Bash(docker:*)"
+      "Bash(docker:*)",
+      "Bash(true)",
+      "Bash(rg:*)",
+      "Bash(chmod:*)",
+      "Bash(diff:*)",
+      "Bash(./build-docker.sh:*)"
     ],
     "deny": []
   }
