@@ -56,6 +56,8 @@ First implementation demonstrating the framework:
 baseline/
 ├── config/          # Pydantic-based configuration
 ├── data/            # Core processing logic
+├── data_splitter.py # Site-based and train/test splitting
+├── utils/           # Validation and utility functions
 ├── example_usage.py # Demonstration script
 └── tests/           # Comprehensive unit tests
 ```
@@ -186,6 +188,7 @@ ML Models      InSilicoVA    Site-Specific Analysis
 1. Need better handling of external API documentation
 2. Site stratification requires custom xform handling
 3. Long-running processes need checkpoint mechanisms
+4. Data splitting for ML pipelines needs simple, robust implementation
 
 ## Contributing Guidelines
 

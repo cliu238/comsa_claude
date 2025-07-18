@@ -38,7 +38,7 @@ This document tracks development tasks, milestones, and progress for the Context
 
 ## Implementation Tasks
 
-### Baseline Module (VA Processing) ✅
+### Baseline Module (VA Processing) 🚧
 - ✅ Create baseline package structure
 - ✅ Implement DataConfig with Pydantic
 - ✅ Build VADataProcessor class
@@ -50,6 +50,11 @@ This document tracks development tasks, milestones, and progress for the Context
 - ✅ Add logging and progress tracking
 - ✅ Generate timestamped outputs with metadata
 - ✅ Update README with module documentation
+- 📋 **NEW**: Implement data splitting module for site-based and train/test splits
+  - **Priority**: High
+  - **Dependencies**: None
+  - **Target Date**: Q1 2025
+  - **Notes**: Simple implementation with imbalanced class handling
 
 ### Transfer Learning Module 📋
 - 📋 Create transfer_learning package structure
