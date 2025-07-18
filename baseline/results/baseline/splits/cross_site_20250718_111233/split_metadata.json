@@ -1,0 +1,47 @@
+{
+  "split_strategy": "cross_site",
+  "test_size": 0.3,
+  "random_state": 42,
+  "split_timestamp": "2025-07-18T11:12:33.270066",
+  "train_samples": 150,
+  "test_samples": 50,
+  "total_samples": 200,
+  "actual_test_ratio": 0.25,
+  "train_class_distribution": {
+    "1": 60,
+    "2": 45,
+    "3": 30,
+    "4": 15
+  },
+  "test_class_distribution": {
+    "1": 20,
+    "2": 15,
+    "3": 10,
+    "4": 5
+  },
+  "config": {
+    "data_path": "/var/folders/gn/8x_zxjc13mn8sr4wkvmvxr440000gn/T/tmpn5pwupok.csv",
+    "output_dir": "results/baseline/",
+    "openva_encoding": false,
+    "drop_columns": [],
+    "stratify_by_site": true,
+    "split_strategy": "cross_site",
+    "test_size": 0.3,
+    "random_state": 42,
+    "site_column": "site",
+    "label_column": "va34",
+    "train_sites": null,
+    "test_sites": null,
+    "min_samples_per_class": 5,
+    "handle_small_classes": "warn"
+  },
+  "train_sites": [
+    "Site_A",
+    "Site_B",
+    "Site_C"
+  ],
+  "test_sites": [
+    "Site_D"
+  ],
+  "total_sites": 4
+}

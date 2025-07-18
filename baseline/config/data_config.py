@@ -2,7 +2,7 @@
 
 import logging
 from pathlib import Path
-from typing import List, Optional
+from typing import List, Literal, Optional
 
 from pydantic import BaseModel, Field, field_validator
 
@@ -23,6 +23,35 @@ class DataConfig(BaseModel):
         default_factory=list, description="Columns to drop during processing"
     )
     stratify_by_site: bool = Field(True, description="Enable site-based stratification")
+    
+    # Data splitting parameters
+    split_strategy: Literal["train_test", "cross_site", "stratified_site"] = Field(
+        default="train_test", description="Strategy for splitting the data"
+    )
+    test_size: float = Field(
+        default=0.3, ge=0.1, le=0.5, description="Proportion of test data (0.1-0.5)"
+    )
+    random_state: int = Field(
+        default=42, description="Random seed for reproducible splits"
+    )
+    site_column: str = Field(
+        default="site", description="Column name containing site information"
+    )
+    label_column: str = Field(
+        default="va34", description="Column name containing target labels"
+    )
+    train_sites: Optional[List[str]] = Field(
+        default=None, description="Specific sites to use for training (cross_site strategy)"
+    )
+    test_sites: Optional[List[str]] = Field(
+        default=None, description="Specific sites to use for testing (cross_site strategy)"
+    )
+    min_samples_per_class: int = Field(
+        default=5, ge=1, description="Minimum samples required per class"
+    )
+    handle_small_classes: Literal["error", "warn", "exclude"] = Field(
+        default="warn", description="How to handle classes with insufficient samples"
+    )
 
     @field_validator("data_path")
     @classmethod
@@ -89,3 +118,29 @@ class DataConfig(BaseModel):
         logging.getLogger().addHandler(file_handler)
 
         logging.info(f"Logging configured. Log file: {log_file}")
+
+    @field_validator("test_size")
+    @classmethod
+    def validate_test_size(cls, v: float) -> float:
+        """Validate test size is within acceptable range."""
+        if not 0.1 <= v <= 0.5:
+            raise ValueError(f"test_size must be between 0.1 and 0.5, got {v}")
+        return v
+
+    @field_validator("split_strategy")
+    @classmethod
+    def validate_split_strategy(cls, v: str) -> str:
+        """Validate split strategy is supported."""
+        valid_strategies = ["train_test", "cross_site", "stratified_site"]
+        if v not in valid_strategies:
+            raise ValueError(f"split_strategy must be one of {valid_strategies}, got {v}")
+        return v
+
+    @field_validator("handle_small_classes")
+    @classmethod
+    def validate_handle_small_classes(cls, v: str) -> str:
+        """Validate small class handling strategy."""
+        valid_handlers = ["error", "warn", "exclude"]
+        if v not in valid_handlers:
+            raise ValueError(f"handle_small_classes must be one of {valid_handlers}, got {v}")
+        return v

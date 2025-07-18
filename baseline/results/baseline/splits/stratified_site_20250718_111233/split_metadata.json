@@ -1,0 +1,40 @@
+{
+  "split_strategy": "stratified_site",
+  "test_size": 0.3,
+  "random_state": 42,
+  "split_timestamp": "2025-07-18T11:12:33.277443",
+  "train_samples": 140,
+  "test_samples": 60,
+  "total_samples": 200,
+  "actual_test_ratio": 0.3,
+  "train_class_distribution": {
+    "1": 56,
+    "2": 40,
+    "3": 28,
+    "4": 16
+  },
+  "test_class_distribution": {
+    "1": 24,
+    "2": 20,
+    "3": 12,
+    "4": 4
+  },
+  "config": {
+    "data_path": "/var/folders/gn/8x_zxjc13mn8sr4wkvmvxr440000gn/T/tmpn5pwupok.csv",
+    "output_dir": "results/baseline/",
+    "openva_encoding": false,
+    "drop_columns": [],
+    "stratify_by_site": true,
+    "split_strategy": "stratified_site",
+    "test_size": 0.3,
+    "random_state": 42,
+    "site_column": "site",
+    "label_column": "va34",
+    "train_sites": null,
+    "test_sites": null,
+    "min_samples_per_class": 5,
+    "handle_small_classes": "warn"
+  },
+  "sites_processed": 4,
+  "sites_with_stratification": 4
+}

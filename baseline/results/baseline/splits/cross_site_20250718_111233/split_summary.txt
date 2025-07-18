@@ -1,0 +1,20 @@
+Data Split Summary
+==================
+
+Strategy: cross_site
+Timestamp: 2025-07-18T11:12:33.270066
+Train samples: 150
+Test samples: 50
+Test ratio: 0.250
+
+Train class distribution:
+  1: 60
+  2: 45
+  3: 30
+  4: 15
+
+Test class distribution:
+  1: 20
+  2: 15
+  3: 10
+  4: 5
