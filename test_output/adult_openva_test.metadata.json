@@ -1,0 +1,23 @@
+{
+  "dataset_name": "adult",
+  "encoding_type": "openva",
+  "processing_timestamp": "2025-07-17T16:38:34.089141",
+  "config": "<MagicMock name='mock.model_dump()' id='5281670080'>",
+  "data_shape": [
+    4,
+    6
+  ],
+  "columns": [
+    "site",
+    "va34",
+    "cod5",
+    "symptom1",
+    "symptom2",
+    "symptom3"
+  ],
+  "va34_distribution": {
+    "1": 2,
+    "2": 1,
+    "3": 1
+  }
+}
