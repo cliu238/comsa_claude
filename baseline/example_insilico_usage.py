@@ -89,10 +89,17 @@ def main():
     feature_exclusion_cols = processor._get_label_equivalent_columns(exclude_current_target=True)
     feature_cols = [col for col in split_result.train.columns if col not in feature_exclusion_cols]
     
-    X_train = split_result.train[feature_cols]
-    y_train = split_result.train[data_config.label_column]
-    X_test = split_result.test[feature_cols]
-    y_test = split_result.test[data_config.label_column]
+    # For demo purposes, use a smaller subset to avoid timeout
+    # Full dataset: 5307 train, 2275 test samples
+    # Demo dataset: 500 train, 200 test samples
+    logger.info("Using smaller subset for demo to avoid timeout")
+    train_subset = split_result.train.head(500)
+    test_subset = split_result.test.head(200)
+    
+    X_train = train_subset[feature_cols]
+    y_train = train_subset[data_config.label_column]
+    X_test = test_subset[feature_cols]
+    y_test = test_subset[data_config.label_column]
     
     logger.info(f"Train set: {len(X_train)} samples")
     logger.info(f"Test set: {len(X_test)} samples")
@@ -107,9 +114,9 @@ def main():
             "name": "Quantile Prior (Default)",
             "config": InSilicoVAConfig(
                 prior_type="quantile",
-                nsim=5000,  # Reduced for faster demo
+                nsim=1000,  # Further reduced for demo
                 jump_scale=0.05,
-                docker_timeout=300,
+                docker_timeout=1800,  # 30 minutes for full dataset
                 cause_column=data_config.label_column,
                 verbose=True
             )
@@ -118,9 +125,9 @@ def main():
             "name": "Default Prior",
             "config": InSilicoVAConfig(
                 prior_type="default",
-                nsim=5000,
+                nsim=1000,  # Further reduced for demo
                 jump_scale=0.05,
-                docker_timeout=300,
+                docker_timeout=1800,  # 30 minutes for full dataset
                 cause_column=data_config.label_column,
                 verbose=True
             )
@@ -168,8 +175,9 @@ def main():
                 logger.info(f"  True: {y_test.iloc[i]}, Predicted: {predictions[i]}")
             
             # Analyze cause distribution
-            true_dist = y_test.value_counts(normalize=True).sort_index()
-            pred_dist = pd.Series(predictions).value_counts(normalize=True).sort_index()
+            # Convert both to string for consistent comparison
+            true_dist = y_test.astype(str).value_counts(normalize=True).sort_index()
+            pred_dist = pd.Series(predictions).astype(str).value_counts(normalize=True).sort_index()
             
             logger.info("\nCause distribution comparison:")
             logger.info("Cause | True % | Pred %")
