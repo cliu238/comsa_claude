@@ -53,7 +53,8 @@
       "Bash(mv:*)",
       "Bash(poetry:*)",
       "Bash(gh repo view:*)",
-      "Bash(gh repo clone:*)"
+      "Bash(gh repo clone:*)",
+      "Bash(docker:*)"
     ],
     "deny": []
   }
