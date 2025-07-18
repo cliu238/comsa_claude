@@ -3,3 +3,11 @@ venv_linux
 __pycache__
 .ruff_cache
 .pytest_cache
+
+# Test output directories
+test_output/
+**/results/*/splits/
+
+# Temporary example files
+examples/cross_site_splitting.py
+examples/dataset_splitting_v2.py
