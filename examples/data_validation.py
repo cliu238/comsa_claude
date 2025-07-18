@@ -6,9 +6,8 @@ from typing import Dict, List, Optional, Union
 import numpy as np
 import pandas as pd
 
-import va_data.va_data_core.phmrc_plugins  # 确保 transform 注册
-from va_data.va_data_core import PHMRCData
-from va_data.va_data_core.phmrc_data import PHMRCData as PHMRCDataClass
+import va_data.phmrc_plugins  # 确保 transform 注册
+from va_data.phmrc_data import PHMRCData
 
 
 def validate_data(
@@ -154,7 +153,6 @@ def _prepare_table3_compatible_data(df: pd.DataFrame, target_format: str) -> pd.
     # Add gs_text34 column by mapping va34 values to cause names
     if "gs_text34" not in data.columns and "va34" in data.columns:
         # Import cause mapping from PHMRCData
-        from va_data.va_data_core.phmrc_data import PHMRCData
         cod34_mapping = PHMRCData.cod34
         data["gs_text34"] = data["va34"].map(cod34_mapping)
     

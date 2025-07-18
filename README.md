@@ -290,6 +290,119 @@ examples/
 - Include project-specific rules
 - Define coding standards
 
+## VA Data Processing Pipeline
+
+### Overview
+
+The `baseline` module provides a standardized pipeline for processing PHMRC (Population Health Metrics Research Consortium) Verbal Autopsy data. It supports two output formats:
+
+1. **Numeric format** - For standard ML algorithms (scikit-learn, XGBoost, etc.)
+2. **OpenVA format** - For InSilicoVA R package compatibility
+
+### Installation
+
+```bash
+# 1. Initialize the va-data submodule
+git submodule update --init --recursive
+
+# 2. Install dependencies with Poetry
+poetry install
+```
+
+### Usage
+
+Run the example script to process PHMRC adult data:
+
+```bash
+poetry run python baseline/example_usage.py
+```
+
+This will:
+- Load and validate PHMRC data using the PHMRCData class
+- Apply OpenVA transformations
+- Generate both numeric and OpenVA encoded outputs
+- Save results to `results/baseline/processed_data/`
+
+### Configuration
+
+The pipeline uses a Pydantic-based configuration system:
+
+```python
+from baseline.config.data_config import DataConfig
+
+config = DataConfig(
+    data_path="data/raw/PHMRC/IHME_PHMRC_VA_DATA_ADULT_Y2013M09D11_0.csv",
+    output_dir="results/baseline/",
+    openva_encoding=False,  # True for InSilicoVA, False for ML
+    drop_columns=[],        # Optional columns to exclude
+    stratify_by_site=True   # Enable site-based stratification
+)
+```
+
+### Output Files
+
+The pipeline generates two files per processing run in `results/baseline/processed_data/`:
+
+1. **CSV Data Files**
+   - `adult_numeric_YYYYMMDD_HHMMSS.csv` - Numeric encoding for ML (0/1 values)
+   - `adult_openva_YYYYMMDD_HHMMSS.csv` - OpenVA encoding for InSilicoVA ("Y"/""/".") 
+
+2. **Metadata JSON Files**
+   - Contains processing configuration, timestamp, data shape, column names, and cause-of-death distribution
+   - Example: `adult_numeric_20250717_163737.metadata.json`
+
+### Testing
+
+Run unit tests with coverage:
+
+```bash
+poetry run pytest tests/baseline/ -v --cov=baseline
+```
+
+The core modules achieve >96% test coverage.
+
+## Updated Project Structure
+
+```
+context-engineering-intro/
+├── .claude/
+│   ├── commands/
+│   │   ├── generate-prp.md    # Generates comprehensive PRPs
+│   │   └── execute-prp.md     # Executes PRPs to implement features
+│   └── settings.local.json    # Claude Code permissions
+├── PRPs/
+│   ├── templates/
+│   │   └── prp_base.md       # Base template for PRPs
+│   ├── EXAMPLE_multi_agent_prp.md  # Example of a complete PRP
+│   └── va_data_processing_pipeline.md  # VA pipeline PRP
+├── baseline/                  # VA data processing module
+│   ├── __init__.py
+│   ├── config/
+│   │   ├── __init__.py
+│   │   └── data_config.py    # Configuration management
+│   ├── data/
+│   │   ├── __init__.py
+│   │   └── data_loader_preprocessor.py  # Core processing logic
+│   └── example_usage.py      # Usage demonstration
+├── examples/                  # Your code examples
+│   └── data_validation.py    # Reference VA data processing
+├── tests/
+│   ├── __init__.py
+│   └── baseline/
+│       ├── __init__.py
+│       └── test_data_loader.py  # Unit tests
+├── results/
+│   └── baseline/
+│       ├── processed_data/   # Output CSV and metadata files
+│       └── logs/            # Processing logs
+├── va-data/                 # Git submodule for VA data utilities
+├── conftest.py             # Pytest configuration
+├── pyproject.toml          # Poetry dependencies
+├── CLAUDE.md               # Global rules for AI assistant
+├── INITIAL.md              # Template for feature requests
+└── README.md               # This file
+```
+
 ## Resources
 
 - [Claude Code Documentation](https://docs.anthropic.com/en/docs/claude-code)

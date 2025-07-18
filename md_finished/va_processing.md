@@ -41,7 +41,7 @@ The ml_pipeline repository (https://github.com/JH-DSAI/ml_pipeline) the stage-ba
 
 ### Key Features
 
-- Configurable preprocessing modes (standard vs Table 3 compatible)
+- Configurable preprocessing modes
 - Site-based data stratification support
 - Automatic handling of VA-specific data patterns (Yes/No, Y/N mappings)
 - Robust missing value handling with appropriate defaults

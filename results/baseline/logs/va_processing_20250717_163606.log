@@ -1,0 +1,78 @@
+2025-07-17 16:36:06,756 - root - INFO - Logging configured. Log file: results/baseline/logs/va_processing_20250717_163606.log
+2025-07-17 16:36:06,757 - baseline.data.data_loader_preprocessor - INFO - Output directories created at: results/baseline/processed_data
+2025-07-17 16:36:06,757 - baseline.data.data_loader_preprocessor - INFO - Initialized VADataProcessor with config: data_path='data/raw/PHMRC/IHME_PHMRC_VA_DATA_ADULT_Y2013M09D11_0.csv' output_dir='results/baseline/' openva_encoding=False drop_columns=[] stratify_by_site=False
+2025-07-17 16:36:06,757 - baseline.data.data_loader_preprocessor - INFO - Loading PHMRC data from data/raw/PHMRC/IHME_PHMRC_VA_DATA_ADULT_Y2013M09D11_0.csv
+2025-07-17 16:36:09,329 - baseline.data.data_loader_preprocessor - INFO - Validated 7582 records with 197 columns
+2025-07-17 16:36:09,435 - baseline.data.data_loader_preprocessor - INFO - Data statistics at post-validation: {
+  "stage": "post-validation",
+  "n_samples": 7582,
+  "n_features": 197,
+  "missing_values": "0",
+  "memory_usage_mb": 65.29185104370117,
+  "n_classes": 34,
+  "class_distribution": {
+    "32": 607,
+    "25": 581,
+    "26": 528,
+    "1": 474,
+    "21": 451,
+    "9": 402,
+    "29": 402,
+    "22": 400,
+    "17": 393,
+    "6": 303,
+    "34": 266,
+    "23": 251,
+    "10": 224,
+    "30": 194,
+    "4": 190,
+    "14": 168,
+    "8": 167,
+    "16": 161,
+    "18": 150,
+    "5": 148,
+    "33": 121,
+    "15": 119,
+    "11": 106,
+    "19": 104,
+    "24": 98,
+    "20": 97,
+    "7": 96,
+    "27": 82,
+    "3": 65,
+    "31": 60,
+    "12": 48,
+    "2": 46,
+    "28": 43,
+    "13": 37
+  }
+}
+2025-07-17 16:36:09,435 - baseline.data.data_loader_preprocessor - INFO - Applying OpenVA transformation
+2025-07-17 16:36:09,909 - baseline.data.data_loader_preprocessor - INFO - OpenVA transformation complete: 7582 records
+2025-07-17 16:36:09,909 - baseline.data.data_loader_preprocessor - INFO - Converting categorical to numeric for ML models
+2025-07-17 16:36:09,911 - baseline.data.data_loader_preprocessor - INFO - Converted 0 categorical columns to numeric
+2025-07-17 16:36:09,914 - baseline.data.data_loader_preprocessor - INFO - Removed rows with missing va34 values. Final record count: 7582
+2025-07-17 16:36:09,918 - __main__ - ERROR - Error during processing: keys must be str, int, float, bool or None, not int64
+2025-07-17 16:36:09,918 - __main__ - ERROR - Full traceback:
+Traceback (most recent call last):
+  File "/Users/ericliu/projects5/context-engineering-intro/baseline/example_usage.py", line 57, in main
+    df_ml = processor_ml.load_and_process()
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/ericliu/projects5/context-engineering-intro/baseline/data/data_loader_preprocessor.py", line 90, in load_and_process
+    self._log_data_statistics(df, f"post-{encoding_type}-encoding")
+  File "/Users/ericliu/projects5/context-engineering-intro/baseline/data/data_loader_preprocessor.py", line 246, in _log_data_statistics
+    f"Data statistics at {stage}: {json.dumps(stats, indent=2, default=str)}"
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/lib/python3.12/json/__init__.py", line 238, in dumps
+    **kw).encode(obj)
+          ^^^^^^^^^^^
+  File "/opt/anaconda3/lib/python3.12/json/encoder.py", line 202, in encode
+    chunks = list(chunks)
+             ^^^^^^^^^^^^
+  File "/opt/anaconda3/lib/python3.12/json/encoder.py", line 432, in _iterencode
+    yield from _iterencode_dict(o, _current_indent_level)
+  File "/opt/anaconda3/lib/python3.12/json/encoder.py", line 406, in _iterencode_dict
+    yield from chunks
+  File "/opt/anaconda3/lib/python3.12/json/encoder.py", line 377, in _iterencode_dict
+    raise TypeError(f'keys must be str, int, float, bool or None, '
+TypeError: keys must be str, int, float, bool or None, not int64

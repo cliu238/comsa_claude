@@ -2,7 +2,7 @@ name: "VA Data Processing Pipeline Implementation"
 description: |
 
 ## Purpose
-Implement a baseline Verbal Autopsy (VA) data processing pipeline that integrates with the JH-DSAI/va-data repository for standardized PHMRC data processing, supporting both standard pipeline and Table 3 compatible preprocessing modes.
+Implement a baseline Verbal Autopsy (VA) data processing pipeline that integrates with the JH-DSAI/va-data repository for standardized PHMRC data processing, supporting both standard ML algorithms and InSilicoVA.
 
 ## Core Principles
 1. **Context is King**: Include ALL necessary documentation, examples, and caveats
@@ -16,8 +16,8 @@ Implement a baseline Verbal Autopsy (VA) data processing pipeline that integrate
 ## Goal
 Build a modular, stage-based data processing pipeline for VA data that:
 - Loads and validates PHMRC CSV data using the va-data submodule
-- Supports both numeric (va34) and text (gs_text34) target formats
-- Implements configurable preprocessing modes (standard vs Table 3 compatible)
+- Converts categorical to numeric format for standard ML algorithms
+- Supports OpenVA encoding for InSilicoVA compatibility
 - Handles VA-specific data patterns and transformations
 - Provides robust error handling and progress logging
 
@@ -25,7 +25,7 @@ Build a modular, stage-based data processing pipeline for VA data that:
 - Standardizes VA data processing across the COMSA project
 - Enables reproducible research with validated data transformations
 - Supports multiple VA algorithms (openVA, InSilicoVA, InterVA) through consistent preprocessing
-- Facilitates comparison with published Table 3 results
+- Provides clean numeric data for ML model training
 
 ## What
 A data processing pipeline that loads raw PHMRC CSV files, validates them using PHMRCData class, applies appropriate transformations based on configuration, and outputs clean data ready for ML models.
@@ -112,11 +112,6 @@ from va_data.va_data_core import PHMRCData
 # GOTCHA: OpenVA encoding uses specific mappings for InSilicoVA
 repldict = {1: "Y", 0: "", 2: "."}  # Must use these exact mappings
 
-# GOTCHA: Table 3 compatible mode requires specific column exclusions
-exclude_cols = ["site", "module", "gs_code34", "gs_text34", "va34", 
-                "gs_code46", "gs_text46", "va46", "gs_code55", "gs_text55", "va55",
-                "gs_comorbid1", "gs_comorbid2", "gs_level", "newid", "cod5"]
-
 # GOTCHA: Pandas future.no_silent_downcasting warning
 # Always use: with pd.option_context("future.no_silent_downcasting", True):
 
@@ -137,9 +132,7 @@ class DataConfig(BaseModel):
     """Configuration for VA data processing."""
     data_path: str = Field(..., description="Path to PHMRC CSV file")
     output_dir: str = Field("results/baseline/", description="Output directory")
-    target_format: Literal["numeric", "text"] = Field("numeric", description="va34 or gs_text34")
     openva_encoding: bool = Field(False, description="Apply OpenVA encoding for InSilicoVA")
-    table3_compatible: bool = Field(False, description="Use Table 3 compatible preprocessing")
     drop_columns: Optional[List[str]] = Field(default_factory=list)
     stratify_by_site: bool = Field(True, description="Enable site-based stratification")
 ```
@@ -172,7 +165,7 @@ Task 4: Create data loader/preprocessor module
 CREATE baseline/data/data_loader_preprocessor.py:
   - COPY patterns from: examples/data_validation.py
   - ENHANCE with: Progress logging, error handling
-  - IMPLEMENT: Both standard and Table 3 modes
+  - IMPLEMENT: Standard ML preprocessing and OpenVA encoding
   - ADD: Site stratification support
 
 Task 5: Create unit tests
@@ -181,7 +174,7 @@ CREATE tests/baseline/__init__.py:
 CREATE tests/baseline/test_data_loader.py:
   - MIRROR test patterns from: ml_pipeline/tests/test_data_validation.py
   - TEST: Happy path, validation errors, missing files
-  - TEST: Both preprocessing modes
+  - TEST: Standard ML preprocessing and OpenVA encoding modes
 
 Task 6: Update Poetry dependencies
 MODIFY pyproject.toml:
@@ -191,7 +184,7 @@ MODIFY pyproject.toml:
 Task 7: Create example usage script
 CREATE baseline/example_usage.py:
   - Demonstrate loading PHMRC adult data
-  - Show both preprocessing modes
+  - Show both standard ML and OpenVA encoding outputs
   - Save results to appropriate directories
 ```
 
@@ -227,20 +220,10 @@ class VADataProcessor:
         df = va_data.validate(nullable=False, drop=self.config.drop_columns)
         logger.info(f"Validated {len(df)} records")
         
-        # Apply preprocessing based on mode
-        if self.config.table3_compatible:
-            df = self._prepare_table3_compatible(df, va_data)
-        else:
-            df = self._prepare_standard_pipeline(df, va_data)
-        
-        # Save processed data
-        self._save_results(df)
-        return df
-    
-    def _prepare_standard_pipeline(self, df: pd.DataFrame, va_data: PHMRCData) -> pd.DataFrame:
         # Apply OpenVA transformation
         df = va_data.xform("openva")
         
+        # Apply preprocessing based on encoding needs
         if self.config.openva_encoding:
             # GOTCHA: Use exact mapping for InSilicoVA
             repldict = {1: "Y", 0: "", 2: "."}
@@ -252,6 +235,8 @@ class VADataProcessor:
             # Convert to numeric for ML models
             df = self._convert_categorical_to_numeric(df)
         
+        # Save processed data
+        self._save_results(df)
         return df
 
 # Task 5: test_data_loader.py structure
@@ -260,10 +245,10 @@ from baseline.data.data_loader_preprocessor import VADataProcessor
 from baseline.config.data_config import DataConfig
 
 def test_load_phmrc_adult_data():
-    """Test loading adult PHMRC data"""
+    """Test loading adult PHMRC data for ML models"""
     config = DataConfig(
         data_path="data/raw/PHMRC/IHME_PHMRC_VA_DATA_ADULT_Y2013M09D11_0.csv",
-        target_format="numeric"
+        openva_encoding=False
     )
     processor = VADataProcessor(config)
     df = processor.load_and_process()
@@ -272,22 +257,25 @@ def test_load_phmrc_adult_data():
     assert len(df) > 0
     assert "va34" in df.columns
     assert df["va34"].notna().all()
+    # Check numeric conversion
+    feature_cols = df.columns.difference(["site", "va34", "cod5"])
+    for col in feature_cols:
+        assert df[col].dtype in ['int64', 'float64']
 
-def test_table3_compatible_mode():
-    """Test Table 3 compatible preprocessing"""
+def test_openva_encoding_mode():
+    """Test OpenVA encoding for InSilicoVA"""
     config = DataConfig(
         data_path="data/raw/PHMRC/IHME_PHMRC_VA_DATA_ADULT_Y2013M09D11_0.csv",
-        table3_compatible=True,
-        target_format="text"
+        openva_encoding=True
     )
     processor = VADataProcessor(config)
     df = processor.load_and_process()
     
-    assert "gs_text34" in df.columns
-    # Check excluded columns are removed
-    exclude_cols = ["module", "gs_code46", "newid"]
-    for col in exclude_cols:
-        assert col not in df.columns
+    # Check OpenVA encoding applied
+    feature_cols = df.columns.difference(["site", "va34", "cod5"])
+    sample_col = df[feature_cols[0]].dropna()
+    # Values should be Y, "", or .
+    assert all(val in ["Y", "", "."] for val in sample_col.unique())
 ```
 
 ### Integration Points
@@ -303,7 +291,8 @@ POETRY:
   
 OUTPUT:
   - create: results/baseline/processed_data/
-  - format: "{dataset}_{mode}_{timestamp}.csv"
+  - format: "{dataset}_{encoding_type}_{timestamp}.csv"
+  - encoding_type: "numeric" or "openva"
   - metadata: Save config as JSON alongside data
 ```
 
@@ -345,9 +334,12 @@ ls -la results/baseline/processed_data/
 # Validate processed data
 poetry run python -c "
 import pandas as pd
-df = pd.read_csv('results/baseline/processed_data/adult_standard_*.csv')
-print(f'Loaded {len(df)} records with {len(df.columns)} columns')
-print(f'Target distribution: {df["va34"].value_counts().head()}')"
+import glob
+files = glob.glob('results/baseline/processed_data/adult_*.csv')
+for f in files:
+    df = pd.read_csv(f)
+    print(f'{f}: {len(df)} records with {len(df.columns)} columns')
+    print(f'Target distribution: {df["va34"].value_counts().head()}')"
 
 # Expected: Data loaded successfully with appropriate columns
 ```
@@ -358,7 +350,7 @@ print(f'Target distribution: {df["va34"].value_counts().head()}')"
 - [ ] No type errors: `poetry run mypy baseline/`
 - [ ] VA-data submodule properly initialized
 - [ ] Processed data saved to results/baseline/
-- [ ] Both preprocessing modes work correctly
+- [ ] Both numeric and OpenVA encoding modes work correctly
 - [ ] Logs show progress for long-running operations
 - [ ] Configuration is documented and validated
 
@@ -370,15 +362,15 @@ print(f'Target distribution: {df["va34"].value_counts().head()}')"
 - ❌ Don't ignore pandas downcasting warnings
 - ❌ Don't hardcode paths - use configuration
 - ❌ Don't skip validation even for "trusted" data
-- ❌ Don't mix preprocessing modes in single run
+- ❌ Don't mix numeric and text encodings in single dataset
 
-## Confidence Score: 8/10
+## Confidence Score: 9/10
 High confidence due to:
 - Clear reference implementation in examples/data_validation.py
 - Access to both required repositories (va-data and ml_pipeline)
-- Well-defined data formats and transformations
+- Simplified to just two output formats (numeric for ML, OpenVA for InSilicoVA)
 - Existing test patterns to follow
+- Removed complexity of Table 3 compatibility
 
-Minor uncertainties:
+Minor uncertainty:
 - Exact va-data submodule integration steps
-- Potential version conflicts with dependencies
