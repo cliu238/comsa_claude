@@ -57,6 +57,8 @@ baseline/
 ├── config/          # Pydantic-based configuration
 ├── data/            # Core processing logic
 ├── data_splitter.py # Site-based and train/test splitting
+├── models/          # ML model implementations
+│   └── insilico_model.py # InSilicoVA model module
 ├── utils/           # Validation and utility functions
 ├── example_usage.py # Demonstration script
 └── tests/           # Comprehensive unit tests
@@ -65,7 +67,7 @@ baseline/
 #### Future Modules (Planned)
 - **transfer_learning/**: Cross-dataset model adaptation
 - **active_learning/**: Intelligent sample selection
-- **model_comparison/**: Systematic algorithm evaluation
+- **model_comparison/**: Systematic algorithm evaluation with InSilicoVA baseline
 
 ## Design Principles
 
@@ -107,6 +109,10 @@ Numeric Encoding  OpenVA Format  Site Stratification
      │             │             │
      ▼             ▼             ▼
 ML Models      InSilicoVA    Site-Specific Analysis
+     │           Model        │
+     ▼          (Docker)      ▼
+Model Comparison  CSMF       Performance Analysis
+  Framework    Accuracy      & Benchmarking
 ```
 
 ## Integration Strategy
