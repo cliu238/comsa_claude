@@ -50,11 +50,16 @@ This document tracks development tasks, milestones, and progress for the Context
 - ✅ Add logging and progress tracking
 - ✅ Generate timestamped outputs with metadata
 - ✅ Update README with module documentation
-- 📋 **NEW**: Implement data splitting module for site-based and train/test splits
+- ✅ **COMPLETED**: Implement data splitting module for site-based and train/test splits
   - **Priority**: High
   - **Dependencies**: None
-  - **Target Date**: Q1 2025
+  - **Completed**: Q1 2025
   - **Notes**: Simple implementation with imbalanced class handling
+- 📋 **NEW**: Implement InSilicoVA model module for VA cause-of-death prediction
+  - **Priority**: High
+  - **Dependencies**: Docker, data pipeline modules
+  - **Target Date**: Q1 2025
+  - **Notes**: Sklearn-like interface, Docker-based execution, CSMF accuracy evaluation
 
 ### Transfer Learning Module 📋
 - 📋 Create transfer_learning package structure
@@ -82,8 +87,8 @@ This document tracks development tasks, milestones, and progress for the Context
 
 ### Model Comparison Framework 📋
 - 📋 Design comparison pipeline architecture
-- 📋 Implement multiple model training
-- 📋 Create unified metrics calculation
+- 📋 Implement multiple model training (InSilicoVA, scikit-learn, deep learning)
+- 📋 Create unified metrics calculation (CSMF accuracy, classification metrics)
 - 📋 Build statistical significance testing
 - 📋 Add visualization dashboards
 - 📋 Implement result export formats
@@ -91,6 +96,7 @@ This document tracks development tasks, milestones, and progress for the Context
 - 📋 Add hyperparameter comparison
 - 📋 Write comprehensive tests
 - 📋 Document interpretation guidelines
+- 📋 **Dependencies**: Requires InSilicoVA model module as baseline
 
 ## DevOps & Infrastructure Tasks
 

@@ -114,6 +114,37 @@ class VADataProcessor:
             )
             return "unknown"
 
+    def _get_label_equivalent_columns(self, exclude_current_target: bool = True) -> list[str]:
+        """Get all columns that contain cause-of-death information.
+        
+        Args:
+            exclude_current_target: Whether to exclude the current target column from the list
+        
+        Returns:
+            List of column names that must be excluded from features to prevent data leakage.
+        """
+        # All label-equivalent columns
+        all_label_columns = [
+            "site",  # Site information (kept for stratification)
+            "module",  # Module type
+            "gs_code34", "gs_text34", "va34",  # 34-cause classification
+            "gs_code46", "gs_text46", "va46",  # 46-cause classification  
+            "gs_code55", "gs_text55", "va55",  # 55-cause classification
+            "gs_comorbid1", "gs_comorbid2",  # Comorbidity information
+            "gs_level",  # Gold standard level
+            "cod5",  # 5-cause grouping
+            "newid"  # ID column
+        ]
+        
+        # If requested, keep the current target column for splitting/processing
+        if exclude_current_target and hasattr(self, 'config') and self.config.label_column:
+            # Remove the current target column from the exclusion list
+            target_col = self.config.label_column
+            if target_col in all_label_columns:
+                all_label_columns = [col for col in all_label_columns if col != target_col]
+        
+        return all_label_columns
+
     def _apply_openva_encoding(self, df: pd.DataFrame) -> pd.DataFrame:
         """Apply OpenVA encoding for InSilicoVA compatibility.
 
@@ -126,8 +157,11 @@ class VADataProcessor:
         # GOTCHA: Use exact mapping for InSilicoVA
         repldict = {1: "Y", 0: "", 2: "."}
 
-        # Apply encoding to all feature columns (exclude site, va34, cod5)
-        cols = df.columns.difference(["site", "va34", "cod5"])
+        # Apply encoding to all feature columns (exclude ALL label-equivalent columns)
+        # CRITICAL: Exclude ALL columns that contain cause-of-death information to prevent data leakage
+        # Keep the current target column for splitting/processing, but don't encode it
+        label_equivalent_columns = self._get_label_equivalent_columns(exclude_current_target=False)
+        cols = df.columns.difference(label_equivalent_columns)
         df = df.astype({c: object for c in cols})
 
         # Handle pandas warning about silent downcasting
@@ -154,9 +188,11 @@ class VADataProcessor:
         """
         data = df.copy()
 
-        # Get feature columns (exclude site and target columns)
+        # Get feature columns (exclude ALL label-equivalent columns)
+        # Keep the current target column for splitting/processing
+        label_equivalent_columns = self._get_label_equivalent_columns(exclude_current_target=True)
         feature_cols = [
-            col for col in data.columns if col not in ["site", "va34", "cod5"]
+            col for col in data.columns if col not in label_equivalent_columns
         ]
         converted_count = 0
 
@@ -240,9 +276,13 @@ class VADataProcessor:
 
         if "va34" in df.columns:
             stats["n_classes"] = int(df["va34"].nunique())
-            # Convert to regular Python int for JSON serialization
+            # Handle case where va34 might be encoded as strings
             class_dist = df["va34"].value_counts().to_dict()
-            stats["class_distribution"] = {int(k): int(v) for k, v in class_dist.items()}
+            try:
+                stats["class_distribution"] = {int(k): int(v) for k, v in class_dist.items()}
+            except ValueError:
+                # If conversion fails (e.g., encoded as "Y", "", "."), keep as strings
+                stats["class_distribution"] = {str(k): int(v) for k, v in class_dist.items()}
 
         logger.info(
             f"Data statistics at {stage}: {json.dumps(stats, indent=2, default=str)}"
