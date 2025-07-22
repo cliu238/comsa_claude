@@ -4,6 +4,7 @@ version = "0.1.0"
 description = "Modular, parallel-DAG machine learning pipeline for structured data"
 authors = ["Your Name <your.email@example.com>"]
 readme = "README.md"
+package-mode = false
 
 [tool.poetry.dependencies]
 python = ">=3.12,<3.14"
@@ -21,6 +22,7 @@ interpret = "^0.6.10"
 pandera = "^0.23.1"
 pyyaml = "^6.0.2"
 pydantic = "^2.10.0"
+tqdm = "^4.67.1"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.0.0"

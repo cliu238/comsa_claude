@@ -155,9 +155,14 @@ Tasks are numbered using the following scheme:
     - Test hypothesis: does more training data hurt out-domain performance?
 - [IM-051] 📋 Optimize VA comparison scripts with Prefect and Ray
   - **Priority**: High
-  - **Dependencies**: IM-035
+  - **Dependencies**: IM-035, Prefect, Ray
   - **Target Date**: Q2 2025
   - **Notes**: Parallelize model training and evaluation using Prefect workflows and Ray distributed computing
+    - Add timing and process status tracking throughout execution
+    - Optimize run_va34_comparison.py for better performance
+    - Enable distributed execution across multiple cores/machines
+    - Implement checkpointing for long-running experiments
+    - Add real-time progress monitoring and logging
 - [IM-036] 📋 Create unified model comparison pipeline
   - **Priority**: High
   - **Dependencies**: IM-035 results, all baseline models

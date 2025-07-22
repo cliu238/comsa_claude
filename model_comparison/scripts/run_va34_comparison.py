@@ -12,6 +12,8 @@ sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 from baseline.utils import setup_logging
 from model_comparison.experiments.experiment_config import ExperimentConfig
 from model_comparison.experiments.site_comparison import SiteComparisonExperiment
+from model_comparison.experiments.parallel_experiment import ParallelSiteComparisonExperiment
+from model_comparison.orchestration.config import ParallelConfig
 
 
 def main():
@@ -90,6 +92,39 @@ def main():
         help="Enable debug logging",
     )
     
+    # Parallel execution arguments
+    parser.add_argument(
+        "--parallel",
+        action="store_true",
+        help="Enable parallel execution using Ray",
+    )
+    
+    parser.add_argument(
+        "--n-workers",
+        type=int,
+        default=-1,
+        help="Number of Ray workers for parallel execution (-1 for auto)",
+    )
+    
+    parser.add_argument(
+        "--batch-size",
+        type=int,
+        default=50,
+        help="Batch size for parallel execution",
+    )
+    
+    parser.add_argument(
+        "--checkpoint-dir",
+        default=None,
+        help="Directory for checkpoints (defaults to output_dir/checkpoints)",
+    )
+    
+    parser.add_argument(
+        "--resume",
+        action="store_true",
+        help="Resume from checkpoint if available",
+    )
+    
     args = parser.parse_args()
     
     # Setup centralized logging
@@ -120,10 +155,38 @@ def main():
         
         logger.info("Starting VA34 site comparison experiment")
         logger.info(f"Configuration: {config.model_dump()}")
+        logger.info(f"Parallel execution: {args.parallel}")
         
         # Run experiment
-        experiment = SiteComparisonExperiment(config)
-        results = experiment.run_experiment()
+        if args.parallel:
+            # Create parallel configuration
+            parallel_config = ParallelConfig(
+                n_workers=args.n_workers,
+                batch_size=args.batch_size,
+                checkpoint_interval=10,
+                ray_dashboard=True,
+                prefect_dashboard=False,  # Don't use Prefect in CLI mode
+            )
+            
+            logger.info("Using parallel execution with Ray")
+            logger.info(f"Workers: {args.n_workers} (-1 for auto)")
+            logger.info(f"Batch size: {args.batch_size}")
+            
+            # Use parallel experiment runner
+            experiment = ParallelSiteComparisonExperiment(config, parallel_config)
+            
+            if not args.resume and args.checkpoint_dir:
+                # Clear checkpoints if not resuming
+                experiment.checkpoint_manager.clear_checkpoints()
+                
+            results = experiment.run_experiment()
+            
+            # Clean up Ray
+            experiment.cleanup()
+        else:
+            # Use sequential experiment runner
+            experiment = SiteComparisonExperiment(config)
+            results = experiment.run_experiment()
         
         # Print summary
         print("\n" + "=" * 60)

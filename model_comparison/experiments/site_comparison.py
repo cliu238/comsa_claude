@@ -2,7 +2,7 @@
 
 import logging
 from pathlib import Path
-from typing import Dict, Tuple
+from typing import Callable, Dict, Optional, Tuple
 
 import numpy as np
 import pandas as pd
@@ -27,9 +27,36 @@ class SiteComparisonExperiment:
         self.config = config
         self.processor = VADataProcessor()
         self.results = []
+        self.progress_callback: Optional[Callable] = None
+        self.checkpoint_callback: Optional[Callable] = None
+        self.enable_parallel = False
 
         # Create output directory
         Path(self.config.output_dir).mkdir(parents=True, exist_ok=True)
+
+    def set_progress_callback(self, callback: Callable) -> None:
+        """Set callback for progress updates.
+
+        Args:
+            callback: Function to call with progress updates
+        """
+        self.progress_callback = callback
+
+    def set_checkpoint_callback(self, callback: Callable) -> None:
+        """Set callback for checkpoint saves.
+
+        Args:
+            callback: Function to call for checkpoint saves
+        """
+        self.checkpoint_callback = callback
+
+    def enable_parallel_execution(self, enabled: bool = True) -> None:
+        """Enable or disable parallel execution mode.
+
+        Args:
+            enabled: Whether to enable parallel mode
+        """
+        self.enable_parallel = enabled
 
     def run_experiment(self) -> pd.DataFrame:
         """Run complete experiment across all configurations."""
@@ -42,14 +69,26 @@ class SiteComparisonExperiment:
         # Run in-domain experiments
         logger.info("Running in-domain experiments...")
         in_domain_results = self._run_in_domain_experiments(data)
+        
+        # Save checkpoint after in-domain experiments
+        if self.checkpoint_callback and len(in_domain_results) > 0:
+            self.checkpoint_callback(in_domain_results, "in_domain_complete")
 
         # Run out-domain experiments
         logger.info("Running out-domain experiments...")
         out_domain_results = self._run_out_domain_experiments(data)
+        
+        # Save checkpoint after out-domain experiments
+        if self.checkpoint_callback and len(out_domain_results) > 0:
+            self.checkpoint_callback(out_domain_results, "out_domain_complete")
 
         # Run training size experiments
         logger.info("Running training size experiments...")
         size_results = self._run_training_size_experiments(data)
+        
+        # Save checkpoint after training size experiments
+        if self.checkpoint_callback and len(size_results) > 0:
+            self.checkpoint_callback(size_results, "training_size_complete")
 
         # Combine all results
         all_results = pd.concat(
@@ -348,6 +387,10 @@ class SiteComparisonExperiment:
             "training_fraction": training_fraction,
             **metrics,
         }
+
+        # Call progress callback if set
+        if self.progress_callback:
+            self.progress_callback(result)
 
         return result
 
