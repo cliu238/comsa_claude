@@ -66,7 +66,7 @@ Tasks are numbered using the following scheme:
   - **Notes**: Sklearn-like interface, Docker-based execution, CSMF accuracy evaluation (~0.79)
 
 ### Classical ML Models (VA Baselines) 🚧
-- [IM-045] 📋 Implement XGBoost baseline model
+- [IM-045] 🚧 Implement XGBoost baseline model
   - **Priority**: High
   - **Dependencies**: VADataProcessor, numeric encoding
   - **Target Date**: Q2 2025

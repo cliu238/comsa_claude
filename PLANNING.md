@@ -128,6 +128,7 @@ Modern ML/AI   Classical VA   Site-Specific  Domain        Sample
 - Random Forest - InSilicoVA   Analysis       Adaptation    Selection
 - XGBoost      - InterVA                     - Source/Target - Uncertainty
 - SVM          - openVA                       - Fine-tuning  - Query Strategy
+- Logistic Reg.
      │             │             │             │             │
      └─────────────┴─────────────┴─────────────┴─────────────┘
                                 │
