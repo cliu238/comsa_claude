@@ -450,6 +450,51 @@ context-engineering-intro/
 └── README.md               # This file
 ```
 
+## VA34 Model Comparison Results
+
+The VA34 site-based model comparison experiment has been implemented to compare InSilicoVA and XGBoost performance across different VA data collection sites.
+
+### Running the Experiment
+
+```bash
+# Basic usage
+python run_va34_comparison.py --data-path path/to/va_data.csv
+
+# Full example with all options
+python run_va34_comparison.py \
+  --data-path ./results/baseline/processed_data/adult_openva_20250717_163656.csv \
+  --sites AP Bohol Dar Mexico UP \
+  --models insilico xgboost \
+  --training-sizes 0.25 0.5 0.75 1.0 \
+  --n-bootstrap 50 \
+  --output-dir results/va34_comparison
+```
+
+### Key Findings (Real VA Data)
+
+After fixing data leakage issues, the experiment shows realistic performance:
+
+**XGBoost Performance:**
+- **In-domain CSMF accuracy**: 83.1% (training and testing on same site)
+- **Out-domain CSMF accuracy**: 43.4% (training on one site, testing on another)
+- **Generalization gap**: 39.7% performance drop
+- **COD accuracy**: ~40% in-domain, ~20% out-domain
+
+**Site-specific observations:**
+- Significant variation in cross-site performance
+- Some sites generalize better than others
+- More training data improves rather than hurts performance
+
+### Output Files
+
+Results are saved to the specified output directory:
+- `full_results.csv` - All experimental results with confidence intervals
+- `in_domain_results.csv` - Same-site train/test results
+- `out_domain_results.csv` - Cross-site train/test results  
+- `training_size_results.csv` - Impact of training data size
+- `summary_statistics.csv` - Aggregated statistics
+- Visualization plots (if --no-plots not specified)
+
 ## Resources
 
 - [Claude Code Documentation](https://docs.anthropic.com/en/docs/claude-code)

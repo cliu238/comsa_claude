@@ -11,11 +11,12 @@ from tqdm import tqdm
 from baseline.data.data_loader import VADataProcessor
 from baseline.models.insilico_model import InSilicoVAModel
 from baseline.models.xgboost_model import XGBoostModel
+from baseline.utils import get_logger
 
 from ..metrics.comparison_metrics import calculate_metrics
 from .experiment_config import ExperimentConfig
 
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__, component="model_comparison")
 
 
 class SiteComparisonExperiment:
@@ -76,6 +77,12 @@ class SiteComparisonExperiment:
             data = data[data["site"].isin(self.config.sites)]
             logger.info(f"Filtered to {len(self.config.sites)} sites")
 
+        # Handle va34 column (rename to cause for compatibility)
+        if "va34" in data.columns and "cause" not in data.columns:
+            data["cause"] = data["va34"].astype(str)  # Convert to string for consistency
+            logger.info("Renamed va34 column to cause")
+            # Don't drop va34 yet - will be dropped with other label columns later
+
         # Ensure we have the expected columns
         required_cols = ["site", "cause"]
         if not all(col in data.columns for col in required_cols):
@@ -126,12 +133,25 @@ class SiteComparisonExperiment:
             # Split into train/test using simple train_test_split
             from sklearn.model_selection import train_test_split
             
-            X = site_data.drop(columns=["cause", "site"])
+            # Drop all label columns to avoid data leakage
+            label_columns = ["cause", "site", "va34", "cod5"]
+            columns_to_drop = [col for col in label_columns if col in site_data.columns]
+            X = site_data.drop(columns=columns_to_drop)
             y = site_data["cause"]
             
-            X_train, X_test, y_train, y_test = train_test_split(
-                X, y, test_size=0.2, random_state=self.config.random_seed, stratify=y
-            )
+            # Try stratified split, fall back to random if necessary
+            try:
+                X_train, X_test, y_train, y_test = train_test_split(
+                    X, y, test_size=0.2, random_state=self.config.random_seed, stratify=y
+                )
+            except ValueError as e:
+                if "least populated class" in str(e):
+                    logger.warning(f"Stratified split failed for {site}, using random split")
+                    X_train, X_test, y_train, y_test = train_test_split(
+                        X, y, test_size=0.2, random_state=self.config.random_seed
+                    )
+                else:
+                    raise
 
             # Train and evaluate each model
             for model_name in self.config.models:
@@ -162,8 +182,10 @@ class SiteComparisonExperiment:
                 logger.warning(f"Skipping train site {train_site} - insufficient data")
                 continue
 
-            # Prepare training data
-            X_train = train_data.drop(columns=["cause", "site"])
+            # Prepare training data - drop all label columns
+            label_columns = ["cause", "site", "va34", "cod5"]
+            columns_to_drop = [col for col in label_columns if col in train_data.columns]
+            X_train = train_data.drop(columns=columns_to_drop)
             y_train = train_data["cause"]
 
             # Test on other sites
@@ -179,7 +201,10 @@ class SiteComparisonExperiment:
                     )
                     continue
 
-                X_test = test_data.drop(columns=["cause", "site"])
+                # Drop all label columns
+                label_columns = ["cause", "site", "va34", "cod5"]
+                columns_to_drop = [col for col in label_columns if col in test_data.columns]
+                X_test = test_data.drop(columns=columns_to_drop)
                 y_test = test_data["cause"]
 
                 # Train and evaluate each model
@@ -217,12 +242,25 @@ class SiteComparisonExperiment:
         # Split data for consistent test set
         from sklearn.model_selection import train_test_split
         
-        X = train_data.drop(columns=["cause", "site"])
+        # Drop all label columns
+        label_columns = ["cause", "site", "va34", "cod5"]
+        columns_to_drop = [col for col in label_columns if col in train_data.columns]
+        X = train_data.drop(columns=columns_to_drop)
         y = train_data["cause"]
         
-        X_train_full, X_test, y_train_full, y_test = train_test_split(
-            X, y, test_size=0.2, random_state=self.config.random_seed, stratify=y
-        )
+        # Try stratified split, fall back to random if necessary
+        try:
+            X_train_full, X_test, y_train_full, y_test = train_test_split(
+                X, y, test_size=0.2, random_state=self.config.random_seed, stratify=y
+            )
+        except ValueError as e:
+            if "least populated class" in str(e):
+                logger.warning(f"Stratified split failed for training size exp, using random split")
+                X_train_full, X_test, y_train_full, y_test = train_test_split(
+                    X, y, test_size=0.2, random_state=self.config.random_seed
+                )
+            else:
+                raise
 
         # Test different training sizes
         for train_size in tqdm(

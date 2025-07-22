@@ -9,7 +9,7 @@ This package provides comprehensive VA data processing capabilities including:
 """
 
 from baseline.config.data_config import DataConfig
-from baseline.data.data_loader_preprocessor import VADataProcessor
+from baseline.data.data_loader import VADataProcessor
 from baseline.data.data_splitter import VADataSplitter, SplitResult
 from baseline.models.insilico_model import InSilicoVAModel
 from baseline.models.model_config import InSilicoVAConfig

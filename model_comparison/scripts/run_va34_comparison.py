@@ -7,24 +7,11 @@ import sys
 from pathlib import Path
 
 # Add project root to path
-sys.path.insert(0, str(Path(__file__).parent))
+sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
+from baseline.utils import setup_logging
 from model_comparison.experiments.experiment_config import ExperimentConfig
 from model_comparison.experiments.site_comparison import SiteComparisonExperiment
-
-
-def setup_logging(debug: bool = False):
-    """Setup logging configuration."""
-    log_level = logging.DEBUG if debug else logging.INFO
-    
-    logging.basicConfig(
-        level=log_level,
-        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-        handlers=[
-            logging.StreamHandler(sys.stdout),
-            logging.FileHandler("va34_comparison.log"),
-        ],
-    )
 
 
 def main():
@@ -105,9 +92,12 @@ def main():
     
     args = parser.parse_args()
     
-    # Setup logging
-    setup_logging(args.debug)
-    logger = logging.getLogger(__name__)
+    # Setup centralized logging
+    logger = setup_logging(
+        __name__,
+        level="DEBUG" if args.debug else "INFO",
+        component="va34_comparison"
+    )
     
     try:
         # Validate data path

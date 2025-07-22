@@ -142,16 +142,22 @@ Tasks are numbered using the following scheme:
 - [IM-034] 📋 Create interactive examples
 
 ### Model Comparison Framework 📋
-- [IM-035] 🚧 Implement VA34 site-based model comparison experiment
+- [IM-035] ✅ Implement VA34 site-based model comparison experiment
   - **Priority**: High
   - **Dependencies**: InSilicoVA (✅), XGBoost (✅), VADataSplitter (✅)
-  - **Target Date**: Q2 2025
+  - **Completed**: 2025-07-22
+  - **PR**: #11
   - **Notes**: Compare InSilicoVA vs XGBoost using VA34 labels across:
     - In-domain: train/test on same site
     - Out-domain: train on one site, test on different sites
     - Varying training data sizes to test generalization
     - Metrics: CSMF accuracy, COD accuracy
     - Test hypothesis: does more training data hurt out-domain performance?
+- [IM-051] 📋 Optimize VA comparison scripts with Prefect and Ray
+  - **Priority**: High
+  - **Dependencies**: IM-035
+  - **Target Date**: Q2 2025
+  - **Notes**: Parallelize model training and evaluation using Prefect workflows and Ray distributed computing
 - [IM-036] 📋 Create unified model comparison pipeline
   - **Priority**: High
   - **Dependencies**: IM-035 results, all baseline models
@@ -249,9 +255,9 @@ Tasks are numbered using the following scheme:
 - [MS-003] ✅ Establish project documentation
 
 ### Q2 2025 🚧
-- [MS-004] 📋 Complete ML baseline models (XGBoost, RF, LR, NB)
+- [MS-004] 📋 Complete ML baseline models (XGBoost ✅, RF, LR, NB)
 - [MS-005] 📋 Integrate classical VA algorithms (InterVA, openVA)
-- [MS-006] 📋 Launch model comparison framework
+- [MS-006] 🚧 Launch model comparison framework (IM-035 ✅)
 - [MS-007] 📋 Complete transfer learning module
 
 ### Q3 2025 📋
@@ -305,9 +311,10 @@ Task ID Format: [Category-Number] where Category is CF/IM/DO/RD/MS
 
 ### Recently Completed
 - [IM-045] ✅ XGBoost baseline model - 2025-07-22
+- [IM-035] ✅ VA34 site-based model comparison experiment - 2025-07-22 (PR #11)
 
 ### In Progress
-- [IM-035] VA34 site-based model comparison experiment
+- No tasks currently in progress
 
 ### Next Up
 - [IM-046] Random Forest baseline model

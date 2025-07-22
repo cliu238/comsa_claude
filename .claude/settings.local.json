@@ -60,7 +60,13 @@
       "Bash(chmod:*)",
       "Bash(diff:*)",
       "Bash(./build-docker.sh:*)",
-      "Bash(sed:*)"
+      "Bash(sed:*)",
+      "Bash(--data-path ./results/baseline/processed_data/adult_openva_20250717_163656.csv )",
+      "Bash(--sites AP Bohol Dar Mexico UP )",
+      "Bash(--models insilico xgboost )",
+      "Bash(--training-sizes 0.5 1.0 )",
+      "Bash(--n-bootstrap 5 )",
+      "Bash(--output-dir results/va34_both_models_comparison)"
     ],
     "deny": []
   }
