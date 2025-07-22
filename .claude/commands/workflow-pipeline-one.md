@@ -10,9 +10,9 @@ START
 Check TASK.md for pending tasks
   ↓
 For each pending task:
-  1. /next-tasks → Create NEXT_STEPS_TASKxx.md
+  1. /next-tasks → Create TASKxxx_yyyy.md
   2. /generate-issue → Create GitHub issue & branch  
-  3. /generate-prp → Create PRP from NEXT_STEPS
+  3. /generate-prp → Create PRP from TASKxxx_yyyy.md
   4. /execute-prp → Implement the PRP
   5. /close-issue → Complete task & create PR
   ↓

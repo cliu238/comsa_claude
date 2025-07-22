@@ -94,6 +94,7 @@ Execute: `/close-issue`
 - After completing a task, check for more pending tasks
 - If tasks remain, continue with next priority task
 - If all tasks completed, exit pipeline
+- If the whole loop has to stop or pause somewhere, please keep the time stamp
 
 ## Progress Tracking
 
