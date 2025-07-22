@@ -142,7 +142,7 @@ Tasks are numbered using the following scheme:
 - [IM-034] 📋 Create interactive examples
 
 ### Model Comparison Framework 📋
-- [IM-035] 📋 Implement VA34 site-based model comparison experiment
+- [IM-035] 🚧 Implement VA34 site-based model comparison experiment
   - **Priority**: High
   - **Dependencies**: InSilicoVA (✅), XGBoost (✅), VADataSplitter (✅)
   - **Target Date**: Q2 2025
@@ -307,10 +307,9 @@ Task ID Format: [Category-Number] where Category is CF/IM/DO/RD/MS
 - [IM-045] ✅ XGBoost baseline model - 2025-07-22
 
 ### In Progress
-- None currently active
+- [IM-035] VA34 site-based model comparison experiment
 
 ### Next Up
-- [IM-035] VA34 site-based model comparison experiment (InSilicoVA vs XGBoost)
 - [IM-046] Random Forest baseline model
 - [IM-049] InterVA model integration
 - [MS-004] Complete ML baseline models milestone
