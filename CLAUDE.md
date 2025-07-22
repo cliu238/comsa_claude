@@ -126,6 +126,7 @@ poetry run
 - **Always confirm file paths and module names** exist before referencing them in code or tests.
 - **Never delete or overwrite existing code** unless explicitly instructed to or if part of a documented GitHub Issue.
 - **For VA-specific terms**, use standard terminology (COD, CSMF, VA, etc.) consistently.
+- **Use context7 MCP for library documentation** - When you need current documentation for libraries (scikit-learn, pandas, numpy, openVA, etc.), use the context7 MCP tools instead of relying on potentially outdated knowledge.
 
 ### ⏱️ Execution Time Constraints
 
