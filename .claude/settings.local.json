@@ -59,7 +59,8 @@
       "Bash(rg:*)",
       "Bash(chmod:*)",
       "Bash(diff:*)",
-      "Bash(./build-docker.sh:*)"
+      "Bash(./build-docker.sh:*)",
+      "Bash(sed:*)"
     ],
     "deny": []
   }

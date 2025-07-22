@@ -2,7 +2,19 @@
 
 ## Overview
 
-This project demonstrates Context Engineering - a systematic approach to providing AI coding assistants with comprehensive context for successful implementation. It combines structured requirements (PRPs), validation loops, and example-driven development to achieve high-quality, one-pass implementations.
+This project demonstrates Context Engineering - a systematic approach to providing AI coding assistants with comprehensive context for successful implementation. It combines structured requirements (PRPs), validation loops, and example-driven development to achieve high-quality, one-pass implementations. At its core, this framework is designed to systematically analyze Verbal Autopsy data using both modern AI/ML approaches and classical VA algorithms.
+
+## Project Purpose
+
+This project aims to systematically analyze Verbal Autopsy (VA) data by combining modern machine learning and AI methods with established classical VA algorithms. Our goal is to:
+
+- **Provide a unified framework** for processing VA data through multiple analytical approaches
+- **Compare performance** between traditional algorithms (InSilicoVA, InterVA, openVA) and modern ML/AI techniques
+- **Enable researchers** to leverage both proven statistical methods and cutting-edge AI for cause-of-death determination
+- **Create reproducible pipelines** that can handle diverse VA datasets with consistent methodology
+- **Advance VA methodology** by facilitating systematic comparison and evaluation of different approaches
+
+The framework serves as both a practical tool for VA analysis and a research platform for developing and testing new algorithms in the field of verbal autopsy.
 
 ## Core Architecture
 
@@ -94,8 +106,11 @@ baseline/
 ## Data Flow Architecture
 
 ### VA Processing Pipeline Example
+
+This pipeline demonstrates our dual approach of combining classical VA algorithms with modern ML methods:
+
 ```
-Raw PHMRC CSV
+Raw PHMRC CSV (Verbal Autopsy Data)
      │
      ▼
 PHMRCData Validation (va-data submodule)
@@ -103,16 +118,25 @@ PHMRCData Validation (va-data submodule)
      ▼
 OpenVA Transformation
      │
-     ├─────────────┬─────────────┐
-     ▼             ▼             ▼
-Numeric Encoding  OpenVA Format  Site Stratification
-     │             │             │
-     ▼             ▼             ▼
-ML Models      InSilicoVA    Site-Specific Analysis
-     │           Model        │
-     ▼          (Docker)      ▼
-Model Comparison  CSMF       Performance Analysis
-  Framework    Accuracy      & Benchmarking
+     ├─────────────┬─────────────┬─────────────┬─────────────┐
+     ▼             ▼             ▼             ▼             ▼
+Numeric Encoding  OpenVA Format  Site          Transfer       Active
+(for ML/AI)      (for Classic)  Stratification Learning      Learning
+     │             │             │             │             │
+     ▼             ▼             ▼             ▼             ▼
+Modern ML/AI   Classical VA   Site-Specific  Domain        Sample
+- Random Forest - InSilicoVA   Analysis       Adaptation    Selection
+- XGBoost      - InterVA                     - Source/Target - Uncertainty
+- SVM          - openVA                       - Fine-tuning  - Query Strategy
+     │             │             │             │             │
+     └─────────────┴─────────────┴─────────────┴─────────────┘
+                                │
+                                ▼
+                    Model Comparison Framework
+                    - CSMF Accuracy Metrics
+                    - COD Agreement Analysis
+                    - Performance Benchmarking
+                    - Statistical Significance Testing
 ```
 
 ## Integration Strategy
