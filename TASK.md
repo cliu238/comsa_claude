@@ -64,13 +64,14 @@ Tasks are numbered using the following scheme:
   - **Dependencies**: Docker, data pipeline modules
   - **Completed**: Q1 2025
   - **Notes**: Sklearn-like interface, Docker-based execution, CSMF accuracy evaluation (~0.79)
-
-### Classical ML Models (VA Baselines) 🚧
-- [IM-045] 🚧 Implement XGBoost baseline model
+- [IM-045] ✅ Implement XGBoost baseline model
   - **Priority**: High
   - **Dependencies**: VADataProcessor, numeric encoding
-  - **Target Date**: Q2 2025
-  - **Notes**: Multi-class classification with hyperparameter tuning
+  - **Completed**: 2025-07-22
+  - **Notes**: Multi-class classification with hyperparameter tuning, Optuna integration, CSMF accuracy metric, 94% test coverage
+  - **Issue**: #8 - Successfully implemented XGBoost with sklearn-like interface, feature importance, cross-validation
+
+### Classical ML Models (VA Baselines) 🚧
 - [IM-046] 📋 Implement Random Forest baseline model
   - **Priority**: High
   - **Dependencies**: VADataProcessor, numeric encoding
@@ -280,6 +281,19 @@ Task ID Format: [Category-Number] where Category is CF/IM/DO/RD/MS
 2. VA-specific research tasks - future improvements
 3. Performance optimizations - after functionality
 4. Documentation videos - supplementary materials
+
+## Current Sprint (Q2 2025)
+
+### Recently Completed
+- [IM-045] ✅ XGBoost baseline model - 2025-07-22
+
+### In Progress
+- None currently active
+
+### Next Up
+- [IM-046] Random Forest baseline model
+- [IM-049] InterVA model integration
+- [MS-004] Complete ML baseline models milestone
 
 ## Notes
 
