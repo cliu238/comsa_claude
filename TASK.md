@@ -103,27 +103,31 @@ Tasks are numbered using the following scheme:
 ### Transfer Learning Module 📋
 - [IM-014] 📋 Create transfer_learning package structure
 - [IM-015] 📋 Design domain adaptation architecture
-- [IM-016] 📋 Implement source/target dataset handling
   - **Priority**: High
-  - **Dependencies**: VADataProcessor, baseline models
-  - **Notes**: Support WHO-2016, MITS, COMSA standards
-- [IM-017] 📋 Implement instance-based transfer methods
+  - **Dependencies**: IM-035 site comparison results
+  - **Notes**: Focus on algorithmic domain adaptation techniques
+- [IM-016] 📋 Implement transfer learning algorithms
   - **Priority**: High
-  - **Dependencies**: ADAPT library integration
-  - **Notes**: TrAdaBoost, KLIEP, KMM methods
-- [IM-018] 📋 Implement feature-based transfer methods
+  - **Dependencies**: ADAPT library, baseline models
+  - **Notes**: TrAdaBoost, KLIEP, KMM for domain adaptation
+    - Different from IM-035 which compares existing models
+    - This implements new transfer learning models
+- [IM-017] 📋 Implement feature-based transfer methods
   - **Priority**: Medium
   - **Dependencies**: Feature extraction pipeline
-  - **Notes**: CORAL, Feature Augmentation (FA)
-- [IM-019] 📋 Add TransTab integration for tabular transfer
+  - **Notes**: CORAL, Feature Augmentation, domain-invariant features
+- [IM-018] 📋 Add TransTab integration for tabular transfer
   - **Priority**: Medium
   - **Dependencies**: Deep learning framework
-  - **Notes**: Pre-trained tabular models
-- [IM-020] 📋 Create cross-validation for transfer tasks
-- [IM-021] 📋 Implement transfer performance metrics
-- [IM-022] 📋 Create visualization tools
-- [IM-023] 📋 Write comprehensive tests
-- [IM-024] 📋 Document usage and examples
+  - **Notes**: Pre-trained tabular models, fine-tuning approaches
+- [IM-019] 📋 Create transfer learning evaluation framework
+  - **Priority**: Medium
+  - **Dependencies**: IM-016, IM-017, IM-018
+  - **Notes**: Specific to transfer learning methods, not general comparison
+- [IM-020] 📋 Write comprehensive tests and documentation
+  - **Priority**: Medium
+  - **Dependencies**: All transfer learning implementations
+  - **Notes**: Unit tests, integration tests, usage examples
 
 ### Active Learning Module 📋
 - [IM-025] 📋 Create active_learning package structure
@@ -138,28 +142,43 @@ Tasks are numbered using the following scheme:
 - [IM-034] 📋 Create interactive examples
 
 ### Model Comparison Framework 📋
-- [IM-035] 📋 Design comparison pipeline architecture
+- [IM-035] 📋 Implement VA34 site-based model comparison experiment
   - **Priority**: High
-  - **Dependencies**: InSilicoVA (✅), ML baselines (pending)
-  - **Notes**: Unified interface for all VA models
-- [IM-036] 📋 Implement multiple model training pipeline
+  - **Dependencies**: InSilicoVA (✅), XGBoost (✅), VADataSplitter (✅)
+  - **Target Date**: Q2 2025
+  - **Notes**: Compare InSilicoVA vs XGBoost using VA34 labels across:
+    - In-domain: train/test on same site
+    - Out-domain: train on one site, test on different sites
+    - Varying training data sizes to test generalization
+    - Metrics: CSMF accuracy, COD accuracy
+    - Test hypothesis: does more training data hurt out-domain performance?
+- [IM-036] 📋 Create unified model comparison pipeline
   - **Priority**: High
-  - **Dependencies**: All baseline models
-  - **Notes**: Parallel training, resource management
-- [IM-037] 📋 Create unified metrics calculation
-  - **Priority**: High
-  - **Dependencies**: CSMF accuracy, COD accuracy metrics
-  - **Notes**: VA-specific metrics, classification metrics
-- [IM-038] 📋 Build statistical significance testing
+  - **Dependencies**: IM-035 results, all baseline models
+  - **Notes**: Generalize IM-035 approach for all models, parallel execution
+- [IM-037] 📋 Build statistical significance testing framework
   - **Priority**: Medium
-  - **Dependencies**: Multiple model results
-  - **Notes**: DeLong test, bootstrapping methods
-- [IM-039] 📋 Add visualization dashboards
-- [IM-040] 📋 Implement result export formats
-- [IM-041] 📋 Create automated report generation
-- [IM-042] 📋 Add hyperparameter comparison
-- [IM-043] 📋 Write comprehensive tests
-- [IM-044] 📋 Document interpretation guidelines
+  - **Dependencies**: IM-035, IM-036
+  - **Notes**: DeLong test, bootstrapping, confidence intervals
+- [IM-038] 📋 Create comparison visualization and reporting
+  - **Priority**: Medium
+  - **Dependencies**: IM-035, IM-036, IM-037
+  - **Notes**: Consolidated task for dashboards, exports, automated reports
+- [IM-039] 📋 Write comprehensive tests for comparison framework
+  - **Priority**: Medium
+  - **Dependencies**: IM-035, IM-036
+  - **Notes**: Unit tests, integration tests, result validation
+- [IM-040] 📋 Document model comparison interpretation guidelines
+  - **Priority**: Low
+  - **Dependencies**: IM-035 through IM-039
+  - **Notes**: Best practices, result interpretation, decision guidelines
+- [IM-041] 📋 Implement COD5 site-based model comparison
+  - **Priority**: Medium
+  - **Dependencies**: IM-035 (VA34 comparison)
+  - **Target Date**: Q3 2025
+  - **Notes**: Repeat IM-035 experiment using COD5 labels (5 aggregated causes)
+    - Compare if simpler labels improve cross-site generalization
+    - Same experimental design as IM-035 but with COD5
 
 ## DevOps & Infrastructure Tasks
 
@@ -291,6 +310,7 @@ Task ID Format: [Category-Number] where Category is CF/IM/DO/RD/MS
 - None currently active
 
 ### Next Up
+- [IM-035] VA34 site-based model comparison experiment (InSilicoVA vs XGBoost)
 - [IM-046] Random Forest baseline model
 - [IM-049] InterVA model integration
 - [MS-004] Complete ML baseline models milestone
