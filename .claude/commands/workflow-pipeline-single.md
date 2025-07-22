@@ -1,22 +1,22 @@
-# Workflow Pipeline - Fully Automated Continuous Task Execution
+# Workflow Pipeline - Single Task Automated Execution
 
-This command orchestrates the complete development workflow from task planning to completion, automatically processing all pending tasks in TASK.md with no user intervention required.
+This command orchestrates the complete development workflow from task planning to completion, automatically processing the specified task ($ARGUMENTS1) from TASK.md with no user intervention required.
 
 ## Pipeline Overview
 
 ```
 START
   ↓
-Check TASK.md for pending tasks
+Validate specified task from $ARGUMENTS1
   ↓
-For each pending task:
-  1. /next-tasks → Create TASKxxx_yyyy.md
+For the specified task:
+  1. /next-tasks → Create NEXT_STEPS_TASKxx.md
   2. /generate-issue → Create GitHub issue & branch  
-  3. /generate-prp → Create PRP from TASKxxx_yyyy.md
+  3. /generate-prp → Create PRP from NEXT_STEPS
   4. /execute-prp → Implement the PRP
   5. /close-issue → Complete task & create PR
   ↓
-LOOP until all tasks completed
+Complete single task
   ↓
 END
 ```
@@ -25,21 +25,22 @@ END
 
 ### Step 1: Initialize Pipeline
 
-- Read TASK.md to identify pending tasks
-- Check current sprint status
-- List all High/Medium/Low priority tasks
+- Read TASK.md to validate specified task ($ARGUMENTS1)
+- Verify task exists and is in 📋 Planned status
+- Extract task details and dependencies
 
-### Step 2: Task Selection
+### Step 2: Task Validation
 
-- Process tasks in priority order: High → Medium → Low
-- For each task, extract:
-  - Task number (e.g., Task 8, Task 9)
+- Validate the specified task ID (e.g., IM-035)
+- Extract from the task:
+  - Task number and ID
   - Task name and description
-  - Any specific requirements
+  - Dependencies and requirements
+  - Priority level
 
 ### Step 3: Execute Task Pipeline
 
-For each selected task:
+For the specified task:
 
 #### 3.1 Planning Phase
 
@@ -89,11 +90,11 @@ Execute: `/close-issue`
 - Delete feature branch
 - Return to main branch
 
-### Step 4: Loop Control
+### Step 4: Completion
 
-- After completing a task, check for more pending tasks
-- If tasks remain, continue with next priority task
-- If all tasks completed, exit pipeline
+- After completing the specified task, update TASK.md status
+- Report successful completion with task details
+- Exit pipeline gracefully
 
 ## Progress Tracking
 
@@ -115,34 +116,35 @@ If any step fails:
 
 ## Fully Automated Execution
 
-The pipeline runs continuously without user checkpoints:
+The pipeline runs the specified task without user checkpoints:
 
-- Automatically selects the highest priority pending task
+- Validates the task ID provided in $ARGUMENTS1
 - Executes all 5 pipeline steps without pausing
-- Automatically creates and merges pull requests
-- Continues to the next task immediately after completion
-- Only stops when all tasks are completed or an error occurs
+- Automatically creates and merges pull request
+- Completes when the single task is finished
+- Only stops when task is completed or an error occurs
 
 ## Example Usage
 
 ```
-/workflow-pipeline
+/workflow-pipeline-part IM-035
 ```
 
 This will:
 
-1. Analyze TASK.md for all pending tasks
-2. Start with the highest priority task
-3. Execute the complete pipeline for that task automatically (no user confirmation)
-4. Continue with the next task immediately
-5. Repeat until all tasks are completed without stopping
+1. Validate that task IM-035 exists in TASK.md
+2. Verify the task is in 📋 Planned status
+3. Execute the complete pipeline for that specific task automatically (no user confirmation)
+4. Create issue, branch, PRP, implementation, and PR
+5. Complete when the single task is finished
 
 ## Notes
 
+- Task ID must be provided as the first argument (e.g., IM-035, IM-046)
 - Each command in the pipeline is executed exactly as defined in its respective .md file
 - The pipeline maintains state between steps
 - All git operations are performed automatically
 - Validation must pass before proceeding to next step
-- **FULLY AUTOMATED**: No user confirmations or checkpoints - runs continuously until completion
+- **FULLY AUTOMATED**: No user confirmations or checkpoints - runs until task completion
 - User can interrupt the pipeline manually if needed, but it will not pause on its own
-- The pipeline will automatically merge PRs and continue to the next task
+- The pipeline will automatically merge the PR for the specified task

@@ -71,7 +71,7 @@ Tasks are numbered using the following scheme:
   - **Notes**: Multi-class classification with hyperparameter tuning, Optuna integration, CSMF accuracy metric, 94% test coverage
   - **Issue**: #8 - Successfully implemented XGBoost with sklearn-like interface, feature importance, cross-validation
 
-### Classical ML Models (VA Baselines) 🚧
+### Classical ML Models (VA Baselines) 📋
 - [IM-046] 📋 Implement Random Forest baseline model
   - **Priority**: High
   - **Dependencies**: VADataProcessor, numeric encoding
