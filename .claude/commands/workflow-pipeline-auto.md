@@ -10,7 +10,7 @@ START
 Check TASK.md for pending tasks
   ↓
 For each pending task:
-  1. /new-tasks → Create NEXT_STEPS_TASKxx.md
+  1. /next-tasks → Create NEXT_STEPS_TASKxx.md
   2. /generate-issue → Create GitHub issue & branch  
   3. /generate-prp → Create PRP from NEXT_STEPS
   4. /execute-prp → Implement the PRP
@@ -24,11 +24,13 @@ END
 ## Execution Steps
 
 ### Step 1: Initialize Pipeline
+
 - Read TASK.md to identify pending tasks
 - Check current sprint status
 - List all High/Medium/Low priority tasks
 
 ### Step 2: Task Selection
+
 - Process tasks in priority order: High → Medium → Low
 - For each task, extract:
   - Task number (e.g., Task 8, Task 9)
@@ -40,28 +42,36 @@ END
 For each selected task:
 
 #### 3.1 Planning Phase
+
 Execute: `/new-tasks`
+
 - Generate NEXT_STEPS_TASKxx.md based on:
   - @PLANNING.md (architecture and constraints)
   - @TASK.md (current progress and dependencies)
 - Output: NEXT_STEPS_TASKxx.md with detailed planning
 
 #### 3.2 Issue Creation
+
 Execute: `/generate-issue NEXT_STEPS_TASKxx.md`
+
 - Update PLANNING.md and TASK.md
 - Create GitHub issue with task details
 - Create feature branch (e.g., feature/task-8-ai-matching)
 - Checkout the new branch
 
 #### 3.3 PRP Generation
+
 Execute: `/generate-prp NEXT_STEPS_TASKxx.md`
+
 - Research codebase patterns
 - Research external documentation
 - Generate comprehensive PRP
 - Output: PRPs/task-xx-[feature-name].md
 
 #### 3.4 Implementation
+
 Execute: `/execute-prp PRPs/task-xx-[feature-name].md`
+
 - Load and understand PRP
 - Create implementation plan with TodoWrite
 - Execute all code changes
@@ -69,7 +79,9 @@ Execute: `/execute-prp PRPs/task-xx-[feature-name].md`
 - Fix any issues until all tests pass
 
 #### 3.5 Completion
+
 Execute: `/close-issue`
+
 - Update TASK.md (move to completed, add notes)
 - Commit all changes
 - Create pull request with "Closes #X"
@@ -78,6 +90,7 @@ Execute: `/close-issue`
 - Return to main branch
 
 ### Step 4: Loop Control
+
 - After completing a task, check for more pending tasks
 - If tasks remain, continue with next priority task
 - If all tasks completed, exit pipeline
@@ -85,6 +98,7 @@ Execute: `/close-issue`
 ## Progress Tracking
 
 Throughout execution:
+
 - Show current task being processed
 - Display pipeline stage (1-5)
 - Report validation results
@@ -93,6 +107,7 @@ Throughout execution:
 ## Error Recovery
 
 If any step fails:
+
 - Stop at the failed step
 - Report the error clearly
 - Provide recovery instructions
@@ -101,6 +116,7 @@ If any step fails:
 ## Fully Automated Execution
 
 The pipeline runs continuously without user checkpoints:
+
 - Automatically selects the highest priority pending task
 - Executes all 5 pipeline steps without pausing
 - Automatically creates and merges pull requests
@@ -114,6 +130,7 @@ The pipeline runs continuously without user checkpoints:
 ```
 
 This will:
+
 1. Analyze TASK.md for all pending tasks
 2. Start with the highest priority task
 3. Execute the complete pipeline for that task automatically (no user confirmation)
