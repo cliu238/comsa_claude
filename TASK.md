@@ -258,6 +258,49 @@ Tasks are numbered using the following scheme:
   - **Priority**: Low
   - **Dependencies**: Deep learning framework
   - **Notes**: Address class imbalance in rare CODs
+- [RD-018] ✅ Analyze XGBoost vs InSilicoVA algorithmic differences and improve cross-site generalization
+  - **Priority**: High
+  - **Dependencies**: IM-035, IM-051 results (results/full_va34_comparison_complete)
+  - **Completed**: 2025-07-23
+  - **Issue**: #14
+  - **PR**: #15
+  - **Deliverable**: Comprehensive markdown report (reports/xgboost_insilico_analysis.md) - NO code modifications
+  - **Notes**: Deep analysis based on experimental evidence showing InSilicoVA's better generalization:
+    - **Experimental Evidence from VA34 comparison:**
+      - XGBoost: 81.5% in-domain → 43.8% out-domain (37.7% drop)
+      - InSilicoVA: 80.0% in-domain → 46.1% out-domain (33.9% drop)
+      - Worst XGBoost transfers: Dar→Pemba (3.3%), AP→Dar (12.7%)
+      - InSilicoVA maintains >25% accuracy even in worst cases
+    - **Algorithmic Nature Analysis:**
+      - XGBoost: Gradient boosting trees that learn complex site-specific patterns
+        - Data-driven: learns whatever patterns maximize accuracy
+        - No built-in epidemiological constraints
+        - Captures spurious correlations specific to training sites
+      - InSilicoVA: Probabilistic Bayesian framework (per McCormick et al., JASA)
+        - Knowledge-driven: incorporates medical/epidemiological priors
+        - Uses conditional probability tables for symptom-cause relationships
+        - Regularized by domain knowledge, preventing overfitting to site quirks
+    - **Site-Specific Analysis (from results):**
+      - Pemba as training site: Both models struggle (XGB=33.1%, INS=33.5%)
+      - AP as training site: InSilicoVA excels (53.7%) vs XGBoost (44.0%)
+      - High variance in XGBoost (±0.231) vs InSilicoVA (±0.105) for AP
+    - **XGBoost Improvement Strategies:**
+      1. Domain Adaptation: adversarial training, gradient reversal layers
+      2. Regularization: L2 on interactions, limit tree depth, feature dropout
+      3. Ensemble Methods: combine with InSilicoVA, site-specific calibration
+      4. Prior Knowledge: custom objectives, medical constraints, hierarchical modeling
+    - **XGBoost Advantages to Preserve:**
+      - Superior in-domain performance (81.5% vs 80.0%)
+      - 50x faster inference (0.9s vs 50s per experiment)
+      - No external dependencies (pure Python vs R/Java/Docker)
+      - Better handling of rare causes with sufficient data
+    - **Report Structure:**
+      1. Executive Summary
+      2. Experimental Results Analysis (with visualizations)
+      3. Algorithmic Deep Dive (theory and implementation differences)
+      4. Site-Specific Performance Patterns
+      5. Recommendations for XGBoost Improvements
+      6. Future Research Directions
 
 ## Milestones
 

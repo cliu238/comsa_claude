@@ -68,7 +68,8 @@
       "Bash(--n-bootstrap 5 )",
       "Bash(--output-dir results/va34_both_models_comparison)",
       "Bash(RAY_ENABLE_MAC_LARGE_OBJECT_STORE=1 poetry run python model_comparison/scripts/run_va34_comparison.py --data-path ./results/insilico_full_run/processed_data/adult_openva_20250718_170102.csv --parallel --n-workers 4 --sites AP BD BRHIMS --models xgboost insilico --training-sizes 1.0 --n-bootstrap 10 --output-dir results/parallel_demo_both --no-plots)",
-      "Bash(cut:*)"
+      "Bash(cut:*)",
+      "mcp__context7__resolve-library-id"
     ],
     "deny": []
   }
