@@ -224,7 +224,7 @@ def main():
                     print(f"\n{model}:")
                     for _, row in model_size.iterrows():
                         print(
-                            f"  {row['training_fraction']:.0%}: "
+                            f"  {row['training_size']:.0%}: "
                             f"CSMF={row['csmf_accuracy']:.3f}"
                         )
         
