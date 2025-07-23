@@ -77,6 +77,7 @@ Execute: `/execute-prp PRPs/task-xx-[feature-name].md`
 - Execute all code changes
 - Run validation commands
 - Fix any issues until all tests pass
+- run it at least once to make sure it all works(IMPORTANT!!!!)
 
 #### 3.5 Completion
 
@@ -94,6 +95,8 @@ Execute: `/close-issue`
 - After completing a task, check for more pending tasks
 - If tasks remain, continue with next priority task
 - If all tasks completed, exit pipeline
+- If the whole loop has to stop or pause somewhere, please keep the time stamp
+- Report how to run everything or where is the output/result and update README.md
 
 ## Progress Tracking
 

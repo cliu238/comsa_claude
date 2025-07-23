@@ -15,7 +15,12 @@ test_output/
 
 # Runtime results
 results/*/
+model_comparison/results/*/
 
 # Temporary example files
 examples/cross_site_splitting.py
 examples/dataset_splitting_v2.py
+
+# Log files
+*.log
+va34_comparison.log

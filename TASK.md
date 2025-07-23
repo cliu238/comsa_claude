@@ -64,13 +64,14 @@ Tasks are numbered using the following scheme:
   - **Dependencies**: Docker, data pipeline modules
   - **Completed**: Q1 2025
   - **Notes**: Sklearn-like interface, Docker-based execution, CSMF accuracy evaluation (~0.79)
-
-### Classical ML Models (VA Baselines) 🚧
-- [IM-045] 📋 Implement XGBoost baseline model
+- [IM-045] ✅ Implement XGBoost baseline model
   - **Priority**: High
   - **Dependencies**: VADataProcessor, numeric encoding
-  - **Target Date**: Q2 2025
-  - **Notes**: Multi-class classification with hyperparameter tuning
+  - **Completed**: 2025-07-22
+  - **Notes**: Multi-class classification with hyperparameter tuning, Optuna integration, CSMF accuracy metric, 94% test coverage
+  - **Issue**: #8 - Successfully implemented XGBoost with sklearn-like interface, feature importance, cross-validation
+
+### Classical ML Models (VA Baselines) 📋
 - [IM-046] 📋 Implement Random Forest baseline model
   - **Priority**: High
   - **Dependencies**: VADataProcessor, numeric encoding
@@ -102,27 +103,31 @@ Tasks are numbered using the following scheme:
 ### Transfer Learning Module 📋
 - [IM-014] 📋 Create transfer_learning package structure
 - [IM-015] 📋 Design domain adaptation architecture
-- [IM-016] 📋 Implement source/target dataset handling
   - **Priority**: High
-  - **Dependencies**: VADataProcessor, baseline models
-  - **Notes**: Support WHO-2016, MITS, COMSA standards
-- [IM-017] 📋 Implement instance-based transfer methods
+  - **Dependencies**: IM-035 site comparison results
+  - **Notes**: Focus on algorithmic domain adaptation techniques
+- [IM-016] 📋 Implement transfer learning algorithms
   - **Priority**: High
-  - **Dependencies**: ADAPT library integration
-  - **Notes**: TrAdaBoost, KLIEP, KMM methods
-- [IM-018] 📋 Implement feature-based transfer methods
+  - **Dependencies**: ADAPT library, baseline models
+  - **Notes**: TrAdaBoost, KLIEP, KMM for domain adaptation
+    - Different from IM-035 which compares existing models
+    - This implements new transfer learning models
+- [IM-017] 📋 Implement feature-based transfer methods
   - **Priority**: Medium
   - **Dependencies**: Feature extraction pipeline
-  - **Notes**: CORAL, Feature Augmentation (FA)
-- [IM-019] 📋 Add TransTab integration for tabular transfer
+  - **Notes**: CORAL, Feature Augmentation, domain-invariant features
+- [IM-018] 📋 Add TransTab integration for tabular transfer
   - **Priority**: Medium
   - **Dependencies**: Deep learning framework
-  - **Notes**: Pre-trained tabular models
-- [IM-020] 📋 Create cross-validation for transfer tasks
-- [IM-021] 📋 Implement transfer performance metrics
-- [IM-022] 📋 Create visualization tools
-- [IM-023] 📋 Write comprehensive tests
-- [IM-024] 📋 Document usage and examples
+  - **Notes**: Pre-trained tabular models, fine-tuning approaches
+- [IM-019] 📋 Create transfer learning evaluation framework
+  - **Priority**: Medium
+  - **Dependencies**: IM-016, IM-017, IM-018
+  - **Notes**: Specific to transfer learning methods, not general comparison
+- [IM-020] 📋 Write comprehensive tests and documentation
+  - **Priority**: Medium
+  - **Dependencies**: All transfer learning implementations
+  - **Notes**: Unit tests, integration tests, usage examples
 
 ### Active Learning Module 📋
 - [IM-025] 📋 Create active_learning package structure
@@ -137,28 +142,61 @@ Tasks are numbered using the following scheme:
 - [IM-034] 📋 Create interactive examples
 
 ### Model Comparison Framework 📋
-- [IM-035] 📋 Design comparison pipeline architecture
+- [IM-035] ✅ Implement VA34 site-based model comparison experiment
   - **Priority**: High
-  - **Dependencies**: InSilicoVA (✅), ML baselines (pending)
-  - **Notes**: Unified interface for all VA models
-- [IM-036] 📋 Implement multiple model training pipeline
+  - **Dependencies**: InSilicoVA (✅), XGBoost (✅), VADataSplitter (✅)
+  - **Completed**: 2025-07-22
+  - **PR**: #11
+  - **Notes**: Compare InSilicoVA vs XGBoost using VA34 labels across:
+    - In-domain: train/test on same site
+    - Out-domain: train on one site, test on different sites
+    - Varying training data sizes to test generalization
+    - Metrics: CSMF accuracy, COD accuracy
+    - Test hypothesis: does more training data hurt out-domain performance?
+- [IM-051] ✅ Optimize VA comparison scripts with Prefect and Ray
   - **Priority**: High
-  - **Dependencies**: All baseline models
-  - **Notes**: Parallel training, resource management
-- [IM-037] 📋 Create unified metrics calculation
+  - **Dependencies**: IM-035, Prefect, Ray
+  - **Completed**: 2025-07-23
+  - **PR**: #13
+  - **Notes**: Parallelize model training and evaluation using Prefect workflows and Ray distributed computing
+    - Added timing and process status tracking throughout execution
+    - Optimized run_va34_comparison.py with --parallel flag
+    - Enabled distributed execution across multiple cores/machines
+    - Implemented checkpointing for long-running experiments
+    - Added real-time progress monitoring with tqdm
+    - Created new run_distributed_comparison.py script
+    - Achieved 50%+ performance improvement goal
+    - **Post-implementation fixes**:
+      - Fixed InSilicoVA data format compatibility (preserved "Y"/"." format)
+      - Fixed training_fraction/training_size column naming mismatch
+      - Required manual intervention after automated workflow claimed completion
+- [IM-036] 📋 Create unified model comparison pipeline
   - **Priority**: High
-  - **Dependencies**: CSMF accuracy, COD accuracy metrics
-  - **Notes**: VA-specific metrics, classification metrics
-- [IM-038] 📋 Build statistical significance testing
+  - **Dependencies**: IM-035 results, all baseline models
+  - **Notes**: Generalize IM-035 approach for all models, parallel execution
+- [IM-037] 📋 Build statistical significance testing framework
   - **Priority**: Medium
-  - **Dependencies**: Multiple model results
-  - **Notes**: DeLong test, bootstrapping methods
-- [IM-039] 📋 Add visualization dashboards
-- [IM-040] 📋 Implement result export formats
-- [IM-041] 📋 Create automated report generation
-- [IM-042] 📋 Add hyperparameter comparison
-- [IM-043] 📋 Write comprehensive tests
-- [IM-044] 📋 Document interpretation guidelines
+  - **Dependencies**: IM-035, IM-036
+  - **Notes**: DeLong test, bootstrapping, confidence intervals
+- [IM-038] 📋 Create comparison visualization and reporting
+  - **Priority**: Medium
+  - **Dependencies**: IM-035, IM-036, IM-037
+  - **Notes**: Consolidated task for dashboards, exports, automated reports
+- [IM-039] 📋 Write comprehensive tests for comparison framework
+  - **Priority**: Medium
+  - **Dependencies**: IM-035, IM-036
+  - **Notes**: Unit tests, integration tests, result validation
+- [IM-040] 📋 Document model comparison interpretation guidelines
+  - **Priority**: Low
+  - **Dependencies**: IM-035 through IM-039
+  - **Notes**: Best practices, result interpretation, decision guidelines
+- [IM-041] 📋 Implement COD5 site-based model comparison
+  - **Priority**: Medium
+  - **Dependencies**: IM-035 (VA34 comparison)
+  - **Target Date**: Q3 2025
+  - **Notes**: Repeat IM-035 experiment using COD5 labels (5 aggregated causes)
+    - Compare if simpler labels improve cross-site generalization
+    - Same experimental design as IM-035 but with COD5
 
 ## DevOps & Infrastructure Tasks
 
@@ -229,9 +267,9 @@ Tasks are numbered using the following scheme:
 - [MS-003] ✅ Establish project documentation
 
 ### Q2 2025 🚧
-- [MS-004] 📋 Complete ML baseline models (XGBoost, RF, LR, NB)
+- [MS-004] 📋 Complete ML baseline models (XGBoost ✅, RF, LR, NB)
 - [MS-005] 📋 Integrate classical VA algorithms (InterVA, openVA)
-- [MS-006] 📋 Launch model comparison framework
+- [MS-006] ✅ Launch model comparison framework (IM-035 ✅, IM-051 ✅)
 - [MS-007] 📋 Complete transfer learning module
 
 ### Q3 2025 📋
@@ -280,6 +318,31 @@ Task ID Format: [Category-Number] where Category is CF/IM/DO/RD/MS
 2. VA-specific research tasks - future improvements
 3. Performance optimizations - after functionality
 4. Documentation videos - supplementary materials
+
+## Current Sprint (Q2 2025)
+
+### Recently Completed
+- [IM-045] ✅ XGBoost baseline model - 2025-07-22
+- [IM-035] ✅ VA34 site-based model comparison experiment - 2025-07-22 (PR #11)
+- [IM-051] ✅ Optimize VA comparison scripts with Prefect and Ray - 2025-07-23 (PR #13)
+
+### In Progress
+- No tasks currently in progress
+
+### Next Up
+- [IM-046] Random Forest baseline model
+- [IM-049] InterVA model integration
+- [MS-004] Complete ML baseline models milestone
+
+### Recent Fixes (Q2 2025)
+- **InSilicoVA Data Format Compatibility** (2025-07-23)
+  - Fixed data preprocessing in ray_tasks.py to preserve "Y"/"." format for InSilicoVA
+  - XGBoost requires numeric encoding, InSilicoVA requires original format
+  - Commit: 2e6c580
+- **Training Size Column Naming** (2025-07-23)
+  - Fixed KeyError in summary script: changed training_fraction to training_size
+  - ExperimentResult class uses training_size, not training_fraction
+  - Commit: 16b1279
 
 ## Notes
 
