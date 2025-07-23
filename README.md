@@ -551,6 +551,54 @@ RAY_ENABLE_MAC_LARGE_OBJECT_STORE=1 poetry run python model_comparison/scripts/r
 - Backward compatible (sequential execution by default)
 - Automatic handling of data format requirements (numeric for XGBoost, "Y"/"." for InSilicoVA)
 
+## Model Implementations
+
+### XGBoost with Medical Priors (NEW)
+
+The `XGBoostPriorEnhanced` model incorporates medical knowledge from InSilicoVA to improve cross-site generalization:
+
+```python
+from baseline.models import XGBoostPriorEnhanced
+from baseline.models.xgboost_prior_config import XGBoostPriorConfig
+
+# Configure prior-enhanced model
+config = XGBoostPriorConfig(
+    n_estimators=100,
+    max_depth=6,
+    use_medical_priors=True,
+    prior_method="both",  # Use both custom objective and feature engineering
+    lambda_prior=0.15,    # Weight for prior term in objective
+    feature_prior_weight=1.0  # Weight for prior-based features
+)
+
+# Train model
+model = XGBoostPriorEnhanced(config)
+model.fit(X_train, y_train)
+
+# Make predictions
+predictions = model.predict(X_test)
+probabilities = model.predict_proba(X_test)
+
+# Analyze prior influence
+influence = model.get_prior_influence_report()
+print(f"Prior contribution: {influence['avg_contribution']:.2%}")
+```
+
+**Key Features:**
+- **Custom Objective Function**: Incorporates medical priors directly into XGBoost training
+- **Feature Engineering**: Adds symptom-cause likelihood features based on prior knowledge
+- **Flexible Integration**: Can use either or both approaches
+- **Performance**: Expected 15-25% improvement in cross-site generalization (based on RD-018 analysis)
+
+**Extracting InSilicoVA Prior Data:**
+```bash
+# Prerequisites: R and InSilicoVA R package
+cd baseline/models/medical_priors
+python extract_insilico_priors.py
+```
+
+This will extract conditional probability matrices from InSilicoVA and save them for use by the prior-enhanced XGBoost model.
+
 ## Resources
 
 - [Claude Code Documentation](https://docs.anthropic.com/en/docs/claude-code)

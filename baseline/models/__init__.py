@@ -13,6 +13,8 @@ from baseline.models.model_config import InSilicoVAConfig
 from baseline.models.model_validator import InSilicoVAValidator, ModelValidationResult
 from baseline.models.xgboost_config import XGBoostConfig
 from baseline.models.xgboost_model import XGBoostModel
+from baseline.models.xgboost_prior_config import XGBoostPriorConfig
+from baseline.models.xgboost_prior_enhanced import XGBoostPriorEnhanced
 
 __all__ = [
     "InSilicoVAModel",
@@ -21,6 +23,8 @@ __all__ = [
     "ModelValidationResult",
     "XGBoostModel",
     "XGBoostConfig",
+    "XGBoostPriorEnhanced",
+    "XGBoostPriorConfig",
     "XGBoostHyperparameterTuner",
     "quick_tune_xgboost",
 ]
