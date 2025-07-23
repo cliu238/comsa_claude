@@ -61,9 +61,15 @@ def train_and_evaluate_model(
         else:
             raise ValueError(f"Unknown model: {model_name}")
 
-        # Preprocess features if needed
-        X_train_processed = _preprocess_features(X_train)
-        X_test_processed = _preprocess_features(X_test)
+        # Preprocess features only for ML models (not InSilicoVA)
+        if model_name == "insilico":
+            # InSilicoVA needs the original "Y"/"." format
+            X_train_processed = X_train
+            X_test_processed = X_test
+        else:
+            # Other models need numeric encoding
+            X_train_processed = _preprocess_features(X_train)
+            X_test_processed = _preprocess_features(X_test)
 
         # Train model
         logger.info(f"Training {model_name} on {len(X_train)} samples")
@@ -135,13 +141,19 @@ def train_and_evaluate_model(
 
 
 def _preprocess_features(X: pd.DataFrame) -> pd.DataFrame:
-    """Preprocess features for model training.
+    """Preprocess features for ML model training.
+    
+    Converts categorical features (including "Y"/"." format) to numeric codes.
+    This is required for scikit-learn based models like XGBoost.
+    
+    Note: InSilicoVA should NOT use this preprocessing as it requires
+    the original "Y"/"." format.
 
     Args:
         X: Input features DataFrame
 
     Returns:
-        Preprocessed features DataFrame
+        Preprocessed features DataFrame with numeric encoding
     """
     X_processed = X.copy()
 
@@ -149,6 +161,7 @@ def _preprocess_features(X: pd.DataFrame) -> pd.DataFrame:
     for col in X_processed.columns:
         if X_processed[col].dtype == "object":
             # Simple label encoding for categorical features
+            # This converts "Y" -> 1, "." -> 0, etc.
             X_processed[col] = pd.Categorical(X_processed[col]).codes
 
     return X_processed
