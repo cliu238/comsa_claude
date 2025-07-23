@@ -633,7 +633,6 @@ All models support:
 - Cross-validation with stratification
 - sklearn-compatible interface (fit, predict, predict_proba)
 - Integration with the model comparison framework
-
 ## Resources
 
 - [Claude Code Documentation](https://docs.anthropic.com/en/docs/claude-code)
