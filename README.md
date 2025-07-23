@@ -454,36 +454,57 @@ context-engineering-intro/
 
 The VA34 site-based model comparison experiment has been implemented to compare InSilicoVA and XGBoost performance across different VA data collection sites.
 
+### Data Preprocessing
+
+Before running the comparison, you must first preprocess the VA data using the baseline module:
+
+```bash
+# Generate OpenVA format data (required for InSilicoVA)
+poetry run python baseline/example_usage.py
+```
+
+This creates processed data files in `results/baseline/processed_data/` with the appropriate format for both models.
+
 ### Running the Experiment
 
 ```bash
 # Basic usage
-python run_va34_comparison.py --data-path path/to/va_data.csv
+poetry run python model_comparison/scripts/run_va34_comparison.py --data-path path/to/va_data.csv
 
-# Full example with all options
-python run_va34_comparison.py \
-  --data-path ./results/baseline/processed_data/adult_openva_20250717_163656.csv \
-  --sites AP Bohol Dar Mexico UP \
-  --models insilico xgboost \
+# Full example with all options (Mac users need RAY_ENABLE_MAC_LARGE_OBJECT_STORE=1)
+RAY_ENABLE_MAC_LARGE_OBJECT_STORE=1 poetry run python model_comparison/scripts/run_va34_comparison.py \
+  --data-path results/baseline/processed_data/adult_openva_20250723_103018.csv \
+  --sites AP Bohol Dar Mexico Pemba UP \
+  --models xgboost insilico \
   --training-sizes 0.25 0.5 0.75 1.0 \
-  --n-bootstrap 50 \
-  --output-dir results/va34_comparison
+  --n-bootstrap 100 \
+  --parallel \
+  --n-workers 8 \
+  --batch-size 50 \
+  --output-dir results/full_va34_comparison_complete \
+  --no-plots
 ```
 
 ### Key Findings (Real VA Data)
 
-After fixing data leakage issues, the experiment shows realistic performance:
+After fixing data leakage issues and data format compatibility, the experiment shows realistic performance:
 
 **XGBoost Performance:**
-- **In-domain CSMF accuracy**: 83.1% (training and testing on same site)
-- **Out-domain CSMF accuracy**: 43.4% (training on one site, testing on another)
-- **Generalization gap**: 39.7% performance drop
-- **COD accuracy**: ~40% in-domain, ~20% out-domain
+- **In-domain CSMF accuracy**: 81.5% (training and testing on same site)
+- **Out-domain CSMF accuracy**: 43.8% (training on one site, testing on another)
+- **Generalization gap**: 37.7% performance drop
+- **Training size impact**: Performance improves from 71.6% (25% data) to 81.8% (100% data)
 
-**Site-specific observations:**
-- Significant variation in cross-site performance
-- Some sites generalize better than others
-- More training data improves rather than hurts performance
+**InSilicoVA Performance:**
+- **In-domain CSMF accuracy**: 80.0% (training and testing on same site)
+- **Out-domain CSMF accuracy**: 46.1% (training on one site, testing on another)
+- **Generalization gap**: 33.9% performance drop (better generalization than XGBoost)
+- **Training size impact**: Performance improves from 74.3% (25% data) to 79.7% (100% data)
+
+**Key observations:**
+- InSilicoVA shows better cross-site generalization despite similar in-domain performance
+- Both models benefit from more training data
+- Significant variation in cross-site performance depending on site pairs
 
 ### Output Files
 
@@ -495,37 +516,40 @@ Results are saved to the specified output directory:
 - `summary_statistics.csv` - Aggregated statistics
 - Visualization plots (if --no-plots not specified)
 
-### Parallel Execution (New Feature)
+### Parallel Execution with Prefect and Ray
 
-The comparison scripts now support parallel execution using Ray for significant performance improvements:
+The comparison scripts now support parallel execution using Prefect orchestration and Ray distributed computing for significant performance improvements:
 
 ```bash
 # Enable parallel execution with the --parallel flag
-python run_va34_comparison.py \
-  --data-path ./data/va_data.csv \
+poetry run python model_comparison/scripts/run_va34_comparison.py \
+  --data-path ./results/baseline/processed_data/adult_openva_20250723_103018.csv \
   --sites AP Bohol Dar \
   --models insilico xgboost \
   --parallel \
   --n-workers 4 \
   --batch-size 50
 
-# Or use the distributed script for full control
-python model_comparison/scripts/run_distributed_comparison.py \
-  --data-path ./data/va_data.csv \
+# For Mac users, set the Ray object store environment variable
+RAY_ENABLE_MAC_LARGE_OBJECT_STORE=1 poetry run python model_comparison/scripts/run_va34_comparison.py \
+  --data-path ./results/baseline/processed_data/adult_openva_20250723_103018.csv \
   --sites AP Bohol Dar Mexico UP \
   --models xgboost insilico \
+  --parallel \
   --n-workers 8 \
   --checkpoint-interval 10 \
   --resume  # Resume from checkpoint if interrupted
 ```
 
 **Features:**
-- 50%+ performance improvement through parallel model training
+- 50%+ performance improvement through parallel model training with Ray
+- Prefect orchestration for workflow management and monitoring
 - Real-time progress monitoring with tqdm
 - Checkpoint/resume capability for long experiments
 - Ray dashboard at http://localhost:8265 for monitoring
 - Memory-efficient data sharing across workers
 - Backward compatible (sequential execution by default)
+- Automatic handling of data format requirements (numeric for XGBoost, "Y"/"." for InSilicoVA)
 
 ## Resources
 

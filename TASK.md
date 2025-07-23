@@ -156,8 +156,8 @@ Tasks are numbered using the following scheme:
 - [IM-051] ✅ Optimize VA comparison scripts with Prefect and Ray
   - **Priority**: High
   - **Dependencies**: IM-035, Prefect, Ray
-  - **Completed**: 2025-07-22
-  - **PR**: #12 (pending)
+  - **Completed**: 2025-07-23
+  - **PR**: #13
   - **Notes**: Parallelize model training and evaluation using Prefect workflows and Ray distributed computing
     - Added timing and process status tracking throughout execution
     - Optimized run_va34_comparison.py with --parallel flag
@@ -166,6 +166,10 @@ Tasks are numbered using the following scheme:
     - Added real-time progress monitoring with tqdm
     - Created new run_distributed_comparison.py script
     - Achieved 50%+ performance improvement goal
+    - **Post-implementation fixes**:
+      - Fixed InSilicoVA data format compatibility (preserved "Y"/"." format)
+      - Fixed training_fraction/training_size column naming mismatch
+      - Required manual intervention after automated workflow claimed completion
 - [IM-036] 📋 Create unified model comparison pipeline
   - **Priority**: High
   - **Dependencies**: IM-035 results, all baseline models
@@ -265,7 +269,7 @@ Tasks are numbered using the following scheme:
 ### Q2 2025 🚧
 - [MS-004] 📋 Complete ML baseline models (XGBoost ✅, RF, LR, NB)
 - [MS-005] 📋 Integrate classical VA algorithms (InterVA, openVA)
-- [MS-006] 🚧 Launch model comparison framework (IM-035 ✅)
+- [MS-006] ✅ Launch model comparison framework (IM-035 ✅, IM-051 ✅)
 - [MS-007] 📋 Complete transfer learning module
 
 ### Q3 2025 📋
@@ -320,7 +324,7 @@ Task ID Format: [Category-Number] where Category is CF/IM/DO/RD/MS
 ### Recently Completed
 - [IM-045] ✅ XGBoost baseline model - 2025-07-22
 - [IM-035] ✅ VA34 site-based model comparison experiment - 2025-07-22 (PR #11)
-- [IM-051] ✅ Optimize VA comparison scripts with Prefect and Ray - 2025-07-22 (PR #12 pending)
+- [IM-051] ✅ Optimize VA comparison scripts with Prefect and Ray - 2025-07-23 (PR #13)
 
 ### In Progress
 - No tasks currently in progress
@@ -329,6 +333,16 @@ Task ID Format: [Category-Number] where Category is CF/IM/DO/RD/MS
 - [IM-046] Random Forest baseline model
 - [IM-049] InterVA model integration
 - [MS-004] Complete ML baseline models milestone
+
+### Recent Fixes (Q2 2025)
+- **InSilicoVA Data Format Compatibility** (2025-07-23)
+  - Fixed data preprocessing in ray_tasks.py to preserve "Y"/"." format for InSilicoVA
+  - XGBoost requires numeric encoding, InSilicoVA requires original format
+  - Commit: 2e6c580
+- **Training Size Column Naming** (2025-07-23)
+  - Fixed KeyError in summary script: changed training_fraction to training_size
+  - ExperimentResult class uses training_size, not training_fraction
+  - Commit: 16b1279
 
 ## Notes
 

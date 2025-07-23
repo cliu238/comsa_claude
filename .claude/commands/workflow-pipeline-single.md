@@ -78,8 +78,34 @@ Execute: `/execute-prp PRPs/task-xx-[feature-name].md`
 - Execute all code changes
 - Run validation commands
 - Fix any issues until all tests pass
-- actually run it to make sure it all works(IMPORTANT!!!!)
-- Fix any issues until all run pass
+
+#### 3.4.1 Real-World Verification (CRITICAL)
+
+Before marking implementation complete:
+
+1. **Test with actual data** - Run the implementation with real project data:
+   - Use existing processed data files if available
+   - Test all major code paths and model types
+   - Verify output files are created correctly
+   - Check logs for any errors or warnings
+
+2. **Verify all components work** - For ML/VA tasks:
+   - Test each model type independently (XGBoost, InSilicoVA, etc.)
+   - Confirm data format compatibility for each model
+   - Ensure parallel execution works if implemented
+   - Validate results make sense (no 0% accuracy, etc.)
+
+3. **Document test commands** - Save the exact commands used for testing:
+   - Include in PR description
+   - Update README if new usage patterns
+
+4. **Fix all failures** - Do NOT proceed if:
+   - Any model fails to run
+   - Errors appear in logs
+   - Output is missing or incorrect
+   - Performance is significantly degraded
+
+Only after ALL real-world tests pass should the task continue to completion.
 
 #### 3.5 Completion
 
@@ -92,12 +118,31 @@ Execute: `/close-issue`
 - Delete feature branch
 - Return to main branch
 
-### Step 4: Completion
+### Step 4: Final Verification & Completion
 
-- After completing the specified task, update TASK.md status
-- Report successful completion with task details
-- Exit pipeline gracefully
-- Report how to run it or where is the output/result and update README.md
+Before marking task as complete:
+
+1. **Verification Checklist**:
+   - ✓ All tests pass (unit tests, integration tests)
+   - ✓ Real-world data tests successful (no model failures)
+   - ✓ All intended functionality works as designed
+   - ✓ Performance meets requirements
+   - ✓ Documentation updated (README, usage examples)
+   - ✓ No errors in logs during real usage
+
+2. **Completion Actions**:
+   - Update TASK.md status only after verification
+   - Report successful completion with:
+     - Task details
+     - Test results summary
+     - Commands to reproduce tests
+   - Include output locations and usage instructions
+   - Update README.md with new functionality
+
+3. **Exit Criteria**:
+   - Task marked complete ONLY when fully functional
+   - All verification steps documented in PR
+   - Real-world usage confirmed working
 
 ## Progress Tracking
 
@@ -151,3 +196,13 @@ This will:
 - **FULLY AUTOMATED**: No user confirmations or checkpoints - runs until task completion
 - User can interrupt the pipeline manually if needed, but it will not pause on its own
 - The pipeline will automatically merge the PR for the specified task
+
+## Critical Requirements
+
+- **NEVER mark a task complete without real-world verification**
+- **Unit tests alone are insufficient** - must test with actual project data
+- **All model types must be tested** - partial functionality is not complete
+- **Log files must be checked** - silent failures are still failures
+- **Performance must be validated** - working slowly may indicate issues
+
+The pipeline's primary goal is delivering working functionality, not just completing procedural steps.
