@@ -46,7 +46,7 @@ def main():
     parser.add_argument(
         "--models",
         nargs="+",
-        choices=["insilico", "xgboost", "random_forest"],
+        choices=["insilico", "xgboost", "random_forest", "logistic_regression"],
         default=["insilico", "xgboost"],
         help="Models to compare",
     )

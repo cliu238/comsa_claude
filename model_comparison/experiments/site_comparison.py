@@ -138,6 +138,9 @@ class SiteComparisonExperiment:
             return XGBoostModel()
         elif model_name == "random_forest":
             return RandomForestModel()
+        elif model_name == "logistic_regression":
+            from baseline.models import LogisticRegressionModel
+            return LogisticRegressionModel()
         else:
             raise ValueError(f"Unknown model: {model_name}")
     

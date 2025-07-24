@@ -81,6 +81,12 @@ baseline/
 - **active_learning/**: Intelligent sample selection
 - **model_comparison/**: Systematic algorithm evaluation with InSilicoVA baseline
 
+#### Current Development
+- **Task IM-047**: Implementing Logistic Regression baseline model
+  - Multinomial classification with L1/L2/ElasticNet regularization
+  - Feature importance via coefficients for interpretability
+  - Part of ML baseline models suite
+
 ## Design Principles
 
 ### 1. Context is King
