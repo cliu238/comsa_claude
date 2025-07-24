@@ -169,29 +169,39 @@ def generate_experiment_configs(
 
 @task
 def prepare_experiment_data(
-    experiments: List[Dict], data: pd.DataFrame, config: ExperimentConfig
+    experiments: List[Dict], data: pd.DataFrame, config: ExperimentConfig, data_openva_ref=None
 ) -> List[Dict]:
     """Prepare data for experiments using Ray.
 
     Args:
         experiments: List of experiment configurations
-        data: Full dataset
+        data: Full dataset (numeric encoding for ML models)
         config: Experiment configuration
+        data_openva_ref: Ray object reference to OpenVA encoded data (for InSilico)
 
     Returns:
         Updated experiment configurations with data references
     """
+    # Get OpenVA data from Ray if provided
+    data_openva = ray.get(data_openva_ref) if data_openva_ref else None
+    
     # Prepare data splits in parallel
     site_data_refs = {}
+    site_data_refs_openva = {}
     sites_to_prepare = list(set(exp.get("site", exp.get("train_site")) for exp in experiments))
 
-    # Submit data preparation tasks
+    # Submit data preparation tasks for both data formats
     prep_tasks = {}
+    prep_tasks_openva = {}
     for site in sites_to_prepare:
         if site and site not in site_data_refs:
             prep_tasks[site] = prepare_data_for_site.remote(
                 data, site, random_seed=config.random_seed
             )
+            if data_openva is not None:
+                prep_tasks_openva[site] = prepare_data_for_site.remote(
+                    data_openva, site, random_seed=config.random_seed
+                )
 
     # Collect results
     for site, task_ref in prep_tasks.items():
@@ -202,33 +212,50 @@ def prepare_experiment_data(
                 "train_data": ray.put((X_train, y_train)),
                 "test_data": ray.put((X_test, y_test)),
             }
+    
+    # Collect OpenVA results if available
+    for site, task_ref in prep_tasks_openva.items():
+        result = ray.get(task_ref)
+        if result is not None:
+            X_train, X_test, y_train, y_test = result
+            site_data_refs_openva[site] = {
+                "train_data": ray.put((X_train, y_train)),
+                "test_data": ray.put((X_test, y_test)),
+            }
 
     # Update experiment configs with data references
     updated_experiments = []
     for exp in experiments:
         exp_copy = exp.copy()
+        
+        # Choose appropriate data format based on model
+        model_name = exp.get("model_name", "")
+        if model_name == "insilico" and site_data_refs_openva:
+            data_refs = site_data_refs_openva
+        else:
+            data_refs = site_data_refs
 
         if exp["experiment_type"] == "in_domain":
             site = exp["site"]
-            if site in site_data_refs:
-                exp_copy["train_data"] = site_data_refs[site]["train_data"]
-                exp_copy["test_data"] = site_data_refs[site]["test_data"]
+            if site in data_refs:
+                exp_copy["train_data"] = data_refs[site]["train_data"]
+                exp_copy["test_data"] = data_refs[site]["test_data"]
                 updated_experiments.append(exp_copy)
 
         elif exp["experiment_type"] == "out_domain":
             train_site = exp["train_site"]
             test_site = exp["test_site"]
-            if train_site in site_data_refs and test_site in site_data_refs:
-                exp_copy["train_data"] = site_data_refs[train_site]["train_data"]
-                exp_copy["test_data"] = site_data_refs[test_site]["test_data"]
+            if train_site in data_refs and test_site in data_refs:
+                exp_copy["train_data"] = data_refs[train_site]["train_data"]
+                exp_copy["test_data"] = data_refs[test_site]["test_data"]
                 updated_experiments.append(exp_copy)
 
         elif exp["experiment_type"] == "training_size":
             site = exp["site"]
-            if site in site_data_refs:
+            if site in data_refs:
                 # For training size experiments, subsample the training data
-                exp_copy["train_data"] = site_data_refs[site]["train_data"]
-                exp_copy["test_data"] = site_data_refs[site]["test_data"]
+                exp_copy["train_data"] = data_refs[site]["train_data"]
+                exp_copy["test_data"] = data_refs[site]["test_data"]
                 exp_copy["training_fraction"] = exp["training_size"]
                 updated_experiments.append(exp_copy)
 
@@ -282,29 +309,65 @@ async def va34_comparison_flow(
             f"http://localhost:{parallel_config.ray_dashboard_port}"
         )
 
+    # Load and prepare data
+    import sys
+    from pathlib import Path as PathLib
+    
     # Initialize checkpoint manager
     checkpoint_manager = CheckpointManager(
         checkpoint_dir=str(Path(config.output_dir) / "checkpoints")
     )
-
-    # Load and prepare data
-    from baseline.data.data_loader import VADataProcessor
-
-    processor = VADataProcessor()
-    data = processor.load_data(config.data_path)
+    
+    # Add va-data to path if it exists
+    va_data_path = PathLib(__file__).parent.parent.parent / "va-data"
+    if va_data_path.exists() and str(va_data_path) not in sys.path:
+        sys.path.insert(0, str(va_data_path))
+    
+    from baseline.data.data_loader_preprocessor import VADataProcessor
+    from baseline.config.data_config import DataConfig
+    
+    # Create data config for loading
+    data_config = DataConfig(
+        data_path=config.data_path,
+        output_dir=config.output_dir,
+        openva_encoding=False,  # Load numeric first for ML models
+        stratify_by_site=False,
+        label_column="va34"
+    )
+    
+    processor = VADataProcessor(data_config)
+    data = processor.load_and_process()
+    
+    # Also load OpenVA encoded data for InSilico
+    data_config_openva = DataConfig(
+        data_path=config.data_path,
+        output_dir=config.output_dir,
+        openva_encoding=True,  # OpenVA format for InSilico
+        stratify_by_site=False,
+        label_column="va34"
+    )
+    processor_openva = VADataProcessor(data_config_openva)
+    data_openva = processor_openva.load_and_process()
 
     # Filter to specified sites
     if config.sites:
         data = data[data["site"].isin(config.sites)]
+        data_openva = data_openva[data_openva["site"].isin(config.sites)]
 
     # Handle va34 column
     if "va34" in data.columns and "cause" not in data.columns:
         data["cause"] = data["va34"].astype(str)
+    if "va34" in data_openva.columns and "cause" not in data_openva.columns:
+        data_openva["cause"] = data_openva["va34"].astype(str)
 
-    logger.info(f"Loaded data with shape: {data.shape}")
+    logger.info(f"Loaded ML data with shape: {data.shape}")
+    logger.info(f"Loaded OpenVA data with shape: {data_openva.shape}")
 
-    # Generate experiment configurations
+    # Put both datasets in Ray object store
     data_ref = ray.put(data)
+    data_openva_ref = ray.put(data_openva)
+    
+    # Generate experiment configurations
     experiments = generate_experiment_configs(config, data_ref, checkpoint_manager)
 
     # Check for existing checkpoint
@@ -318,7 +381,7 @@ async def va34_comparison_flow(
         start_time -= checkpoint.elapsed_seconds  # Adjust for previous run time
 
     # Prepare data for experiments
-    experiments = await prepare_experiment_data(experiments, data, config)
+    experiments = prepare_experiment_data(experiments, data, config, data_openva_ref)
 
     # Initialize progress tracking
     progress_actor = ProgressReporter.remote(len(experiments))
@@ -344,12 +407,19 @@ async def va34_comparison_flow(
         # Submit batch to Ray
         result_refs = []
         for exp in batch:
-            # Remove data_ref from individual experiments (already in train/test data)
-            exp_copy = exp.copy()
-            exp_copy.pop("data_ref", None)
-            exp_copy["n_bootstrap"] = config.n_bootstrap
-
-            result_ref = train_and_evaluate_model.remote(**exp_copy)
+            # Extract required fields for the remote function
+            model_name = exp["model_name"]
+            train_data = exp["train_data"]
+            test_data = exp["test_data"]
+            experiment_metadata = exp["experiment_metadata"]
+            
+            result_ref = train_and_evaluate_model.remote(
+                model_name=model_name,
+                train_data=train_data,
+                test_data=test_data,
+                experiment_metadata=experiment_metadata,
+                n_bootstrap=config.n_bootstrap
+            )
             result_refs.append(result_ref)
 
         # Wait for results with progress updates
@@ -387,12 +457,18 @@ async def va34_comparison_flow(
     if config.generate_plots:
         logger.info("Generating visualizations...")
         from model_comparison.visualization.comparison_plots import (
-            create_comparison_plots,
+            plot_model_comparison,
+            plot_model_performance,
+            plot_generalization_gap,
         )
 
         plot_dir = Path(config.output_dir) / "plots"
         plot_dir.mkdir(exist_ok=True)
-        create_comparison_plots(final_results, str(plot_dir))
+        
+        # Generate different plot types
+        plot_model_comparison(final_results, str(plot_dir / "model_comparison.png"))
+        plot_model_performance(final_results, str(plot_dir / "model_performance.png"))
+        plot_generalization_gap(final_results, str(plot_dir / "generalization_gap.png"))
 
     total_time = time.time() - start_time
     logger.info(

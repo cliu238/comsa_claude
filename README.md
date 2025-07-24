@@ -459,41 +459,24 @@ context-engineering-intro/
 
 ## VA34 Model Comparison Results
 
-The VA34 site-based model comparison experiment has been implemented to compare model performance across different VA data collection sites. Available models include:
+The VA34 site-based model comparison has been fully integrated into the distributed comparison framework. All model comparisons now use the unified `run_distributed_comparison.py` script which supports parallel execution with Ray and Prefect orchestration.
+
+### Available Models
+
 - **InSilicoVA**: Bayesian probabilistic model with epidemiological priors
-- **XGBoost**: Gradient boosting model with high accuracy
-- **Random Forest**: Ensemble model with excellent feature importance analysis
+- **XGBoost**: Gradient boosting model with excellent accuracy
+- **Random Forest**: Ensemble model with robust feature importance analysis
+- **Logistic Regression**: Fast linear model with L1/L2 regularization options
 
-### Data Preprocessing
+### Latest Performance Results
 
-Before running the comparison, you must first preprocess the VA data using the baseline module:
+Based on the latest implementation with all fixes applied:
 
-```bash
-# Generate OpenVA format data (required for InSilicoVA)
-poetry run python baseline/example_usage.py
-```
-
-This creates processed data files in `results/baseline/processed_data/` with the appropriate format for both models.
-
-### Running the Experiment
-
-```bash
-# Basic usage
-poetry run python model_comparison/scripts/run_va34_comparison.py --data-path path/to/va_data.csv
-
-# Full example with all options (Mac users need RAY_ENABLE_MAC_LARGE_OBJECT_STORE=1)
-RAY_ENABLE_MAC_LARGE_OBJECT_STORE=1 poetry run python model_comparison/scripts/run_va34_comparison.py \
-  --data-path results/baseline/processed_data/adult_openva_20250723_103018.csv \
-  --sites AP Bohol Dar Mexico Pemba UP \
-  --models xgboost insilico random_forest logistic_regression \
-  --training-sizes 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0 \
-  --n-bootstrap 100 \
-  --parallel \
-  --n-workers 8 \
-  --batch-size 50 \
-  --output-dir results/full_va34_comparison_complete \
-  --no-plots
-```
+**Model Performance (CSMF Accuracy)**:
+- **XGBoost**: 76.5% ± 10.9% (best overall performance)
+- **Logistic Regression**: 75.9% ± 9.3% (excellent performance with fast training)
+- **Random Forest**: 67.9% ± 11.5% (good balance of speed and accuracy)
+- **InSilico**: 62.6% ± 17.7% (best cross-site generalization despite lower average)
 
 ### Key Findings (Real VA Data)
 
@@ -526,40 +509,6 @@ Results are saved to the specified output directory:
 - `summary_statistics.csv` - Aggregated statistics
 - Visualization plots (if --no-plots not specified)
 
-### Parallel Execution with Prefect and Ray
-
-The comparison scripts now support parallel execution using Prefect orchestration and Ray distributed computing for significant performance improvements:
-
-```bash
-# Enable parallel execution with the --parallel flag
-poetry run python model_comparison/scripts/run_va34_comparison.py \
-  --data-path ./results/baseline/processed_data/adult_openva_20250723_103018.csv \
-  --sites AP Bohol Dar \
-  --models insilico xgboost \
-  --parallel \
-  --n-workers 4 \
-  --batch-size 50
-
-# For Mac users, set the Ray object store environment variable
-RAY_ENABLE_MAC_LARGE_OBJECT_STORE=1 poetry run python model_comparison/scripts/run_va34_comparison.py \
-  --data-path ./results/baseline/processed_data/adult_openva_20250723_103018.csv \
-  --sites AP Bohol Dar Mexico UP \
-  --models xgboost insilico \
-  --parallel \
-  --n-workers 8 \
-  --checkpoint-interval 10 \
-  --resume  # Resume from checkpoint if interrupted
-```
-
-**Features:**
-- 50%+ performance improvement through parallel model training with Ray
-- Prefect orchestration for workflow management and monitoring
-- Real-time progress monitoring with tqdm
-- Checkpoint/resume capability for long experiments
-- Ray dashboard at http://localhost:8265 for monitoring
-- Memory-efficient data sharing across workers
-- Backward compatible (sequential execution by default)
-- Automatic handling of data format requirements (numeric for XGBoost, "Y"/"." for InSilicoVA)
 
 ## Available ML Models
 
@@ -665,6 +614,130 @@ All models support:
 - Cross-validation with stratification
 - sklearn-compatible interface (fit, predict, predict_proba)
 - Integration with the model comparison framework
+
+## Distributed Model Comparison
+
+The project includes a distributed model comparison framework using Ray and Prefect for running large-scale experiments across multiple models and sites. This unified framework replaces the previous separate scripts and provides parallel execution capabilities for all model types.
+
+### Quick Start Commands
+
+#### System Requirements Note
+The `--n-workers` parameter should be adjusted based on your system:
+- **2-4 cores**: Use `--n-workers 2`
+- **8 cores**: Use `--n-workers 4-6`
+- **16+ cores**: Use `--n-workers 8-14` (leave some cores for system tasks)
+
+For a quick test with fewer experiments:
+```bash
+poetry run python model_comparison/scripts/run_distributed_comparison.py \
+    --data-path data/raw/PHMRC/IHME_PHMRC_VA_DATA_ADULT_Y2013M09D11_0.csv \
+    --sites Mexico AP UP \
+    --models logistic_regression random_forest xgboost insilico \
+    --n-workers 8 \
+    --training-sizes 0.5 1.0 \
+    --n-bootstrap 10 \
+    --output-dir results/model_comparison_quick \
+    --no-plots
+```
+
+For full evaluation (recommended to run in terminal due to long execution time):
+```bash
+poetry run python model_comparison/scripts/run_distributed_comparison.py \
+    --data-path data/raw/PHMRC/IHME_PHMRC_VA_DATA_ADULT_Y2013M09D11_0.csv \
+    --sites Mexico AP UP \
+    --models logistic_regression random_forest xgboost insilico \
+    --n-workers 12 \
+    --training-sizes 0.25 0.5 0.75 1.0 \
+    --n-bootstrap 100 \
+    --output-dir results/model_comparison_full \
+    --no-plots
+```
+
+For all sites with maximum parallelization:
+```bash
+poetry run python model_comparison/scripts/run_distributed_comparison.py \
+    --data-path data/raw/PHMRC/IHME_PHMRC_VA_DATA_ADULT_Y2013M09D11_0.csv \
+    --sites Mexico AP UP Dar Bohol Pemba \
+    --models logistic_regression random_forest xgboost insilico \
+    --n-workers 14 \
+    --training-sizes 0.25 0.5 0.75 1.0 \
+    --n-bootstrap 100 \
+    --batch-size 100 \
+    --output-dir results/model_comparison_all_sites \
+    --no-plots
+```
+
+### Command Line Options
+
+- `--data-path`: Path to the VA data CSV file (required)
+- `--sites`: List of sites to include in comparison (e.g., Mexico AP UP Dar Bohol Pemba)
+- `--models`: Models to compare (choices: logistic_regression, random_forest, xgboost, insilico)
+- `--n-workers`: Number of Ray workers for parallel execution (-1 for auto)
+- `--training-sizes`: Training data fractions for size experiments (default: 0.25 0.5 0.75 1.0)
+- `--n-bootstrap`: Number of bootstrap iterations for confidence intervals (default: 100)
+- `--output-dir`: Directory to save results (default: results/distributed_comparison)
+- `--no-plots`: Skip generating visualization plots
+- `--resume`: Resume from checkpoint if available
+- `--clear-checkpoints`: Clear existing checkpoints before starting
+
+### Execution Time Considerations
+
+**⚠️ Important:** InSilico models can take 30-60 minutes per experiment. With 100 bootstrap iterations and multiple sites/training sizes, the full comparison may take several hours.
+
+**Recommendations:**
+1. **Use terminal or screen/tmux**: Claude Code has a 10-minute timeout limit. For long-running experiments, run directly in your terminal:
+   ```bash
+   # Using screen
+   screen -S va_comparison
+   poetry run python model_comparison/scripts/run_distributed_comparison.py [options]
+   # Detach with Ctrl+A, D
+   
+   # Using tmux
+   tmux new -s va_comparison
+   poetry run python model_comparison/scripts/run_distributed_comparison.py [options]
+   # Detach with Ctrl+B, D
+   ```
+
+2. **Use checkpoints**: The script automatically saves checkpoints every 10 experiments. Use `--resume` to continue from where you left off:
+   ```bash
+   poetry run python model_comparison/scripts/run_distributed_comparison.py --resume [other options]
+   ```
+
+3. **Start with quick tests**: Run with fewer bootstrap iterations (10-20) and fewer training sizes to verify everything works before running the full evaluation.
+
+### Output Files
+
+Results are saved to the specified output directory:
+- `va34_comparison_results.csv` - Detailed results for each experiment including:
+  - Model performance metrics (CSMF accuracy, COD accuracy)
+  - Experiment metadata (sites, training size, execution time)
+  - Error messages for failed experiments
+- `checkpoints/` - Checkpoint files for resuming interrupted runs
+
+### Model Performance Summary
+
+Based on the implemented fixes, expected performance ranges:
+- **Random Forest**: 78-82% CSMF accuracy (in-domain)
+- **XGBoost**: 60-74% CSMF accuracy (in-domain)
+- **Logistic Regression**: 65-70% CSMF accuracy (in-domain)
+- **InSilico**: 70-74% CSMF accuracy (cross-site validation)
+
+### Troubleshooting
+
+1. **Memory issues on macOS**: The script automatically limits Ray's object store to 2GB on macOS. If you still encounter issues, reduce `--n-workers`.
+
+2. **InSilico Docker errors**: Ensure Docker is running and the InSilico image is built:
+   ```bash
+   ./build-docker.sh
+   ```
+
+3. **Missing va_data module**: The script automatically adds the va-data directory to Python path. Ensure the submodule is initialized:
+   ```bash
+   git submodule update --init --recursive
+   ```
+
+4. **NaN values in data**: The preprocessing now handles NaN values automatically by converting them to a special category for categorical features and -1 for numeric features.
+
 ## Resources
 
 - [Claude Code Documentation](https://docs.anthropic.com/en/docs/claude-code)

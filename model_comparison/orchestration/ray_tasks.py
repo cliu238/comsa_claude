@@ -166,9 +166,15 @@ def _preprocess_features(X: pd.DataFrame) -> pd.DataFrame:
     # Encode categorical features
     for col in X_processed.columns:
         if X_processed[col].dtype == "object":
+            # Handle NaN values before encoding
+            # Replace NaN with a special category before encoding
+            X_processed[col] = X_processed[col].fillna("missing")
             # Simple label encoding for categorical features
-            # This converts "Y" -> 1, "." -> 0, etc.
+            # This converts "Y" -> 1, "." -> 0, "missing" -> -1, etc.
             X_processed[col] = pd.Categorical(X_processed[col]).codes
+
+    # Fill any remaining NaN values (numeric columns) with -1
+    X_processed = X_processed.fillna(-1)
 
     return X_processed
 

@@ -2,6 +2,7 @@
 
 import hashlib
 import json
+import platform
 from datetime import datetime
 from typing import Dict, List, Optional
 
@@ -77,9 +78,15 @@ class ParallelConfig(BaseModel):
 
         if self.object_store_memory:
             # Convert to bytes for Ray
-            kwargs["object_store_memory"] = self._memory_to_bytes(
-                self.object_store_memory
-            )
+            memory_bytes = self._memory_to_bytes(self.object_store_memory)
+            
+            # Check if running on macOS and limit memory to 2GB
+            if platform.system() == "Darwin":
+                max_macos_memory = self._memory_to_bytes("2GB")
+                if memory_bytes > max_macos_memory:
+                    memory_bytes = max_macos_memory
+            
+            kwargs["object_store_memory"] = memory_bytes
 
         return kwargs
 
