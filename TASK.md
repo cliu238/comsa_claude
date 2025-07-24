@@ -72,11 +72,13 @@ Tasks are numbered using the following scheme:
   - **Issue**: #8 - Successfully implemented XGBoost with sklearn-like interface, feature importance, cross-validation
 
 ### Classical ML Models (VA Baselines) 📋
-- [IM-046] 📋 Implement Random Forest baseline model
+- [IM-046] ✅ Implement Random Forest baseline model
   - **Priority**: High
   - **Dependencies**: VADataProcessor, numeric encoding
-  - **Target Date**: Q2 2025
-  - **Notes**: Feature importance analysis, handle class imbalance
+  - **Completed**: 2025-07-24
+  - **PR**: #19
+  - **Notes**: sklearn-compatible interface, MDI and permutation importance, balanced class weights, 100% test coverage
+  - **Issue**: #18 - Successfully implemented with feature importance analysis and CSMF accuracy metrics
 - [IM-047] 📋 Implement Logistic Regression baseline model
   - **Priority**: Medium
   - **Dependencies**: VADataProcessor, numeric encoding
@@ -197,40 +199,6 @@ Tasks are numbered using the following scheme:
   - **Notes**: Repeat IM-035 experiment using COD5 labels (5 aggregated causes)
     - Compare if simpler labels improve cross-site generalization
     - Same experimental design as IM-035 but with COD5
-- [IM-057] ✅ Incorporate InSilicoVA medical priors into XGBoost for improved generalization
-  - **Priority**: High
-  - **Dependencies**: RD-018, IM-035, IM-045 (XGBoost baseline)
-  - **Target Date**: Q3 2025
-  - **Issue**: #16
-  - **Completed**: 2025-07-23
-  - **PR**: #17
-  - **Notes**: Leverage InSilicoVA's expert medical knowledge to constrain XGBoost learning:
-    - **Data Source**: InSilicoVA prior tables at https://github.com/verbal-autopsy-software/InSilicoVA/tree/master/InSilicoVA/data
-    - **Key Components**:
-      - probTable: Conditional probability tables for symptom-cause relationships
-      - condprob: Prior probabilities informed by medical expertise
-      - Population-level cause distributions
-    - **Implementation Approaches**:
-      1. Custom XGBoost objective function incorporating prior probabilities
-      2. Feature engineering based on symptom-cause associations
-      3. Sample weighting based on prior likelihood
-      4. Constraint-based tree construction limiting implausible splits
-      5. Ensemble approach combining data-driven and prior-driven predictions
-    - **Expected Impact**: 
-      - Reduce generalization gap by 15-25% (based on RD-018 analysis)
-      - Prevent learning of medically implausible patterns
-      - Improve performance on rare causes with strong priors
-    - **Validation**: 
-      - Repeat IM-035 experiments with prior-enhanced XGBoost
-      - Compare against vanilla XGBoost and InSilicoVA
-      - Measure impact on both in-domain and cross-site performance
-    - **Implementation Summary**:
-      - Created medical_priors module for loading InSilicoVA conditional probabilities
-      - Implemented custom XGBoost objective function with prior term
-      - Added prior-based feature engineering (75 features per 15 causes)
-      - Created XGBoostPriorEnhanced model with sklearn-compatible interface
-      - Includes data extraction script for InSilicoVA R package data
-      - Comprehensive tests with >90% coverage goal
 
 ## DevOps & Infrastructure Tasks
 
@@ -402,12 +370,13 @@ Task ID Format: [Category-Number] where Category is CF/IM/DO/RD/MS
 - [IM-045] ✅ XGBoost baseline model - 2025-07-22
 - [IM-035] ✅ VA34 site-based model comparison experiment - 2025-07-22 (PR #11)
 - [IM-051] ✅ Optimize VA comparison scripts with Prefect and Ray - 2025-07-23 (PR #13)
+- [IM-046] ✅ Random Forest baseline model - 2025-07-24 (PR #19)
 
 ### In Progress
 - No tasks currently in progress
 
 ### Next Up
-- [IM-046] Random Forest baseline model
+- [IM-047] Logistic Regression baseline model
 - [IM-049] InterVA model integration
 - [MS-004] Complete ML baseline models milestone
 

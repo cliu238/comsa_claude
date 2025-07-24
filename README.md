@@ -430,6 +430,13 @@ context-engineering-intro/
 │   ├── data/
 │   │   ├── __init__.py
 │   │   └── data_loader_preprocessor.py  # Core processing logic
+│   ├── models/               # ML model implementations
+│   │   ├── __init__.py
+│   │   ├── insilico_model.py      # InSilicoVA wrapper
+│   │   ├── xgboost_model.py       # XGBoost implementation
+│   │   ├── xgboost_config.py      # XGBoost configuration
+│   │   ├── random_forest_model.py  # Random Forest implementation
+│   │   └── random_forest_config.py # Random Forest configuration
 │   └── example_usage.py      # Usage demonstration
 ├── examples/                  # Your code examples
 │   └── data_validation.py    # Reference VA data processing
@@ -551,53 +558,81 @@ RAY_ENABLE_MAC_LARGE_OBJECT_STORE=1 poetry run python model_comparison/scripts/r
 - Backward compatible (sequential execution by default)
 - Automatic handling of data format requirements (numeric for XGBoost, "Y"/"." for InSilicoVA)
 
-## Model Implementations
+## Available ML Models
 
-### XGBoost with Medical Priors (NEW)
+The baseline module provides several machine learning models for VA cause-of-death prediction, all following a consistent sklearn-compatible interface:
 
-The `XGBoostPriorEnhanced` model incorporates medical knowledge from InSilicoVA to improve cross-site generalization:
-
+### XGBoost Model
+High-performance gradient boosting model with excellent accuracy:
 ```python
-from baseline.models import XGBoostPriorEnhanced
-from baseline.models.xgboost_prior_config import XGBoostPriorConfig
+from baseline.models import XGBoostModel, XGBoostConfig
 
-# Configure prior-enhanced model
-config = XGBoostPriorConfig(
-    n_estimators=100,
-    max_depth=6,
-    use_medical_priors=True,
-    prior_method="both",  # Use both custom objective and feature engineering
-    lambda_prior=0.15,    # Weight for prior term in objective
-    feature_prior_weight=1.0  # Weight for prior-based features
-)
+# Initialize with custom configuration
+config = XGBoostConfig(n_estimators=200, max_depth=8, learning_rate=0.1)
+model = XGBoostModel(config=config)
 
-# Train model
-model = XGBoostPriorEnhanced(config)
+# Train and predict
 model.fit(X_train, y_train)
-
-# Make predictions
 predictions = model.predict(X_test)
-probabilities = model.predict_proba(X_test)
 
-# Analyze prior influence
-influence = model.get_prior_influence_report()
-print(f"Prior contribution: {influence['avg_contribution']:.2%}")
+# Get feature importance
+importance = model.get_feature_importance("gain")
 ```
 
-**Key Features:**
-- **Custom Objective Function**: Incorporates medical priors directly into XGBoost training
-- **Feature Engineering**: Adds symptom-cause likelihood features based on prior knowledge
-- **Flexible Integration**: Can use either or both approaches
-- **Performance**: Expected 15-25% improvement in cross-site generalization (based on RD-018 analysis)
+### Random Forest Model
+Robust ensemble model with built-in feature importance analysis:
+```python
+from baseline.models import RandomForestModel, RandomForestConfig
 
-**Extracting InSilicoVA Prior Data:**
-```bash
-# Prerequisites: R and InSilicoVA R package
-cd baseline/models/medical_priors
-python extract_insilico_priors.py
+# Initialize with balanced class weights
+config = RandomForestConfig(
+    n_estimators=100,
+    class_weight="balanced",  # Handle imbalanced VA data
+    max_features="sqrt"       # Optimal for high-dimensional data
+)
+model = RandomForestModel(config=config)
+
+# Train and evaluate
+model.fit(X_train, y_train)
+csmf_accuracy = model.calculate_csmf_accuracy(y_test, model.predict(X_test))
+
+# Get feature importance (MDI or permutation)
+mdi_importance = model.get_feature_importance("mdi")
+perm_importance = model.get_feature_importance("permutation", X_test, y_test)
+
+# Cross-validation
+cv_results = model.cross_validate(X_train, y_train, cv=5)
+print(f"CSMF accuracy: {cv_results['csmf_accuracy_mean']:.3f} ± {cv_results['csmf_accuracy_std']:.3f}")
 ```
 
-This will extract conditional probability matrices from InSilicoVA and save them for use by the prior-enhanced XGBoost model.
+### InSilicoVA Model
+Bayesian probabilistic model with epidemiological priors:
+```python
+from baseline.models import InSilicoVAModel
+
+# Requires OpenVA format data and Docker
+model = InSilicoVAModel()
+model.fit(X_train_openva, y_train)
+predictions = model.predict(X_test_openva)
+```
+
+### Model Features Comparison
+
+| Feature | XGBoost | Random Forest | InSilicoVA |
+|---------|---------|---------------|------------|
+| Training Speed | Fast | Moderate | Slow |
+| Prediction Speed | Fast | Fast | Slow |
+| Feature Importance | ✓ | ✓ (Better) | ✗ |
+| Handles Missing Data | ✓ | ✓ | ✓ |
+| Cross-site Generalization | Good | Better | Best |
+| Interpretability | Medium | High | High |
+| Class Imbalance Handling | Good | Excellent | Good |
+
+All models support:
+- CSMF accuracy calculation
+- Cross-validation with stratification
+- sklearn-compatible interface (fit, predict, predict_proba)
+- Integration with the model comparison framework
 
 ## Resources
 
