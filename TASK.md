@@ -72,11 +72,13 @@ Tasks are numbered using the following scheme:
   - **Issue**: #8 - Successfully implemented XGBoost with sklearn-like interface, feature importance, cross-validation
 
 ### Classical ML Models (VA Baselines) 📋
-- [IM-046] 📋 Implement Random Forest baseline model
+- [IM-046] ✅ Implement Random Forest baseline model
   - **Priority**: High
   - **Dependencies**: VADataProcessor, numeric encoding
-  - **Target Date**: Q2 2025
-  - **Notes**: Feature importance analysis, handle class imbalance
+  - **Completed**: 2025-07-24
+  - **PR**: #19
+  - **Notes**: sklearn-compatible interface, MDI and permutation importance, balanced class weights, 100% test coverage
+  - **Issue**: #18 - Successfully implemented with feature importance analysis and CSMF accuracy metrics
 - [IM-047] 📋 Implement Logistic Regression baseline model
   - **Priority**: Medium
   - **Dependencies**: VADataProcessor, numeric encoding
@@ -368,12 +370,13 @@ Task ID Format: [Category-Number] where Category is CF/IM/DO/RD/MS
 - [IM-045] ✅ XGBoost baseline model - 2025-07-22
 - [IM-035] ✅ VA34 site-based model comparison experiment - 2025-07-22 (PR #11)
 - [IM-051] ✅ Optimize VA comparison scripts with Prefect and Ray - 2025-07-23 (PR #13)
+- [IM-046] ✅ Random Forest baseline model - 2025-07-24 (PR #19)
 
 ### In Progress
 - No tasks currently in progress
 
 ### Next Up
-- [IM-046] Random Forest baseline model
+- [IM-047] Logistic Regression baseline model
 - [IM-049] InterVA model integration
 - [MS-004] Complete ML baseline models milestone
 
