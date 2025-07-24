@@ -62,7 +62,7 @@ def parse_arguments():
         "--models",
         nargs="+",
         default=["xgboost", "insilico"],
-        choices=["xgboost", "insilico"],
+        choices=["xgboost", "insilico", "random_forest"],
         help="Models to compare",
     )
 
@@ -127,7 +127,7 @@ def parse_arguments():
     # Output arguments
     parser.add_argument(
         "--output-dir",
-        default="model_comparison/results/distributed",
+        default="results/distributed",
         help="Directory to save results",
     )
     parser.add_argument(

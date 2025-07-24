@@ -32,7 +32,7 @@ def main():
     # Optional arguments
     parser.add_argument(
         "--output-dir",
-        default="model_comparison/results/va34_comparison",
+        default="results/va34_comparison",
         help="Output directory for results",
     )
     
@@ -55,7 +55,7 @@ def main():
         "--training-sizes",
         nargs="+",
         type=float,
-        default=[0.25, 0.5, 0.75, 1.0],
+        default=[0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0],
         help="Training data fractions to test",
     )
     

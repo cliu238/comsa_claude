@@ -20,7 +20,7 @@ class ExperimentConfig(BaseModel):
 
     # Training configuration
     training_sizes: List[float] = Field(
-        default=[0.25, 0.5, 0.75, 1.0], description="Fractions of training data to use"
+        default=[0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0], description="Fractions of training data to use"
     )
 
     # Model configuration
@@ -34,7 +34,7 @@ class ExperimentConfig(BaseModel):
     n_jobs: int = Field(default=-1, description="Parallel jobs")
 
     # Output configuration
-    output_dir: str = Field(default="model_comparison/results/va34_comparison")
+    output_dir: str = Field(default="results/va34_comparison")
     save_predictions: bool = Field(default=True)
     generate_plots: bool = Field(default=True)
 

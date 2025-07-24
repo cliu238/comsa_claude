@@ -18,7 +18,7 @@ model_comparison/
 ├── tests/                # Unit tests
 │   ├── test_metrics.py         # Test metric calculations
 │   └── test_site_comparison.py # Test experiment logic
-└── results/              # Output directory (git-ignored)
+└── tests/                # Unit tests
 ```
 
 ## Running Experiments
@@ -39,7 +39,7 @@ python run_va34_comparison.py \
   --models insilico xgboost \
   --training-sizes 0.25 0.5 0.75 1.0 \
   --n-bootstrap 50 \
-  --output-dir ../results/va34_comparison
+  --output-dir ../../results/va34_comparison
 ```
 
 ### Command Line Options
@@ -49,7 +49,7 @@ python run_va34_comparison.py \
 - `--models`: Models to compare [`insilico`, `xgboost`] (default: both)
 - `--training-sizes`: Training data fractions (default: [0.25, 0.5, 0.75, 1.0])
 - `--n-bootstrap`: Bootstrap iterations for CIs (default: 100)
-- `--output-dir`: Where to save results (default: model_comparison/results/va34_comparison)
+- `--output-dir`: Where to save results (default: results/va34_comparison)
 - `--no-plots`: Skip visualization generation
 - `--debug`: Enable debug logging
 
