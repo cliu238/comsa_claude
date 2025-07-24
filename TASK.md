@@ -84,11 +84,13 @@ Tasks are numbered using the following scheme:
   - **PR**: #19
   - **Notes**: sklearn-compatible interface, MDI and permutation importance, balanced class weights, 100% test coverage
   - **Issue**: #18 - Successfully implemented with feature importance analysis and CSMF accuracy metrics
-- [IM-047] 🚧 Implement Logistic Regression baseline model
+- [IM-047] ✅ Implement Logistic Regression baseline model
   - **Priority**: Medium
   - **Dependencies**: VADataProcessor, numeric encoding
-  - **Target Date**: Q2 2025
-  - **Notes**: Multinomial with L1/L2 regularization
+  - **Completed**: 2025-07-24
+  - **PR**: #21
+  - **Notes**: Multinomial with L1/L2/ElasticNet regularization, coefficient-based feature importance, 96% test coverage
+  - **Issue**: #20 - Successfully implemented with sklearn-compatible interface and CSMF accuracy metrics
 - [IM-048] 📋 Implement CategoricalNB baseline model
   - **Priority**: Medium
   - **Dependencies**: VADataProcessor, numeric encoding
@@ -393,10 +395,11 @@ Task ID Format: [Category-Number] where Category is CF/IM/DO/RD/MS
 - [IM-035] ✅ VA34 site-based model comparison experiment - 2025-07-22 (PR #11)
 - [IM-051] ✅ Optimize VA comparison scripts with Prefect and Ray - 2025-07-23 (PR #13)
 - [IM-046] ✅ Random Forest baseline model - 2025-07-24 (PR #19)
+- [IM-047] ✅ Logistic Regression baseline model - 2025-07-24 (PR #21)
 
 ### In Progress
 
-- [IM-047] Logistic Regression baseline model
+- No tasks currently in progress
 
 ### Next Up
 

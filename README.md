@@ -485,8 +485,8 @@ poetry run python model_comparison/scripts/run_va34_comparison.py --data-path pa
 RAY_ENABLE_MAC_LARGE_OBJECT_STORE=1 poetry run python model_comparison/scripts/run_va34_comparison.py \
   --data-path results/baseline/processed_data/adult_openva_20250723_103018.csv \
   --sites AP Bohol Dar Mexico Pemba UP \
-  --models xgboost insilico random_forest \
-  --training-sizes 0.25 0.5 0.75 1.0 \
+  --models xgboost insilico random_forest logistic_regression \
+  --training-sizes 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0 \
   --n-bootstrap 100 \
   --parallel \
   --n-workers 8 \
@@ -619,17 +619,46 @@ model.fit(X_train_openva, y_train)
 predictions = model.predict(X_test_openva)
 ```
 
+### Logistic Regression Model
+Fast, interpretable linear model with regularization options:
+```python
+from baseline.models import LogisticRegressionModel, LogisticRegressionConfig
+
+# Initialize with L1 regularization for feature selection
+config = LogisticRegressionConfig(
+    penalty="l1",
+    solver="saga",  # Supports all penalty types
+    C=0.1,          # Stronger regularization
+    class_weight="balanced"
+)
+model = LogisticRegressionModel(config=config)
+
+# Train and evaluate
+model.fit(X_train, y_train)
+csmf_accuracy = model.calculate_csmf_accuracy(y_test, model.predict(X_test))
+
+# Get coefficient-based feature importance
+importance = model.get_feature_importance()
+print(f"Top 5 features: {importance.head()}")
+
+# L1 regularization creates sparse models
+zero_features = (importance['importance'] == 0).sum()
+print(f"Features eliminated by L1: {zero_features}")
+```
+
 ### Model Features Comparison
 
-| Feature | XGBoost | Random Forest | InSilicoVA |
-|---------|---------|---------------|------------|
-| Training Speed | Fast | Moderate | Slow |
-| Prediction Speed | Fast | Fast | Slow |
-| Feature Importance | ✓ | ✓ (Better) | ✗ |
-| Handles Missing Data | ✓ | ✓ | ✓ |
-| Cross-site Generalization | Good | Better | Best |
-| Interpretability | Medium | High | High |
-| Class Imbalance Handling | Good | Excellent | Good |
+| Feature | XGBoost | Random Forest | Logistic Regression | InSilicoVA |
+|---------|---------|---------------|-------------------|------------|
+| Training Speed | Fast | Moderate | Very Fast | Slow |
+| Prediction Speed | Fast | Fast | Very Fast | Slow |
+| Feature Importance | ✓ | ✓ (Better) | ✓ (Coefficients) | ✗ |
+| Handles Missing Data | ✓ | ✓ | ✓ | ✓ |
+| Cross-site Generalization | Good | Better | Moderate | Best |
+| Interpretability | Medium | High | Very High | High |
+| Class Imbalance Handling | Good | Excellent | Good | Good |
+| Regularization | ✗ | ✗ | L1/L2/ElasticNet | ✗ |
+| Feature Selection | ✗ | ✗ | ✓ (L1) | ✗ |
 
 All models support:
 - CSMF accuracy calculation
