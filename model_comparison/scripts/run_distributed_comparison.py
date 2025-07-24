@@ -62,7 +62,7 @@ def parse_arguments():
         "--models",
         nargs="+",
         default=["xgboost", "insilico"],
-        choices=["xgboost", "insilico", "random_forest"],
+        choices=["xgboost", "insilico", "random_forest", "logistic_regression"],
         help="Models to compare",
     )
 

@@ -15,6 +15,7 @@ This document tracks development tasks, milestones, and progress for the Context
 ## Task ID Reference
 
 Tasks are numbered using the following scheme:
+
 - **CF-XXX**: Core Framework tasks
 - **IM-XXX**: Implementation tasks
 - **DO-XXX**: DevOps & Infrastructure tasks
@@ -25,6 +26,7 @@ Tasks are numbered using the following scheme:
 ## Core Framework Tasks
 
 ### Context Engineering Infrastructure
+
 - [CF-001] ✅ Create project template structure
 - [CF-002] ✅ Implement Claude command system
 - [CF-003] ✅ Create /generate-prp command for PRP generation
@@ -34,6 +36,7 @@ Tasks are numbered using the following scheme:
 - [CF-007] 📋 Implement PRP versioning system
 
 ### Documentation & Examples
+
 - [CF-008] ✅ Write comprehensive README.md
 - [CF-009] ✅ Create INITIAL_EXAMPLE.md
 - [CF-010] ✅ Add EXAMPLE_multi_agent_prp.md
@@ -43,6 +46,7 @@ Tasks are numbered using the following scheme:
 ## Implementation Tasks
 
 ### Baseline Module (VA Processing) ✅
+
 - [IM-001] ✅ Create baseline package structure
 - [IM-002] ✅ Implement DataConfig with Pydantic
 - [IM-003] ✅ Build VADataProcessor class
@@ -72,6 +76,7 @@ Tasks are numbered using the following scheme:
   - **Issue**: #8 - Successfully implemented XGBoost with sklearn-like interface, feature importance, cross-validation
 
 ### Classical ML Models (VA Baselines) 📋
+
 - [IM-046] ✅ Implement Random Forest baseline model
   - **Priority**: High
   - **Dependencies**: VADataProcessor, numeric encoding
@@ -79,18 +84,19 @@ Tasks are numbered using the following scheme:
   - **PR**: #19
   - **Notes**: sklearn-compatible interface, MDI and permutation importance, balanced class weights, 100% test coverage
   - **Issue**: #18 - Successfully implemented with feature importance analysis and CSMF accuracy metrics
-- [IM-047] 📋 Implement Logistic Regression baseline model
+- [IM-047] 🚧 Implement Logistic Regression baseline model
   - **Priority**: Medium
   - **Dependencies**: VADataProcessor, numeric encoding
   - **Target Date**: Q2 2025
   - **Notes**: Multinomial with L1/L2 regularization
-- [IM-048] 📋 Implement Naive Bayes baseline model
+- [IM-048] 📋 Implement CategoricalNB baseline model
   - **Priority**: Medium
   - **Dependencies**: VADataProcessor, numeric encoding
   - **Target Date**: Q2 2025
   - **Notes**: Handle missing data appropriately
 
 ### Classical VA Algorithms 📋
+
 - [IM-049] 📋 Implement InterVA model integration
   - **Priority**: High
   - **Dependencies**: Docker, OpenVA format encoding
@@ -103,6 +109,7 @@ Tasks are numbered using the following scheme:
   - **Notes**: Comprehensive VA algorithm suite
 
 ### Transfer Learning Module 📋
+
 - [IM-014] 📋 Create transfer_learning package structure
 - [IM-015] 📋 Design domain adaptation architecture
   - **Priority**: High
@@ -132,6 +139,7 @@ Tasks are numbered using the following scheme:
   - **Notes**: Unit tests, integration tests, usage examples
 
 ### Active Learning Module 📋
+
 - [IM-025] 📋 Create active_learning package structure
 - [IM-026] 📋 Implement uncertainty sampling strategies
 - [IM-027] 📋 Build query selection algorithms
@@ -144,6 +152,7 @@ Tasks are numbered using the following scheme:
 - [IM-034] 📋 Create interactive examples
 
 ### Model Comparison Framework 📋
+
 - [IM-035] ✅ Implement VA34 site-based model comparison experiment
   - **Priority**: High
   - **Dependencies**: InSilicoVA (✅), XGBoost (✅), VADataSplitter (✅)
@@ -203,6 +212,7 @@ Tasks are numbered using the following scheme:
 ## DevOps & Infrastructure Tasks
 
 ### Testing & Quality
+
 - [DO-001] ✅ Set up pytest framework
 - [DO-002] ✅ Configure coverage reporting
 - [DO-003] ✅ Add black for code formatting
@@ -215,6 +225,7 @@ Tasks are numbered using the following scheme:
 - [DO-010] 📋 Add mutation testing
 
 ### Deployment & Packaging
+
 - [DO-011] 📋 Create Docker containers
 - [DO-012] 📋 Set up package distribution
 - [DO-013] 📋 Add CLI entry points
@@ -227,6 +238,7 @@ Tasks are numbered using the following scheme:
 ## Research & Development Tasks
 
 ### Algorithm Improvements
+
 - [RD-001] 📋 Research latest VA algorithms
 - [RD-002] 📋 Implement ensemble methods
 - [RD-003] 📋 Add deep learning approaches
@@ -236,6 +248,7 @@ Tasks are numbered using the following scheme:
 - [RD-007] 📋 Implement adaptive algorithms
 
 ### Data Handling
+
 - [RD-008] 📋 Add support for more VA formats
 - [RD-009] 📋 Implement data augmentation
 - [RD-010] 📋 Add synthetic data generation
@@ -244,6 +257,7 @@ Tasks are numbered using the following scheme:
 - [RD-013] 📋 Add multi-language support
 
 ### VA-Specific Research
+
 - [RD-014] 📋 Optimize CSMF accuracy across different populations
   - **Priority**: High
   - **Dependencies**: Multiple models, diverse datasets
@@ -307,22 +321,26 @@ Tasks are numbered using the following scheme:
 ## Milestones
 
 ### Q1 2025 ✅
+
 - [MS-001] ✅ Launch Context Engineering framework
 - [MS-002] ✅ Complete baseline VA processing module
 - [MS-003] ✅ Establish project documentation
 
 ### Q2 2025 🚧
+
 - [MS-004] 📋 Complete ML baseline models (XGBoost ✅, RF, LR, NB)
 - [MS-005] 📋 Integrate classical VA algorithms (InterVA, openVA)
 - [MS-006] ✅ Launch model comparison framework (IM-035 ✅, IM-051 ✅)
 - [MS-007] 📋 Complete transfer learning module
 
 ### Q3 2025 📋
+
 - [MS-008] 📋 Launch active learning framework
 - [MS-009] 📋 Add advanced visualization dashboards
 - [MS-010] 📋 Publish research findings with comparative analysis
 
 ### Q4 2025 📋
+
 - [MS-011] 📋 Full production deployment with all modules
 - [MS-012] 📋 Release v2.0 with complete VA analysis suite
 - [MS-013] 📋 Community contributions and extensions
@@ -346,12 +364,14 @@ Task ID Format: [Category-Number] where Category is CF/IM/DO/RD/MS
 ## Priority Matrix
 
 ### High Priority
+
 1. ML baseline models (XGBoost, RF) - needed for comparison
 2. InterVA integration - classical VA algorithm
 3. Model comparison framework - evaluate all approaches
 4. Transfer learning source/target handling - cross-dataset adaptation
 
 ### Medium Priority
+
 1. Classical ML models (LR, NB) - additional baselines
 2. openVA integration - comprehensive VA suite
 3. Transfer learning methods (ADAPT, TransTab)
@@ -359,6 +379,7 @@ Task ID Format: [Category-Number] where Category is CF/IM/DO/RD/MS
 5. CI/CD setup - automated testing
 
 ### Low Priority
+
 1. Advanced visualizations - nice to have
 2. VA-specific research tasks - future improvements
 3. Performance optimizations - after functionality
@@ -367,20 +388,24 @@ Task ID Format: [Category-Number] where Category is CF/IM/DO/RD/MS
 ## Current Sprint (Q2 2025)
 
 ### Recently Completed
+
 - [IM-045] ✅ XGBoost baseline model - 2025-07-22
 - [IM-035] ✅ VA34 site-based model comparison experiment - 2025-07-22 (PR #11)
 - [IM-051] ✅ Optimize VA comparison scripts with Prefect and Ray - 2025-07-23 (PR #13)
 - [IM-046] ✅ Random Forest baseline model - 2025-07-24 (PR #19)
 
 ### In Progress
-- No tasks currently in progress
+
+- [IM-047] Logistic Regression baseline model
 
 ### Next Up
-- [IM-047] Logistic Regression baseline model
+
+- [IM-048] CategoricalNB baseline model
 - [IM-049] InterVA model integration
 - [MS-004] Complete ML baseline models milestone
 
 ### Recent Fixes (Q2 2025)
+
 - **InSilicoVA Data Format Compatibility** (2025-07-23)
   - Fixed data preprocessing in ray_tasks.py to preserve "Y"/"." format for InSilicoVA
   - XGBoost requires numeric encoding, InSilicoVA requires original format

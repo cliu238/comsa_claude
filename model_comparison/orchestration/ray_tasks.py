@@ -25,7 +25,7 @@ def train_and_evaluate_model(
     inside the function to ensure proper serialization.
 
     Args:
-        model_name: Name of the model to train ('insilico', 'xgboost', or 'random_forest')
+        model_name: Name of the model to train ('insilico', 'xgboost', 'random_forest', or 'logistic_regression')
         train_data: Tuple of (X_train, y_train)
         test_data: Tuple of (X_test, y_test)
         experiment_metadata: Dictionary with experiment details
@@ -61,6 +61,9 @@ def train_and_evaluate_model(
             model = XGBoostModel()
         elif model_name == "random_forest":
             model = RandomForestModel()
+        elif model_name == "logistic_regression":
+            from baseline.models.logistic_regression_model import LogisticRegressionModel
+            model = LogisticRegressionModel()
         else:
             raise ValueError(f"Unknown model: {model_name}")
 
