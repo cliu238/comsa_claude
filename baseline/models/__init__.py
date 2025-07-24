@@ -11,6 +11,8 @@ from baseline.models.hyperparameter_tuning import (
 from baseline.models.insilico_model import InSilicoVAModel
 from baseline.models.model_config import InSilicoVAConfig
 from baseline.models.model_validator import InSilicoVAValidator, ModelValidationResult
+from baseline.models.random_forest_config import RandomForestConfig
+from baseline.models.random_forest_model import RandomForestModel
 from baseline.models.xgboost_config import XGBoostConfig
 from baseline.models.xgboost_model import XGBoostModel
 
@@ -23,4 +25,6 @@ __all__ = [
     "XGBoostConfig",
     "XGBoostHyperparameterTuner",
     "quick_tune_xgboost",
+    "RandomForestModel",
+    "RandomForestConfig",
 ]
