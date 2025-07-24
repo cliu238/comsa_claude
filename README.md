@@ -459,7 +459,10 @@ context-engineering-intro/
 
 ## VA34 Model Comparison Results
 
-The VA34 site-based model comparison experiment has been implemented to compare InSilicoVA and XGBoost performance across different VA data collection sites.
+The VA34 site-based model comparison experiment has been implemented to compare model performance across different VA data collection sites. Available models include:
+- **InSilicoVA**: Bayesian probabilistic model with epidemiological priors
+- **XGBoost**: Gradient boosting model with high accuracy
+- **Random Forest**: Ensemble model with excellent feature importance analysis
 
 ### Data Preprocessing
 
@@ -482,7 +485,7 @@ poetry run python model_comparison/scripts/run_va34_comparison.py --data-path pa
 RAY_ENABLE_MAC_LARGE_OBJECT_STORE=1 poetry run python model_comparison/scripts/run_va34_comparison.py \
   --data-path results/baseline/processed_data/adult_openva_20250723_103018.csv \
   --sites AP Bohol Dar Mexico Pemba UP \
-  --models xgboost insilico \
+  --models xgboost insilico random_forest \
   --training-sizes 0.25 0.5 0.75 1.0 \
   --n-bootstrap 100 \
   --parallel \

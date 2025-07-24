@@ -25,7 +25,7 @@ def train_and_evaluate_model(
     inside the function to ensure proper serialization.
 
     Args:
-        model_name: Name of the model to train ('insilico' or 'xgboost')
+        model_name: Name of the model to train ('insilico', 'xgboost', or 'random_forest')
         train_data: Tuple of (X_train, y_train)
         test_data: Tuple of (X_test, y_test)
         experiment_metadata: Dictionary with experiment details
@@ -41,6 +41,7 @@ def train_and_evaluate_model(
         # Import inside remote function for serialization
         from baseline.models.insilico_model import InSilicoVAModel
         from baseline.models.xgboost_model import XGBoostModel
+        from baseline.models.random_forest_model import RandomForestModel
         from model_comparison.metrics.comparison_metrics import calculate_metrics
 
         # Set up logging for worker
@@ -58,6 +59,8 @@ def train_and_evaluate_model(
             model = InSilicoVAModel()
         elif model_name == "xgboost":
             model = XGBoostModel()
+        elif model_name == "random_forest":
+            model = RandomForestModel()
         else:
             raise ValueError(f"Unknown model: {model_name}")
 

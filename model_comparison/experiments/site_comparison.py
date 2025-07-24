@@ -11,6 +11,7 @@ from tqdm import tqdm
 from baseline.data.data_loader import VADataProcessor
 from baseline.models.insilico_model import InSilicoVAModel
 from baseline.models.xgboost_model import XGBoostModel
+from baseline.models.random_forest_model import RandomForestModel
 from baseline.utils import get_logger
 
 from ..metrics.comparison_metrics import calculate_metrics
@@ -135,6 +136,8 @@ class SiteComparisonExperiment:
             return InSilicoVAModel()
         elif model_name == "xgboost":
             return XGBoostModel()
+        elif model_name == "random_forest":
+            return RandomForestModel()
         else:
             raise ValueError(f"Unknown model: {model_name}")
     
@@ -351,8 +354,8 @@ class SiteComparisonExperiment:
         X_train, y_train = train_data
         X_test, y_test = test_data
 
-        # Preprocess features for XGBoost
-        if model_name == "xgboost":
+        # Preprocess features for ML models (XGBoost, Random Forest)
+        if model_name in ["xgboost", "random_forest"]:
             X_train = self._preprocess_features(X_train)
             X_test = self._preprocess_features(X_test)
 
