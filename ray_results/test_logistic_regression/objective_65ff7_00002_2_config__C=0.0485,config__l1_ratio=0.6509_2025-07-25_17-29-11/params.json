@@ -1,0 +1,7 @@
+{
+  "config__C": 0.0484654674349613,
+  "config__l1_ratio": 0.6509282305242027,
+  "config__max_iter": 1000,
+  "config__penalty": "l1",
+  "config__solver": "saga"
+}

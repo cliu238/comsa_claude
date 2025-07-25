@@ -25,6 +25,7 @@ from model_comparison.orchestration.ray_tasks import (
     ProgressReporter,
     prepare_data_for_site,
     train_and_evaluate_model,
+    tune_and_train_model,
 )
 
 logger = get_logger(__name__, component="orchestration")
@@ -414,13 +415,25 @@ async def va34_comparison_flow(
             test_data = exp["test_data"]
             experiment_metadata = exp["experiment_metadata"]
             
-            result_ref = train_and_evaluate_model.remote(
-                model_name=model_name,
-                train_data=train_data,
-                test_data=test_data,
-                experiment_metadata=experiment_metadata,
-                n_bootstrap=config.n_bootstrap
-            )
+            # Use tuning task if enabled and model supports it
+            if config.tuning.enabled and model_name != "insilico":
+                tuning_config_dict = config.tuning.model_dump()
+                result_ref = tune_and_train_model.remote(
+                    model_name=model_name,
+                    train_data=train_data,
+                    test_data=test_data,
+                    experiment_metadata=experiment_metadata,
+                    tuning_config=tuning_config_dict,
+                    n_bootstrap=config.n_bootstrap
+                )
+            else:
+                result_ref = train_and_evaluate_model.remote(
+                    model_name=model_name,
+                    train_data=train_data,
+                    test_data=test_data,
+                    experiment_metadata=experiment_metadata,
+                    n_bootstrap=config.n_bootstrap
+                )
             result_refs.append(result_ref)
 
         # Wait for results with progress updates
