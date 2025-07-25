@@ -182,7 +182,7 @@ Tasks are numbered using the following scheme:
   - **Priority**: High
   - **Dependencies**: IM-035 (VA34 comparison), IM-051 (Ray optimization)
   - **Target Date**: Q1 2025
-  - **Issue**: #22 (to be created)
+  - **Issue**: #23
   - **Notes**: Bootstrap CI not calculated despite n_bootstrap=100 specified
     - Root cause: ray_tasks.py expects list format but metrics return separate bounds
     - Fix metrics calculation to return [lower, upper] format
