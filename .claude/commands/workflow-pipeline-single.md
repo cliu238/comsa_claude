@@ -95,17 +95,24 @@ Before marking implementation complete:
    - Ensure parallel execution works if implemented
    - Validate results make sense (no 0% accuracy, etc.)
 
-3. **Document test commands** - Save the exact commands used for testing:
+3. **Verify with subagent data-root-cause-analyst** - Use the data-root-cause-analyst subagent to:
+   - Analyze any unexpected results or performance issues
+   - Diagnose potential data quality or algorithmic problems
+   - Design experiments to validate hypotheses about issues
+   - **If the agent identifies any problems, MUST fix them before proceeding**
+
+4. **Document test commands** - Save the exact commands used for testing:
    - Include in PR description
    - Update README if new usage patterns
 
-4. **Fix all failures** - Do NOT proceed if:
+5. **Fix all failures** - Do NOT proceed if:
    - Any model fails to run
    - Errors appear in logs
    - Output is missing or incorrect
    - Performance is significantly degraded
+   - The data-root-cause-analyst identifies unresolved issues
 
-Only after ALL real-world tests pass should the task continue to completion.
+Only after ALL real-world tests pass and the data-root-cause-analyst confirms no issues should the task continue to completion.
 
 #### 3.5 Completion
 

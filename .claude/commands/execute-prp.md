@@ -12,6 +12,8 @@ Implement a feature using using the PRP file.
    - Follow all instructions in the PRP and extend the research if needed
    - Ensure you have all needed context to implement the PRP fully
    - Do more web searches and codebase exploration as needed
+   - **May use the subagent data-root-cause-analyst** to assist with problem diagnosis and solution/experiments design
+   - **Can use context7 MCP** for up-to-date library documentation and examples
 
 2. **ULTRATHINK**
    - Think hard before you execute the plan. Create a comprehensive plan addressing all requirements.

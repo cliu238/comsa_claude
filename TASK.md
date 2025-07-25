@@ -100,25 +100,20 @@ Tasks are numbered using the following scheme:
 ### Classical VA Algorithms 📋
 
 - [IM-049] 📋 Implement InterVA model integration
-  - **Priority**: High
+  - **Priority**: Low
   - **Dependencies**: Docker, OpenVA format encoding
   - **Target Date**: Q2 2025
   - **Notes**: R-based implementation via Docker
-- [IM-050] 📋 Implement openVA model integration
-  - **Priority**: Medium
-  - **Dependencies**: Docker, OpenVA format encoding
-  - **Target Date**: Q2 2025
-  - **Notes**: Comprehensive VA algorithm suite
 
 ### Transfer Learning Module 📋
 
 - [IM-014] 📋 Create transfer_learning package structure
 - [IM-015] 📋 Design domain adaptation architecture
-  - **Priority**: High
+  - **Priority**: Low
   - **Dependencies**: IM-035 site comparison results
   - **Notes**: Focus on algorithmic domain adaptation techniques
 - [IM-016] 📋 Implement transfer learning algorithms
-  - **Priority**: High
+  - **Priority**: Low
   - **Dependencies**: ADAPT library, baseline models
   - **Notes**: TrAdaBoost, KLIEP, KMM for domain adaptation
     - Different from IM-035 which compares existing models
@@ -183,22 +178,39 @@ Tasks are numbered using the following scheme:
       - Fixed InSilicoVA data format compatibility (preserved "Y"/"." format)
       - Fixed training_fraction/training_size column naming mismatch
       - Required manual intervention after automated workflow claimed completion
-- [IM-036] 📋 Create unified model comparison pipeline
+- [IM-052] 📋 Fix bootstrap confidence intervals in model comparison framework
   - **Priority**: High
+  - **Dependencies**: IM-035 (VA34 comparison), IM-051 (Ray optimization)
+  - **Target Date**: Q1 2025
+  - **Notes**: Bootstrap CI not calculated despite n_bootstrap=100 specified
+    - Root cause: ray_tasks.py expects list format but metrics return separate bounds
+    - Fix metrics calculation to return [lower, upper] format
+    - Update ExperimentResult to properly handle CI data
+    - Validate with 100-1000 bootstrap iterations
+- [IM-053] 📋 Implement hyperparameter tuning for all ML models
+  - **Priority**: High
+  - **Dependencies**: IM-045 (XGBoost), IM-046 (Random Forest), IM-047 (Logistic Regression)
+  - **Target Date**: Q1 2025
+  - **Notes**: All models currently use default configurations
+    - Implement GridSearchCV or Bayesian optimization
+    - XGBoost: tune max_depth, learning_rate, n_estimators, regularization
+    - Random Forest: tune n_estimators, max_depth, min_samples_split
+    - Logistic Regression: tune C, penalty, solver
+    - Expected 10-30% performance improvement
+    - Use Ray for distributed hyperparameter search
+    - **Integration**: Must integrate with model_comparison/scripts/run_distributed_comparison.py
+      - Add hyperparameter tuning phase before model training
+      - Leverage existing Ray infrastructure for distributed tuning
+      - Update ExperimentConfig to include hyperparameter search space
+      - Ensure tuned parameters are logged and reproducible
+- [IM-036] 📋 Create unified model comparison pipeline
+  - **Priority**: Low
   - **Dependencies**: IM-035 results, all baseline models
   - **Notes**: Generalize IM-035 approach for all models, parallel execution
-- [IM-037] 📋 Build statistical significance testing framework
-  - **Priority**: Medium
-  - **Dependencies**: IM-035, IM-036
-  - **Notes**: DeLong test, bootstrapping, confidence intervals
 - [IM-038] 📋 Create comparison visualization and reporting
   - **Priority**: Medium
   - **Dependencies**: IM-035, IM-036, IM-037
   - **Notes**: Consolidated task for dashboards, exports, automated reports
-- [IM-039] 📋 Write comprehensive tests for comparison framework
-  - **Priority**: Medium
-  - **Dependencies**: IM-035, IM-036
-  - **Notes**: Unit tests, integration tests, result validation
 - [IM-040] 📋 Document model comparison interpretation guidelines
   - **Priority**: Low
   - **Dependencies**: IM-035 through IM-039
@@ -261,7 +273,7 @@ Tasks are numbered using the following scheme:
 ### VA-Specific Research
 
 - [RD-014] 📋 Optimize CSMF accuracy across different populations
-  - **Priority**: High
+  - **Priority**: Low
   - **Dependencies**: Multiple models, diverse datasets
   - **Notes**: Population-specific calibration
 - [RD-015] 📋 Develop hybrid VA models (combining classical and ML)
@@ -331,7 +343,7 @@ Tasks are numbered using the following scheme:
 ### Q2 2025 🚧
 
 - [MS-004] 📋 Complete ML baseline models (XGBoost ✅, RF, LR, NB)
-- [MS-005] 📋 Integrate classical VA algorithms (InterVA, openVA)
+- [MS-005] 📋 Integrate classical VA algorithms (InterVA)
 - [MS-006] ✅ Launch model comparison framework (IM-035 ✅, IM-051 ✅)
 - [MS-007] 📋 Complete transfer learning module
 
@@ -367,18 +379,16 @@ Task ID Format: [Category-Number] where Category is CF/IM/DO/RD/MS
 
 ### High Priority
 
-1. ML baseline models (XGBoost, RF) - needed for comparison
-2. InterVA integration - classical VA algorithm
-3. Model comparison framework - evaluate all approaches
-4. Transfer learning source/target handling - cross-dataset adaptation
+1. Fix bootstrap confidence intervals (IM-052) - critical for statistical validation
+2. Implement hyperparameter tuning (IM-053) - 10-30% performance improvement potential
+3. ML baseline models (XGBoost ✅, RF ✅, LR ✅) - needed for comparison
 
 ### Medium Priority
 
 1. Classical ML models (LR, NB) - additional baselines
-2. openVA integration - comprehensive VA suite
-3. Transfer learning methods (ADAPT, TransTab)
-4. Active learning framework - efficient annotation
-5. CI/CD setup - automated testing
+2. Transfer learning methods (ADAPT, TransTab)
+3. Active learning framework - efficient annotation
+4. CI/CD setup - automated testing
 
 ### Low Priority
 
@@ -386,6 +396,10 @@ Task ID Format: [Category-Number] where Category is CF/IM/DO/RD/MS
 2. VA-specific research tasks - future improvements
 3. Performance optimizations - after functionality
 4. Documentation videos - supplementary materials
+5. InterVA integration (IM-049) - classical VA algorithm
+6. Model comparison framework (IM-036) - evaluate all approaches
+7. Transfer learning source/target handling (IM-015, IM-016) - cross-dataset adaptation
+8. Population-specific CSMF optimization (RD-014) - diverse population calibration
 
 ## Current Sprint (Q2 2025)
 
@@ -403,8 +417,9 @@ Task ID Format: [Category-Number] where Category is CF/IM/DO/RD/MS
 
 ### Next Up
 
+- [IM-052] Fix bootstrap confidence intervals in model comparison framework
+- [IM-053] Implement hyperparameter tuning for all ML models
 - [IM-048] CategoricalNB baseline model
-- [IM-049] InterVA model integration
 - [MS-004] Complete ML baseline models milestone
 
 ### Recent Fixes (Q2 2025)
