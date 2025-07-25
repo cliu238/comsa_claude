@@ -202,7 +202,7 @@ Tasks are numbered using the following scheme:
   - **Priority**: High
   - **Dependencies**: IM-045 (XGBoost ✅), IM-046 (Random Forest ✅), IM-047 (Logistic Regression ✅), IM-051 (Ray infrastructure ✅)
   - **Target Date**: Q1 2025
-  - **Issue**: #27 (to be created)
+  - **Issue**: #28
   - **Notes**: Comprehensive hyperparameter optimization to improve model performance
     - **Search Spaces**:
       - XGBoost: max_depth=[3,5,7,10], learning_rate=[0.01,0.1,0.3], n_estimators=[100,200,500], subsample=[0.7,0.8,1.0], regularization
