@@ -7,6 +7,8 @@ InSilicoVA and ML model implementations like XGBoost.
 from baseline.models.hyperparameter_tuning import (
     XGBoostHyperparameterTuner,
     quick_tune_xgboost,
+    CategoricalNBHyperparameterTuner,
+    quick_tune_categorical_nb,
 )
 from baseline.models.insilico_model import InSilicoVAModel
 from baseline.models.logistic_regression_config import LogisticRegressionConfig
@@ -17,6 +19,8 @@ from baseline.models.random_forest_config import RandomForestConfig
 from baseline.models.random_forest_model import RandomForestModel
 from baseline.models.xgboost_config import XGBoostConfig
 from baseline.models.xgboost_model import XGBoostModel
+from baseline.models.categorical_nb_config import CategoricalNBConfig
+from baseline.models.categorical_nb_model import CategoricalNBModel
 
 __all__ = [
     "InSilicoVAModel",
@@ -31,4 +35,8 @@ __all__ = [
     "RandomForestConfig",
     "LogisticRegressionModel",
     "LogisticRegressionConfig",
+    "CategoricalNBModel",
+    "CategoricalNBConfig",
+    "CategoricalNBHyperparameterTuner",
+    "quick_tune_categorical_nb",
 ]

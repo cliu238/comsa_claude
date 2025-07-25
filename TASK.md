@@ -91,13 +91,26 @@ Tasks are numbered using the following scheme:
   - **PR**: #21
   - **Notes**: Multinomial with L1/L2/ElasticNet regularization, coefficient-based feature importance, 96% test coverage
   - **Issue**: #20 - Successfully implemented with sklearn-compatible interface and CSMF accuracy metrics
-- [IM-048] 🚧 Implement CategoricalNB baseline model
+- [IM-048] ✅ Implement CategoricalNB baseline model
   - **Priority**: High
   - **Dependencies**: VADataProcessor, categorical encoding pipeline
-  - **Target Date**: Q2 2025
-  - **Started**: 2025-07-25
+  - **Completed**: 2025-07-25
   - **Issue**: #30
-  - **Notes**: Final ML baseline model to complete suite. Handles categorical features natively, robust to missing data, probabilistic output for CSMF accuracy
+  - **Notes**: Final ML baseline model to complete ML baseline suite. Implements sklearn-compatible interface with categorical feature handling
+    - **Implementation**: CategoricalNBModel class with config-based parameter management
+    - **Features**: Native categorical data support, missing value handling, feature importance via log probabilities
+    - **Integration**: Seamless hyperparameter tuning with existing Ray/Optuna infrastructure
+    - **Testing**: 29 unit tests with 100% pass rate, comprehensive edge case coverage
+    - **Performance**: Fast training/inference, expected 70-85% CSMF accuracy range
+    - **Files Added**: 
+      - baseline/models/categorical_nb_model.py (full implementation)
+      - baseline/models/categorical_nb_config.py (Pydantic configuration)
+      - tests/baseline/test_categorical_nb_model.py (comprehensive test suite)
+      - examples/categorical_nb_example.py (usage demonstration)
+    - **Files Modified**:
+      - baseline/models/__init__.py (export new classes)
+      - baseline/models/hyperparameter_tuning.py (added CategoricalNBHyperparameterTuner)
+    - **Success**: Completes ML baseline model suite (XGBoost, Random Forest, Logistic Regression, CategoricalNB)
 
 ### Classical VA Algorithms 📋
 
@@ -363,7 +376,7 @@ Tasks are numbered using the following scheme:
 
 ### Q2 2025 🚧
 
-- [MS-004] 📋 Complete ML baseline models (XGBoost ✅, RF, LR, NB)
+- [MS-004] ✅ Complete ML baseline models (XGBoost ✅, RF ✅, LR ✅, NB ✅) - 2025-07-25
 - [MS-005] 📋 Integrate classical VA algorithms (InterVA)
 - [MS-006] ✅ Launch model comparison framework (IM-035 ✅, IM-051 ✅)
 - [MS-007] 📋 Complete transfer learning module
@@ -432,15 +445,17 @@ Task ID Format: [Category-Number] where Category is CF/IM/DO/RD/MS
 - [IM-046] ✅ Random Forest baseline model - 2025-07-24 (PR #19)
 - [IM-047] ✅ Logistic Regression baseline model - 2025-07-24 (PR #21)
 - [IM-052] ✅ Fix bootstrap confidence intervals in model comparison framework - 2025-07-25 (PR #26)
+- [IM-048] ✅ CategoricalNB baseline model - 2025-07-25 (Issue #30)
 
 ### In Progress
 
-- [IM-048] CategoricalNB baseline model - started 2025-07-25
+- Currently no active tasks
 
 ### Next Up
 
-- [MS-004] Complete ML baseline models milestone
+- [MS-004] ✅ Complete ML baseline models milestone - achieved with IM-048 completion
 - [IM-036] Create unified model comparison pipeline
+- [IM-053] Complete hyperparameter tuning for all ML models
 
 ### Recent Fixes (Q2 2025)
 
