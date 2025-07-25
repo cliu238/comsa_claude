@@ -25,18 +25,19 @@ We have conducted comprehensive model comparison experiments across all 6 PHMRC 
 
 #### In-Domain vs Out-Domain Performance
 
-| Model | In-Domain CSMF | Out-Domain CSMF | Generalization Gap |
-|-------|----------------|-----------------|-------------------|
-| **XGBoost** | **0.884** (±0.028) | 0.383 (±0.218) | -56.6% |
-| **Logistic Regression** | 0.836 (±0.028) | 0.448 (±0.159) | -46.4% |
-| **InSilicoVA** | 0.800 (±0.067) | **0.461** (±0.116) | -42.4% |
-| **Random Forest** | 0.792 (±0.034) | 0.365 (±0.180) | -54.0% |
+| Model | In-Domain CSMF | Out-Domain CSMF | In-Domain COD | Out-Domain COD | Generalization Gap |
+|-------|----------------|-----------------|---------------|----------------|-------------------|
+| **XGBoost** | **0.884** (±0.028) | 0.383 (±0.218) | **0.467** (±0.091) | 0.181 (±0.123) | -56.6% |
+| **Logistic Regression** | 0.836 (±0.028) | 0.448 (±0.159) | 0.419 (±0.079) | 0.168 (±0.104) | -46.4% |
+| **InSilicoVA** | 0.800 (±0.067) | **0.461** (±0.116) | 0.410 (±0.082) | **0.215** (±0.064) | -42.4% |
+| **Random Forest** | 0.792 (±0.034) | 0.365 (±0.180) | 0.452 (±0.086) | 0.162 (±0.101) | -54.0% |
 
 **Key Insights**:
-- Logistic Regression achieves highest overall CSMF accuracy
-- InSilicoVA shows best COD accuracy and geographic generalization
-- XGBoost dominates in-domain but struggles with cross-site transfer
-- Random Forest shows lowest overall performance but fastest execution
+- **In-Domain Performance**: XGBoost dominates both CSMF (0.884) and COD (0.467) accuracy
+- **Out-Domain Performance**: InSilicoVA achieves best CSMF (0.461) and COD (0.215) generalization
+- **COD vs CSMF Patterns**: All models show larger performance drops in COD than CSMF accuracy
+- **Geographic Generalization**: InSilicoVA demonstrates superior cross-site transfer despite lower in-domain performance
+- **Computational Trade-off**: Random Forest provides fastest execution but lowest generalization performance
 
 ### 2. **Training Size Impact Analysis: Mexico Site Only**
 
@@ -76,6 +77,7 @@ All models used default configurations:
 
 ### 4. **Geographic Generalization Patterns**
 
+#### CSMF Accuracy Generalization
 | Model | In-Domain CSMF | Out-Domain CSMF | Absolute Drop | Relative Drop |
 |-------|----------------|-----------------|---------------|---------------|
 | **InSilicoVA** | 0.800 (±0.067) | 0.461 (±0.116) | 0.339 | -42.4% |
@@ -83,11 +85,32 @@ All models used default configurations:
 | **Random Forest** | 0.792 (±0.034) | 0.365 (±0.180) | 0.427 | -54.0% |
 | **XGBoost** | 0.884 (±0.028) | 0.383 (±0.218) | 0.500 | -56.6% |
 
+#### COD Accuracy Generalization
+| Model | In-Domain COD | Out-Domain COD | Absolute Drop | Relative Drop |
+|-------|---------------|----------------|---------------|---------------|
+| **InSilicoVA** | 0.410 (±0.082) | 0.215 (±0.064) | 0.195 | -47.6% |
+| **Random Forest** | 0.452 (±0.086) | 0.162 (±0.101) | 0.290 | -64.2% |
+| **Logistic Regression** | 0.419 (±0.079) | 0.168 (±0.104) | 0.251 | -59.9% |
+| **XGBoost** | 0.467 (±0.091) | 0.181 (±0.123) | 0.286 | -61.2% |
+
 **Generalization Quality Ranking**:
-1. **InSilicoVA**: Best generalization (smallest drop of 42.4%)
-2. **Logistic Regression**: Good generalization (46.4% drop) with simpler model
-3. **Random Forest**: Moderate generalization (54.0% drop) despite ensemble approach
-4. **XGBoost**: Poorest generalization (56.6% drop) despite highest in-domain accuracy
+
+**CSMF Accuracy Generalization (Best to Worst)**:
+1. **InSilicoVA**: Best CSMF generalization (-42.4% drop)
+2. **Logistic Regression**: Good CSMF generalization (-46.4% drop) 
+3. **Random Forest**: Moderate CSMF generalization (-54.0% drop)
+4. **XGBoost**: Poorest CSMF generalization (-56.6% drop)
+
+**COD Accuracy Generalization (Best to Worst)**:
+1. **InSilicoVA**: Best COD generalization (-47.6% drop)
+2. **Logistic Regression**: Moderate COD generalization (-59.9% drop)
+3. **XGBoost**: Poor COD generalization (-61.2% drop)
+4. **Random Forest**: Poorest COD generalization (-64.2% drop)
+
+**Key Generalization Insights**:
+- InSilicoVA consistently shows best generalization across both metrics
+- COD accuracy suffers larger generalization losses than CSMF accuracy for all models
+- XGBoost's excellent in-domain performance does not translate to good cross-site transfer
 
 ### 5. **Site-Specific Performance Breakdown**
 
@@ -246,8 +269,8 @@ All models used default configurations:
 
 5. **✓ Performance Trade-offs Identified**: 
    - Overall CSMF: Logistic Regression (0.547±0.221) leads
-   - In-Domain: XGBoost (0.884±0.028) dominates
-   - Cross-Site: InSilicoVA (0.461±0.116) excels
+   - In-Domain: XGBoost dominates both CSMF (0.884±0.028) and COD (0.467±0.091)
+   - Cross-Site: InSilicoVA excels in both CSMF (0.461±0.116) and COD (0.215±0.064) generalization
    - Speed: Random Forest (0.36s average) fastest
 
 6. **✓ Statistical Variability Documented**: High standard deviations in out-domain performance indicate significant site-to-site transfer challenges
@@ -255,13 +278,20 @@ All models used default configurations:
    - Out-domain CSMF std dev ranges from 0.116 (InSilicoVA) to 0.218 (XGBoost)
    - InSilicoVA shows most consistent performance across experiments
 
+7. **✓ COD vs CSMF Performance Patterns**: Individual cause-of-death prediction shows larger generalization losses than population-level estimates
+   - COD generalization drops range from -47.6% (InSilicoVA) to -64.2% (Random Forest)
+   - CSMF generalization drops range from -42.4% (InSilicoVA) to -56.6% (XGBoost)
+   - All models demonstrate better geographic transfer for population statistics than individual predictions
+
 ### Research Impact
 
 **For VA Model Selection**:
-- **In-Domain Deployment**: Choose XGBoost for highest accuracy (0.884 CSMF)
-- **Cross-Site Deployment**: Choose InSilicoVA for best generalization (0.461 CSMF out-domain)
-- **Simple Baseline**: Logistic Regression provides strong overall performance (0.547 CSMF) with interpretability
-- **Fast Processing**: Random Forest for real-time applications (0.3s per prediction)
+- **In-Domain Deployment**: Choose XGBoost for highest accuracy (0.884 CSMF, 0.467 COD)
+- **Cross-Site Deployment**: Choose InSilicoVA for best generalization (0.461 CSMF, 0.215 COD out-domain)
+- **Individual COD Focus**: Choose XGBoost for in-domain individual death classification (0.467 COD)
+- **Population CSMF Focus**: Choose XGBoost for in-domain population-level estimates (0.884 CSMF)
+- **Simple Baseline**: Logistic Regression provides strong overall performance with interpretability
+- **Fast Processing**: Random Forest for real-time applications (0.36s per prediction)
 
 **Critical Insight on Hyperparameters**:
 - **Current results are baseline only** - no tuning performed
