@@ -1,4 +1,10 @@
-"""Ray remote functions for parallel VA model training and evaluation."""
+"""Ray remote functions for parallel VA model training and evaluation.
+
+This module ensures consistent data preprocessing across all models:
+- All models use "cause" as the label column (created from "va34" if needed)
+- The same set of label-equivalent columns are dropped for all models
+- Feature columns are identical across all model types
+"""
 
 import time
 import traceback
@@ -54,6 +60,33 @@ def train_and_evaluate_model(
         X_train, y_train = train_data
         X_test, y_test = test_data
 
+        # Apply training size subsampling if specified
+        training_size = experiment_metadata.get("training_size", 1.0)
+        if training_size < 1.0:
+            from sklearn.model_selection import train_test_split
+            
+            # Subsample the training data while preserving class distribution
+            try:
+                X_train, _, y_train, _ = train_test_split(
+                    X_train, y_train, 
+                    train_size=training_size, 
+                    random_state=42,  # Fixed seed for reproducibility
+                    stratify=y_train
+                )
+                logger.info(
+                    f"Subsampled training data from {len(train_data[0])} to {len(X_train)} samples "
+                    f"(training_size={training_size})"
+                )
+            except ValueError as e:
+                # If stratification fails (e.g., some classes have only 1 sample), 
+                # fall back to random sampling
+                logger.warning(f"Stratified sampling failed: {e}. Using random sampling.")
+                X_train, _, y_train, _ = train_test_split(
+                    X_train, y_train, 
+                    train_size=training_size, 
+                    random_state=42
+                )
+
         # Initialize model
         if model_name == "insilico":
             model = InSilicoVAModel()
@@ -78,7 +111,7 @@ def train_and_evaluate_model(
             X_test_processed = _preprocess_features(X_test)
 
         # Train model
-        logger.info(f"Training {model_name} on {len(X_train)} samples")
+        logger.info(f"Training {model_name} on {len(X_train)} samples (training_size={training_size})")
         model.fit(X_train_processed, y_train)
 
         # Make predictions
@@ -205,11 +238,29 @@ def prepare_data_for_site(
         if len(site_data) < 50:  # Skip sites with too little data
             return None
 
-        # Drop label columns
-        label_columns = ["cause", "site", "va34", "cod5"]
+        # Drop label columns - must match VADataProcessor._get_label_equivalent_columns()
+        # This ensures no label-equivalent columns leak into features
+        label_columns = [
+            "cause",  # Primary label column used by all models
+            "site",  # Site information (used for stratification, not features)
+            "module",  # Module type
+            "gs_code34", "gs_text34", "va34",  # 34-cause classification
+            "gs_code46", "gs_text46", "va46",  # 46-cause classification  
+            "gs_code55", "gs_text55", "va55",  # 55-cause classification
+            "gs_comorbid1", "gs_comorbid2",  # Comorbidity information
+            "gs_level",  # Gold standard level
+            "cod5",  # 5-cause grouping
+            "newid"  # ID column
+        ]
         columns_to_drop = [col for col in label_columns if col in site_data.columns]
         X = site_data.drop(columns=columns_to_drop)
-        y = site_data["cause"]
+        y = site_data["cause"]  # All models use "cause" as the label
+        
+        # Log feature column count for consistency validation
+        logger = get_logger(__name__, component="orchestration", console=False)
+        logger.info(
+            f"Site {site}: {len(X.columns)} features after dropping {len(columns_to_drop)} columns"
+        )
 
         # Try stratified split, fall back to random if necessary
         try:

@@ -354,7 +354,8 @@ async def va34_comparison_flow(
         data = data[data["site"].isin(config.sites)]
         data_openva = data_openva[data_openva["site"].isin(config.sites)]
 
-    # Handle va34 column
+    # Handle va34 column - ensure all models use "cause" as the label column
+    # This standardization is critical for consistent model comparison
     if "va34" in data.columns and "cause" not in data.columns:
         data["cause"] = data["va34"].astype(str)
     if "va34" in data_openva.columns and "cause" not in data_openva.columns:
