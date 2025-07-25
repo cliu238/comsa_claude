@@ -96,7 +96,7 @@ Tasks are numbered using the following scheme:
   - **Dependencies**: VADataProcessor, categorical encoding pipeline
   - **Target Date**: Q2 2025
   - **Started**: 2025-07-25
-  - **Issue**: #TBD
+  - **Issue**: #30
   - **Notes**: Final ML baseline model to complete suite. Handles categorical features natively, robust to missing data, probabilistic output for CSMF accuracy
 
 ### Classical VA Algorithms 📋
