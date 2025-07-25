@@ -159,3 +159,60 @@ class TestComparisonMetrics:
         pred_wrong = pd.Series(["D"] * 40 + ["B"] * 30 + ["C"] * 20 + ["A"] * 10)
         wrong_acc = calculate_csmf_accuracy(true_dist, pred_wrong.values)
         assert wrong_acc < slight_acc
+
+    def test_calculate_metrics_with_bootstrap_ci_list_format(self, sample_predictions):
+        """Test that calculate_metrics returns CI in list format."""
+        y_true, y_pred = sample_predictions
+        
+        # Calculate with bootstrap
+        metrics = calculate_metrics(y_true, y_pred, n_bootstrap=50)
+        
+        # Check CI is in list format
+        assert isinstance(metrics["cod_accuracy_ci"], list)
+        assert len(metrics["cod_accuracy_ci"]) == 2
+        assert isinstance(metrics["csmf_accuracy_ci"], list)
+        assert len(metrics["csmf_accuracy_ci"]) == 2
+        
+        # Check values are sensible
+        assert metrics["cod_accuracy_ci"][0] <= metrics["cod_accuracy"]
+        assert metrics["cod_accuracy"] <= metrics["cod_accuracy_ci"][1]
+        
+        # Check backward compatibility
+        assert metrics["cod_accuracy_ci_lower"] == metrics["cod_accuracy_ci"][0]
+        assert metrics["cod_accuracy_ci_upper"] == metrics["cod_accuracy_ci"][1]
+
+    def test_calculate_metrics_without_bootstrap(self):
+        """Test that CI is None when n_bootstrap=0."""
+        y_true = pd.Series(["A", "B", "A", "B"])
+        y_pred = np.array(["A", "B", "A", "B"])
+        
+        metrics = calculate_metrics(y_true, y_pred, n_bootstrap=0)
+        
+        assert metrics["cod_accuracy_ci"] is None
+        assert metrics["csmf_accuracy_ci"] is None
+        # No old format fields when n_bootstrap=0
+        assert "cod_accuracy_ci_lower" not in metrics
+        assert "cod_accuracy_ci_upper" not in metrics
+
+    def test_bootstrap_with_small_sample(self):
+        """Test bootstrap handles small samples gracefully."""
+        # Only 3 samples - bootstrap should still work
+        y_true = pd.Series(["A", "B", "A"])
+        y_pred = np.array(["A", "B", "B"])
+        
+        metrics = calculate_metrics(y_true, y_pred, n_bootstrap=20)
+        
+        assert metrics["cod_accuracy_ci"] is not None
+        assert 0 <= metrics["cod_accuracy_ci"][0] <= metrics["cod_accuracy_ci"][1] <= 1
+
+    def test_bootstrap_reproducibility(self):
+        """Test that bootstrap results are reproducible."""
+        y_true = pd.Series(["A"] * 50 + ["B"] * 50)
+        y_pred = np.array(["A"] * 45 + ["B"] * 55)
+        
+        # Run twice - should get same results
+        metrics1 = calculate_metrics(y_true, y_pred, n_bootstrap=100)
+        metrics2 = calculate_metrics(y_true, y_pred, n_bootstrap=100)
+        
+        assert metrics1["cod_accuracy_ci"] == metrics2["cod_accuracy_ci"]
+        assert metrics1["csmf_accuracy_ci"] == metrics2["csmf_accuracy_ci"]

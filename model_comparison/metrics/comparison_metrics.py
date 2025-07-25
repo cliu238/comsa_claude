@@ -1,6 +1,6 @@
 """Metrics calculation for model comparison."""
 
-from typing import Callable, Dict, Optional, Tuple
+from typing import Callable, Dict, List, Optional, Tuple, Union
 
 import numpy as np
 import pandas as pd
@@ -12,7 +12,7 @@ def calculate_metrics(
     y_pred: np.ndarray,
     y_proba: Optional[np.ndarray] = None,
     n_bootstrap: int = 100,
-) -> Dict[str, float]:
+) -> Dict[str, Union[float, List[float], None]]:
     """Calculate comprehensive metrics with confidence intervals.
 
     Args:
@@ -32,19 +32,31 @@ def calculate_metrics(
     cod_accuracy = accuracy_score(y_true, y_pred)
     csmf_accuracy = calculate_csmf_accuracy(y_true, y_pred)
 
-    # Bootstrap confidence intervals
-    cod_ci = bootstrap_metric(y_true, y_pred, accuracy_score, n_bootstrap)
+    # Only calculate CI if n_bootstrap > 0
+    if n_bootstrap > 0:
+        # Bootstrap confidence intervals
+        cod_ci = bootstrap_metric(y_true, y_pred, accuracy_score, n_bootstrap)
+        csmf_ci = bootstrap_metric(y_true, y_pred, calculate_csmf_accuracy, n_bootstrap)
 
-    csmf_ci = bootstrap_metric(y_true, y_pred, calculate_csmf_accuracy, n_bootstrap)
-
-    metrics = {
-        "cod_accuracy": cod_accuracy,
-        "cod_accuracy_ci_lower": cod_ci[0],
-        "cod_accuracy_ci_upper": cod_ci[1],
-        "csmf_accuracy": csmf_accuracy,
-        "csmf_accuracy_ci_lower": csmf_ci[0],
-        "csmf_accuracy_ci_upper": csmf_ci[1],
-    }
+        metrics = {
+            "cod_accuracy": cod_accuracy,
+            "cod_accuracy_ci": list(cod_ci),  # List format expected by ray_tasks.py
+            "csmf_accuracy": csmf_accuracy,
+            "csmf_accuracy_ci": list(csmf_ci),  # List format expected by ray_tasks.py
+            # Backward compatibility: Keep old format
+            "cod_accuracy_ci_lower": cod_ci[0],
+            "cod_accuracy_ci_upper": cod_ci[1],
+            "csmf_accuracy_ci_lower": csmf_ci[0],
+            "csmf_accuracy_ci_upper": csmf_ci[1],
+        }
+    else:
+        # No bootstrap requested
+        metrics = {
+            "cod_accuracy": cod_accuracy,
+            "cod_accuracy_ci": None,
+            "csmf_accuracy": csmf_accuracy,
+            "csmf_accuracy_ci": None,
+        }
 
     # Add per-cause metrics if space allows
     if len(np.unique(y_true)) <= 10:  # Only for small number of causes
@@ -127,7 +139,14 @@ def bootstrap_metric(
     # Set random seed for reproducibility
     rng = np.random.RandomState(42)
 
-    for _ in range(n_bootstrap):
+    # Progress indication for long runs (optional, if tqdm available)
+    try:
+        from tqdm import tqdm
+        iterator = tqdm(range(n_bootstrap), desc="Bootstrap CI", disable=n_bootstrap < 50)
+    except ImportError:
+        iterator = range(n_bootstrap)
+
+    for _ in iterator:
         # Resample indices with replacement
         indices = rng.choice(n_samples, n_samples, replace=True)
 
