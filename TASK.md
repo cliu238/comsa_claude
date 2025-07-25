@@ -198,22 +198,30 @@ Tasks are numbered using the following scheme:
       - CI format is consistent: [lower_bound, upper_bound]
       - Tests pass with full coverage of CI code
       - Backward compatibility maintained
-- [IM-053] 📋 Implement hyperparameter tuning for all ML models
+- [IM-053] 🚧 Implement hyperparameter tuning for all ML models
   - **Priority**: High
-  - **Dependencies**: IM-045 (XGBoost), IM-046 (Random Forest), IM-047 (Logistic Regression)
+  - **Dependencies**: IM-045 (XGBoost ✅), IM-046 (Random Forest ✅), IM-047 (Logistic Regression ✅), IM-051 (Ray infrastructure ✅)
   - **Target Date**: Q1 2025
-  - **Notes**: All models currently use default configurations
-    - Implement GridSearchCV or Bayesian optimization
-    - XGBoost: tune max_depth, learning_rate, n_estimators, regularization
-    - Random Forest: tune n_estimators, max_depth, min_samples_split
-    - Logistic Regression: tune C, penalty, solver
-    - Expected 10-30% performance improvement
-    - Use Ray for distributed hyperparameter search
-    - **Integration**: Must integrate with model_comparison/scripts/run_distributed_comparison.py
-      - Add hyperparameter tuning phase before model training
-      - Leverage existing Ray infrastructure for distributed tuning
-      - Update ExperimentConfig to include hyperparameter search space
-      - Ensure tuned parameters are logged and reproducible
+  - **Issue**: #27 (to be created)
+  - **Notes**: Comprehensive hyperparameter optimization to improve model performance
+    - **Search Spaces**:
+      - XGBoost: max_depth=[3,5,7,10], learning_rate=[0.01,0.1,0.3], n_estimators=[100,200,500], subsample=[0.7,0.8,1.0], regularization
+      - Random Forest: n_estimators=[100,200,500], max_depth=[None,10,20,30], min_samples_split=[2,5,10], max_features=['sqrt','log2',0.5]
+      - Logistic Regression: C=[0.001-100], penalty=['l1','l2','elasticnet'], solver=['saga'], l1_ratio for elasticnet
+    - **Implementation Strategy**:
+      - Ray Tune integration with ASHAScheduler for early stopping
+      - Stratified k-fold (k=5) for tuning validation
+      - Computational budget constraints (< 2 hours full experiment)
+      - Checkpointing for resilience
+    - **Integration Points**:
+      - model_comparison/hyperparameter_tuning/ module structure
+      - Seamless integration with run_distributed_comparison.py
+      - Update ExperimentConfig for tuning specifications
+      - Cache and log best parameters for reproducibility
+    - **Expected Outcomes**:
+      - 10-30% improvement in CSMF accuracy
+      - Better out-domain generalization
+      - Documented optimal configurations per dataset/site
 - [IM-036] 📋 Create unified model comparison pipeline
   - **Priority**: Low
   - **Dependencies**: IM-035 results, all baseline models
@@ -425,13 +433,13 @@ Task ID Format: [Category-Number] where Category is CF/IM/DO/RD/MS
 
 ### In Progress
 
-- None currently
+- [IM-053] 🚧 Implement hyperparameter tuning for all ML models
 
 ### Next Up
 
-- [IM-053] Implement hyperparameter tuning for all ML models
 - [IM-048] CategoricalNB baseline model
 - [MS-004] Complete ML baseline models milestone
+- [IM-036] Create unified model comparison pipeline
 
 ### Recent Fixes (Q2 2025)
 
