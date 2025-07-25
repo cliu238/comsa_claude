@@ -178,15 +178,21 @@ Tasks are numbered using the following scheme:
       - Fixed InSilicoVA data format compatibility (preserved "Y"/"." format)
       - Fixed training_fraction/training_size column naming mismatch
       - Required manual intervention after automated workflow claimed completion
-- [IM-052] 📋 Fix bootstrap confidence intervals in model comparison framework
+- [IM-052] 🚧 Fix bootstrap confidence intervals in model comparison framework
   - **Priority**: High
   - **Dependencies**: IM-035 (VA34 comparison), IM-051 (Ray optimization)
   - **Target Date**: Q1 2025
+  - **Issue**: #22 (to be created)
   - **Notes**: Bootstrap CI not calculated despite n_bootstrap=100 specified
     - Root cause: ray_tasks.py expects list format but metrics return separate bounds
     - Fix metrics calculation to return [lower, upper] format
     - Update ExperimentResult to properly handle CI data
     - Validate with 100-1000 bootstrap iterations
+    - Implementation steps:
+      1. Update comparison_metrics.py to return CI as lists
+      2. Simplify ray_tasks.py CI assignment logic
+      3. Add comprehensive unit tests
+      4. Validate with small experiment
 - [IM-053] 📋 Implement hyperparameter tuning for all ML models
   - **Priority**: High
   - **Dependencies**: IM-045 (XGBoost), IM-046 (Random Forest), IM-047 (Logistic Regression)
@@ -413,11 +419,10 @@ Task ID Format: [Category-Number] where Category is CF/IM/DO/RD/MS
 
 ### In Progress
 
-- No tasks currently in progress
+- [IM-052] 🚧 Fix bootstrap confidence intervals in model comparison framework
 
 ### Next Up
 
-- [IM-052] Fix bootstrap confidence intervals in model comparison framework
 - [IM-053] Implement hyperparameter tuning for all ML models
 - [IM-048] CategoricalNB baseline model
 - [MS-004] Complete ML baseline models milestone
