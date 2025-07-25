@@ -1,0 +1,153 @@
+{
+  "data_info": {
+    "n_samples": 1000,
+    "n_features": 50,
+    "n_classes": 8,
+    "class_distribution": {
+      "Digestive": 128,
+      "Cancer": 127,
+      "Nervous": 126,
+      "Respiratory": 126,
+      "Maternal": 125,
+      "Other": 124,
+      "Cardiovascular": 123,
+      "Infectious": 121
+    }
+  },
+  "basic_functionality": {
+    "model_initialization": "PASS",
+    "model_fitting": "PASS",
+    "predictions": "PASS",
+    "prediction_shape": [
+      300
+    ],
+    "probability_shape": [
+      300,
+      8
+    ],
+    "cross_validation": "PASS",
+    "cv_csmf_accuracy": 0.9349593495934959,
+    "cv_cod_accuracy": 0.4985877260555372,
+    "metrics_calculation": "PASS",
+    "test_csmf_accuracy": 0.9318181818181818,
+    "test_cod_accuracy": 0.53
+  },
+  "hyperparameter_tuning": {
+    "tuner_initialization": "PASS",
+    "hyperparameter_tuning": "PASS",
+    "best_params": {
+      "n_estimators": 498,
+      "max_depth": 7,
+      "learning_rate": 0.046244293281781444,
+      "subsample": 0.925736391218897,
+      "colsample_bytree": 0.8537329974297012,
+      "reg_alpha": 0.6612974455580328,
+      "reg_lambda": 0.003973628838239575
+    },
+    "best_score": 0.9463414634146341,
+    "n_trials_completed": 15,
+    "final_model_training": "PASS",
+    "final_test_csmf": 0.9431818181818181,
+    "final_test_cod": 0.5333333333333333,
+    "quick_tune_function": "PASS"
+  },
+  "parameter_spaces": {
+    "default_config": "PASS",
+    "parameter_ranges": {
+      "n_estimators": [
+        50,
+        500
+      ],
+      "max_depth": [
+        3,
+        10
+      ],
+      "learning_rate": [
+        0.01,
+        0.3
+      ],
+      "subsample": [
+        0.5,
+        1.0
+      ],
+      "colsample_bytree": [
+        0.5,
+        1.0
+      ],
+      "reg_alpha": [
+        0.0001,
+        10.0
+      ],
+      "reg_lambda": [
+        0.0001,
+        10.0
+      ]
+    },
+    "parameter_space_validation": "PASS",
+    "config_validation": "PASS"
+  },
+  "edge_cases": {
+    "small_dataset": "PASS",
+    "invalid_metric_handling": "PASS",
+    "single_class": "HANDLED",
+    "missing_values": "NOT_PRESENT"
+  },
+  "integration": {
+    "tuned_model_metrics": {
+      "cod_accuracy": 0.5133333333333333,
+      "cod_accuracy_ci": [
+        0.4715,
+        0.5525833333333333
+      ],
+      "csmf_accuracy": 0.928030303030303,
+      "csmf_accuracy_ci": [
+        0.8409244877726372,
+        0.9565242239512313
+      ],
+      "cod_accuracy_ci_lower": 0.4715,
+      "cod_accuracy_ci_upper": 0.5525833333333333,
+      "csmf_accuracy_ci_lower": 0.8409244877726372,
+      "csmf_accuracy_ci_upper": 0.9565242239512313,
+      "accuracy_Nervous": 0.5526315789473685,
+      "accuracy_Maternal": 0.6578947368421053,
+      "accuracy_Other": 0.4594594594594595,
+      "accuracy_Cancer": 0.5263157894736842,
+      "accuracy_Digestive": 0.3684210526315789,
+      "accuracy_Respiratory": 0.4473684210526316,
+      "accuracy_Cardiovascular": 0.5135135135135135,
+      "accuracy_Infectious": 0.5833333333333334
+    },
+    "integration_test": "PASS",
+    "baseline_metrics": {
+      "cod_accuracy": 0.53,
+      "cod_accuracy_ci": [
+        0.4766666666666667,
+        0.58775
+      ],
+      "csmf_accuracy": 0.9318181818181818,
+      "csmf_accuracy_ci": [
+        0.8651127819548873,
+        0.9397998761009507
+      ],
+      "cod_accuracy_ci_lower": 0.4766666666666667,
+      "cod_accuracy_ci_upper": 0.58775,
+      "csmf_accuracy_ci_lower": 0.8651127819548873,
+      "csmf_accuracy_ci_upper": 0.9397998761009507,
+      "accuracy_Nervous": 0.6052631578947368,
+      "accuracy_Maternal": 0.6578947368421053,
+      "accuracy_Other": 0.6486486486486487,
+      "accuracy_Cancer": 0.42105263157894735,
+      "accuracy_Digestive": 0.39473684210526316,
+      "accuracy_Respiratory": 0.5,
+      "accuracy_Cardiovascular": 0.5135135135135135,
+      "accuracy_Infectious": 0.5
+    },
+    "improvement": {
+      "csmf_accuracy": -0.0037878787878787845,
+      "cod_accuracy": -0.01666666666666672
+    }
+  },
+  "overall_status": "PASS",
+  "failed_tests": [],
+  "errors": []
+}

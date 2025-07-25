@@ -29,7 +29,7 @@ from prefect import serve
 sys.path.append(str(Path(__file__).parent.parent.parent))
 
 from baseline.utils import get_logger
-from model_comparison.experiments.experiment_config import ExperimentConfig
+from model_comparison.experiments.experiment_config import ExperimentConfig, TuningConfig
 from model_comparison.orchestration.config import ParallelConfig
 from model_comparison.orchestration.prefect_flows import (
     cleanup_ray_resources,
@@ -136,6 +136,43 @@ def parse_arguments():
         help="Skip generating visualization plots",
     )
 
+    # Hyperparameter tuning arguments
+    parser.add_argument(
+        "--enable-tuning",
+        action="store_true",
+        help="Enable hyperparameter tuning for ML models",
+    )
+    parser.add_argument(
+        "--tuning-trials",
+        type=int,
+        default=100,
+        help="Number of tuning trials per model",
+    )
+    parser.add_argument(
+        "--tuning-algorithm",
+        choices=["grid", "random", "bayesian"],
+        default="bayesian",
+        help="Hyperparameter search algorithm",
+    )
+    parser.add_argument(
+        "--tuning-metric",
+        choices=["csmf_accuracy", "cod_accuracy"],
+        default="csmf_accuracy",
+        help="Metric to optimize during tuning",
+    )
+    parser.add_argument(
+        "--tuning-cv-folds",
+        type=int,
+        default=5,
+        help="Cross-validation folds for tuning",
+    )
+    parser.add_argument(
+        "--tuning-cpus-per-trial",
+        type=float,
+        default=1.0,
+        help="CPUs allocated per tuning trial",
+    )
+    
     # Other arguments
     parser.add_argument(
         "--random-seed", type=int, default=42, help="Random seed for reproducibility"
@@ -158,6 +195,16 @@ async def main():
     """Main execution function."""
     args = parse_arguments()
 
+    # Create tuning configuration
+    tuning_config = TuningConfig(
+        enabled=args.enable_tuning,
+        n_trials=args.tuning_trials,
+        search_algorithm=args.tuning_algorithm,
+        tuning_metric=args.tuning_metric,
+        cv_folds=args.tuning_cv_folds,
+        n_cpus_per_trial=args.tuning_cpus_per_trial,
+    )
+    
     # Create configurations
     experiment_config = ExperimentConfig(
         data_path=args.data_path,
@@ -168,6 +215,7 @@ async def main():
         random_seed=args.random_seed,
         output_dir=args.output_dir,
         generate_plots=not args.no_plots,
+        tuning=tuning_config,
     )
 
     parallel_config = ParallelConfig(
