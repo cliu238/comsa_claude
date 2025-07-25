@@ -88,6 +88,14 @@ baseline/
   - Ensure proper statistical validation with 100-1000 iterations
   - Critical for model comparison statistical significance
 
+- **Task IM-053**: Implement Hyperparameter Tuning for All ML Models
+  - Priority: High (10-30% performance improvement expected)
+  - Dependencies: IM-045 (XGBoost ✅), IM-046 (Random Forest ✅), IM-047 (Logistic Regression ✅)
+  - Integrate with existing Ray infrastructure for distributed tuning
+  - Support multiple optimization methods (Grid, Random, Bayesian, Optuna)
+  - Create model_comparison/hyperparameter_tuning/ module
+  - Extend ExperimentConfig with search space definitions
+
 ## Design Principles
 
 ### 1. Context is King

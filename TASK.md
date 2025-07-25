@@ -193,10 +193,11 @@ Tasks are numbered using the following scheme:
       2. Simplify ray_tasks.py CI assignment logic
       3. Add comprehensive unit tests
       4. Validate with small experiment
-- [IM-053] 📋 Implement hyperparameter tuning for all ML models
+- [IM-053] 🚧 Implement hyperparameter tuning for all ML models
   - **Priority**: High
-  - **Dependencies**: IM-045 (XGBoost), IM-046 (Random Forest), IM-047 (Logistic Regression)
+  - **Dependencies**: IM-045 (XGBoost ✅), IM-046 (Random Forest ✅), IM-047 (Logistic Regression ✅)
   - **Target Date**: Q1 2025
+  - **Issue**: #24 (to be created)
   - **Notes**: All models currently use default configurations
     - Implement GridSearchCV or Bayesian optimization
     - XGBoost: tune max_depth, learning_rate, n_estimators, regularization
@@ -209,6 +210,15 @@ Tasks are numbered using the following scheme:
       - Leverage existing Ray infrastructure for distributed tuning
       - Update ExperimentConfig to include hyperparameter search space
       - Ensure tuned parameters are logged and reproducible
+    - **Implementation Plan**:
+      1. Create hyperparameter search space schema with Pydantic
+      2. Implement model-specific search spaces (XGBoost, RF, LR)
+      3. Create model_comparison/hyperparameter_tuning/ module
+      4. Implement base tuner interface with cross-validation
+      5. Add Ray-based distributed tuning capabilities
+      6. Integrate Optuna for Bayesian optimization
+      7. Update CLI with tuning flags (--tune-hyperparameters, etc.)
+      8. Add comprehensive unit and integration tests
 - [IM-036] 📋 Create unified model comparison pipeline
   - **Priority**: Low
   - **Dependencies**: IM-035 results, all baseline models
@@ -385,8 +395,8 @@ Task ID Format: [Category-Number] where Category is CF/IM/DO/RD/MS
 
 ### High Priority
 
-1. Fix bootstrap confidence intervals (IM-052) - critical for statistical validation
-2. Implement hyperparameter tuning (IM-053) - 10-30% performance improvement potential
+1. Fix bootstrap confidence intervals (IM-052) 🚧 - critical for statistical validation
+2. Implement hyperparameter tuning (IM-053) 🚧 - 10-30% performance improvement potential
 3. ML baseline models (XGBoost ✅, RF ✅, LR ✅) - needed for comparison
 
 ### Medium Priority
@@ -420,10 +430,10 @@ Task ID Format: [Category-Number] where Category is CF/IM/DO/RD/MS
 ### In Progress
 
 - [IM-052] 🚧 Fix bootstrap confidence intervals in model comparison framework
+- [IM-053] 🚧 Implement hyperparameter tuning for all ML models
 
 ### Next Up
 
-- [IM-053] Implement hyperparameter tuning for all ML models
 - [IM-048] CategoricalNB baseline model
 - [MS-004] Complete ML baseline models milestone
 
