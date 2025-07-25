@@ -82,10 +82,11 @@ baseline/
 - **model_comparison/**: Systematic algorithm evaluation with InSilicoVA baseline
 
 #### Current Development
-- **Task IM-047**: Implementing Logistic Regression baseline model
-  - Multinomial classification with L1/L2/ElasticNet regularization
-  - Feature importance via coefficients for interpretability
-  - Part of ML baseline models suite
+- **Task IM-052**: Fixing bootstrap confidence intervals in model comparison framework
+  - Critical for statistical validation of model performance differences
+  - Issue: Bootstrap CI not calculated despite n_bootstrap=100 being specified
+  - Root cause: Data format mismatch between ray_tasks.py expectations and metrics output
+  - Solution: Update metrics to return CI in [lower, upper] format and fix ExperimentResult serialization
 
 ## Design Principles
 
