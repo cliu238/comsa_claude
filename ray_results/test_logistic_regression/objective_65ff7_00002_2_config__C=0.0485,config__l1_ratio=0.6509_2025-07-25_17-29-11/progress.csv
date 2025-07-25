@@ -1,0 +1,2 @@
+csmf_accuracy,cod_accuracy,timestamp,checkpoint_dir_name,done,training_iteration,trial_id,date,time_this_iter_s,time_total_s,pid,hostname,node_ip,time_since_restore,iterations_since_restore
+0.004429727740986007,0.10000480965779285,1753478953,,False,1,65ff7_00002,2025-07-25_17-29-13,0.014312982559204102,0.014312982559204102,52225,wse-dsai-ggp67pg757.win.ad.jhu.edu,127.0.0.1,0.014312982559204102,1

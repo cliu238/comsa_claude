@@ -1,0 +1,9 @@
+{
+  "config__colsample_bytree": 0.7102463929488764,
+  "config__learning_rate": 0.01701909510022647,
+  "config__max_depth": 3,
+  "config__n_estimators": 100,
+  "config__reg_alpha": 0.5396569266626641,
+  "config__reg_lambda": 1.4489163166401522,
+  "config__subsample": 0.8416497125172375
+}

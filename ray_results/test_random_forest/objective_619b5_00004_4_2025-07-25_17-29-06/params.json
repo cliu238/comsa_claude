@@ -1,0 +1,8 @@
+{
+  "config__bootstrap": true,
+  "config__max_depth": null,
+  "config__max_features": "sqrt",
+  "config__min_samples_leaf": 1,
+  "config__min_samples_split": 2,
+  "config__n_estimators": 100
+}
