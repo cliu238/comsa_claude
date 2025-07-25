@@ -91,11 +91,13 @@ Tasks are numbered using the following scheme:
   - **PR**: #21
   - **Notes**: Multinomial with L1/L2/ElasticNet regularization, coefficient-based feature importance, 96% test coverage
   - **Issue**: #20 - Successfully implemented with sklearn-compatible interface and CSMF accuracy metrics
-- [IM-048] 📋 Implement CategoricalNB baseline model
-  - **Priority**: Medium
-  - **Dependencies**: VADataProcessor, numeric encoding
+- [IM-048] 🚧 Implement CategoricalNB baseline model
+  - **Priority**: High
+  - **Dependencies**: VADataProcessor, categorical encoding pipeline
   - **Target Date**: Q2 2025
-  - **Notes**: Handle missing data appropriately
+  - **Started**: 2025-07-25
+  - **Issue**: #TBD
+  - **Notes**: Final ML baseline model to complete suite. Handles categorical features natively, robust to missing data, probabilistic output for CSMF accuracy
 
 ### Classical VA Algorithms 📋
 
@@ -433,11 +435,10 @@ Task ID Format: [Category-Number] where Category is CF/IM/DO/RD/MS
 
 ### In Progress
 
-- [IM-053] 🚧 Implement hyperparameter tuning for all ML models
+- [IM-048] CategoricalNB baseline model - started 2025-07-25
 
 ### Next Up
 
-- [IM-048] CategoricalNB baseline model
 - [MS-004] Complete ML baseline models milestone
 - [IM-036] Create unified model comparison pipeline
 

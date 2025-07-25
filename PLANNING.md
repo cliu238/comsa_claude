@@ -82,12 +82,12 @@ baseline/
 - **model_comparison/**: Systematic algorithm evaluation with InSilicoVA baseline
 
 #### Current Development
-- **Task IM-053**: Implementing hyperparameter tuning for all ML models
-  - Critical for optimizing model performance across different VA datasets
-  - Objective: 10-30% improvement in CSMF accuracy through systematic tuning
-  - Approach: Ray Tune integration with existing distributed infrastructure
-  - Models: XGBoost, Random Forest, Logistic Regression with custom search spaces
-  - Integration: Seamless with run_distributed_comparison.py workflow
+- **Task IM-048**: Implementing CategoricalNB baseline model
+  - Final ML baseline model to complete the suite alongside XGBoost, Random Forest, and Logistic Regression
+  - Objective: Add probabilistic approach that handles categorical features natively
+  - Approach: Sklearn CategoricalNB with categorical encoding pipeline
+  - Benefits: Robust to missing data, fast training/inference, interpretable probabilities
+  - Integration: Seamless with existing hyperparameter tuning and comparison infrastructure
 
 ## Design Principles
 
