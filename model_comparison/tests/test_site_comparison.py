@@ -113,7 +113,7 @@ class TestSiteComparison:
         assert all(results["train_site"] == results["test_site"])
 
         # Check metrics are present
-        required_metrics = ["csmf_accuracy", "cod_accuracy", "csmf_accuracy_ci_lower"]
+        required_metrics = ["csmf_accuracy", "cod_accuracy", "csmf_accuracy_ci", "cod_accuracy_ci"]
         for metric in required_metrics:
             assert metric in results.columns
 

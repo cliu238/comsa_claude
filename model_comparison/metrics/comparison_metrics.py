@@ -24,6 +24,11 @@ def calculate_metrics(
     Returns:
         Dictionary containing metrics and confidence intervals
     """
+    # Import logger
+    from baseline.utils import get_logger
+    logger = get_logger(__name__)
+    logger.debug(f"Starting bootstrap with {n_bootstrap} iterations")
+    
     # Check input lengths
     if len(y_true) != len(y_pred):
         raise ValueError(f"Length mismatch: y_true ({len(y_true)}) != y_pred ({len(y_pred)})")
@@ -34,16 +39,14 @@ def calculate_metrics(
 
     # Bootstrap confidence intervals
     cod_ci = bootstrap_metric(y_true, y_pred, accuracy_score, n_bootstrap)
-
     csmf_ci = bootstrap_metric(y_true, y_pred, calculate_csmf_accuracy, n_bootstrap)
 
+    # CRITICAL: Return CI as lists, not separate keys
     metrics = {
         "cod_accuracy": cod_accuracy,
-        "cod_accuracy_ci_lower": cod_ci[0],
-        "cod_accuracy_ci_upper": cod_ci[1],
+        "cod_accuracy_ci": [cod_ci[0], cod_ci[1]],  # List format
         "csmf_accuracy": csmf_accuracy,
-        "csmf_accuracy_ci_lower": csmf_ci[0],
-        "csmf_accuracy_ci_upper": csmf_ci[1],
+        "csmf_accuracy_ci": [csmf_ci[0], csmf_ci[1]],  # List format
     }
 
     # Add per-cause metrics if space allows
@@ -51,6 +54,9 @@ def calculate_metrics(
         cause_accuracies = calculate_per_cause_accuracy(y_true, y_pred)
         for cause, acc in cause_accuracies.items():
             metrics[f"accuracy_{cause}"] = acc
+    
+    logger.debug(f"Bootstrap complete. COD CI: {metrics['cod_accuracy_ci']}, "
+                f"CSMF CI: {metrics['csmf_accuracy_ci']}")
 
     return metrics
 
@@ -117,6 +123,9 @@ def bootstrap_metric(
     Returns:
         Tuple of (lower_bound, upper_bound)
     """
+    from baseline.utils import get_logger
+    logger = get_logger(__name__)
+    
     scores = []
     n_samples = len(y_true)
 
@@ -127,7 +136,13 @@ def bootstrap_metric(
     # Set random seed for reproducibility
     rng = np.random.RandomState(42)
 
-    for _ in range(n_bootstrap):
+    # Log progress for larger bootstrap iterations
+    log_interval = max(1, n_bootstrap // 10)
+    
+    for i in range(n_bootstrap):
+        if i % log_interval == 0:
+            logger.debug(f"Bootstrap iteration {i}/{n_bootstrap}")
+            
         # Resample indices with replacement
         indices = rng.choice(n_samples, n_samples, replace=True)
 
@@ -143,6 +158,7 @@ def bootstrap_metric(
             continue
 
     if not scores:
+        logger.warning("No valid bootstrap scores calculated - returning (0.0, 0.0)")
         return (0.0, 0.0)
 
     # Calculate confidence intervals

@@ -8,7 +8,7 @@ This module ensures consistent data preprocessing across all models:
 
 import time
 import traceback
-from typing import Dict, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 import pandas as pd
 import ray
@@ -87,16 +87,34 @@ def train_and_evaluate_model(
                     random_state=42
                 )
 
-        # Initialize model
+        # Get tuned parameters if available
+        tuned_params = experiment_metadata.get("tuned_params", {}).get(model_name, {})
+        
+        # Initialize model with tuned parameters
         if model_name == "insilico":
-            model = InSilicoVAModel()
+            model = InSilicoVAModel()  # InSilico doesn't use hyperparameters
         elif model_name == "xgboost":
-            model = XGBoostModel()
+            if tuned_params:
+                from baseline.models.model_factory import create_model
+                model = create_model("xgboost", tuned_params)
+                logger.info(f"Using tuned parameters for XGBoost: {tuned_params}")
+            else:
+                model = XGBoostModel()
         elif model_name == "random_forest":
-            model = RandomForestModel()
+            if tuned_params:
+                from baseline.models.model_factory import create_model
+                model = create_model("random_forest", tuned_params)
+                logger.info(f"Using tuned parameters for Random Forest: {tuned_params}")
+            else:
+                model = RandomForestModel()
         elif model_name == "logistic_regression":
-            from baseline.models.logistic_regression_model import LogisticRegressionModel
-            model = LogisticRegressionModel()
+            if tuned_params:
+                from baseline.models.model_factory import create_model
+                model = create_model("logistic_regression", tuned_params)
+                logger.info(f"Using tuned parameters for Logistic Regression: {tuned_params}")
+            else:
+                from baseline.models.logistic_regression_model import LogisticRegressionModel
+                model = LogisticRegressionModel()
         else:
             raise ValueError(f"Unknown model: {model_name}")
 
@@ -128,7 +146,7 @@ def train_and_evaluate_model(
             y_true=y_test, y_pred=y_pred, y_proba=y_proba, n_bootstrap=n_bootstrap
         )
 
-        # Create result
+        # Create result - SIMPLIFIED CI assignment
         result = ExperimentResult(
             experiment_id=experiment_metadata["experiment_id"],
             model_name=model_name,
@@ -138,14 +156,25 @@ def train_and_evaluate_model(
             training_size=experiment_metadata.get("training_size", 1.0),
             csmf_accuracy=metrics["csmf_accuracy"],
             cod_accuracy=metrics["cod_accuracy"],
-            csmf_accuracy_ci=metrics.get("csmf_accuracy_ci") if isinstance(metrics.get("csmf_accuracy_ci"), list) else None,
-            cod_accuracy_ci=metrics.get("cod_accuracy_ci") if isinstance(metrics.get("cod_accuracy_ci"), list) else None,
+            csmf_accuracy_ci=metrics.get("csmf_accuracy_ci"),  # Direct assignment
+            cod_accuracy_ci=metrics.get("cod_accuracy_ci"),    # Direct assignment
             n_train=len(y_train),
             n_test=len(y_test),
             execution_time_seconds=time.time() - start_time,
             worker_id=ray.get_runtime_context().get_worker_id(),
             retry_count=retry_count,
         )
+        
+        # Add validation (defensive programming)
+        if result.csmf_accuracy_ci:
+            assert len(result.csmf_accuracy_ci) == 2, "CI must be [lower, upper]"
+            assert result.csmf_accuracy_ci[0] <= result.csmf_accuracy <= result.csmf_accuracy_ci[1], \
+                f"CSMF accuracy {result.csmf_accuracy} not within CI {result.csmf_accuracy_ci}"
+        
+        if result.cod_accuracy_ci:
+            assert len(result.cod_accuracy_ci) == 2, "CI must be [lower, upper]"
+            assert result.cod_accuracy_ci[0] <= result.cod_accuracy <= result.cod_accuracy_ci[1], \
+                f"COD accuracy {result.cod_accuracy} not within CI {result.cod_accuracy_ci}"
 
         logger.info(
             f"Completed: {model_name} - CSMF: {metrics['csmf_accuracy']:.3f}, "
@@ -328,3 +357,111 @@ class ProgressReporter:
     def get_results(self) -> list:
         """Get all collected results."""
         return self.results
+
+
+@ray.remote
+def tune_hyperparameters(
+    model_name: str,
+    train_data: Tuple[pd.DataFrame, pd.Series],
+    tuning_config: Dict,
+    experiment_id: str,
+) -> Dict[str, Any]:
+    """Tune hyperparameters for a model using Ray.
+    
+    This function runs hyperparameter tuning in a Ray worker, with all imports
+    done inside to ensure proper serialization.
+    
+    Args:
+        model_name: Name of the model to tune
+        train_data: Tuple of (X_train, y_train)
+        tuning_config: Configuration for hyperparameter tuning
+        experiment_id: Unique experiment identifier
+        
+    Returns:
+        Dictionary with best parameters, score, and tuning time
+    """
+    # Import inside remote function
+    from model_comparison.hyperparameter_tuning import get_tuner
+    from model_comparison.hyperparameter_tuning.utils import (
+        load_cached_params,
+        save_cached_params,
+    )
+    from baseline.utils import get_logger
+    
+    logger = get_logger(__name__, component="orchestration", console=False)
+    X_train, y_train = train_data
+    
+    # Check cache first
+    cache_key = f"{experiment_id}_{model_name}"
+    cached_params = load_cached_params(cache_key)
+    if cached_params:
+        logger.info(f"Using cached parameters for {model_name}")
+        return {
+            "best_params": cached_params,
+            "best_score": 0.0,  # Score not cached
+            "tuning_time_seconds": 0.0,
+            "from_cache": True,
+        }
+    
+    # CRITICAL: Set n_jobs=1 to avoid nested parallelism with Ray
+    tuning_config["n_jobs"] = 1
+    
+    # Create and run tuner
+    start_time = time.time()
+    try:
+        tuner = get_tuner(
+            method=tuning_config.get("method", "optuna"),
+            model_name=model_name,
+            X=X_train,
+            y=y_train,
+            n_trials=tuning_config.get("n_trials", 50),
+            timeout=tuning_config.get("timeout_seconds"),
+            metric=tuning_config.get("metric", "csmf_accuracy"),
+            cv_folds=tuning_config.get("cv_folds", 5),
+            random_seed=42,
+        )
+        
+        logger.info(
+            f"Starting hyperparameter tuning for {model_name} "
+            f"using {tuning_config['method']} method"
+        )
+        
+        result = tuner.tune()
+        
+        # Cache results
+        save_cached_params(
+            cache_key,
+            result.best_params,
+            metadata={
+                "best_score": result.best_score,
+                "n_trials": result.n_trials_completed,
+                "model": model_name,
+                "method": tuning_config["method"],
+            }
+        )
+        
+        tuning_time = time.time() - start_time
+        logger.info(
+            f"Completed tuning for {model_name} in {tuning_time:.1f}s. "
+            f"Best score: {result.best_score:.4f}"
+        )
+        
+        return {
+            "best_params": result.best_params,
+            "best_score": result.best_score,
+            "tuning_time_seconds": tuning_time,
+            "n_trials_completed": result.n_trials_completed,
+            "from_cache": False,
+        }
+        
+    except Exception as e:
+        logger.error(f"Error tuning {model_name}: {str(e)}")
+        logger.error(traceback.format_exc())
+        # Return default parameters on error
+        return {
+            "best_params": {},
+            "best_score": 0.0,
+            "tuning_time_seconds": time.time() - start_time,
+            "error": str(e),
+            "from_cache": False,
+        }

@@ -5,6 +5,35 @@ from typing import List, Optional
 from pydantic import BaseModel, Field, field_validator
 
 
+class HyperparameterSearchConfig(BaseModel):
+    """Configuration for hyperparameter search."""
+    
+    enabled: bool = Field(default=False, description="Enable hyperparameter tuning")
+    method: str = Field(
+        default="optuna",
+        pattern="^(grid|random|optuna|ray_tune)$",
+        description="Tuning method to use"
+    )
+    n_trials: int = Field(default=50, ge=1, description="Number of trials")
+    timeout_seconds: Optional[float] = Field(
+        default=1800,  # 30 minutes
+        ge=0,
+        description="Maximum time for tuning per model"
+    )
+    metric: str = Field(
+        default="csmf_accuracy",
+        pattern="^(csmf_accuracy|cod_accuracy)$",
+        description="Metric to optimize"
+    )
+    cv_folds: int = Field(default=5, ge=2, description="Cross-validation folds")
+    cache_dir: str = Field(
+        default="cache/tuned_params",
+        description="Directory to cache tuned parameters"
+    )
+    
+    model_config = {"validate_assignment": True}
+
+
 class ExperimentConfig(BaseModel):
     """Configuration for VA34 site comparison experiment."""
 
@@ -37,6 +66,12 @@ class ExperimentConfig(BaseModel):
     output_dir: str = Field(default="results/va34_comparison")
     save_predictions: bool = Field(default=True)
     generate_plots: bool = Field(default=True)
+    
+    # Hyperparameter tuning configuration
+    hyperparameter_search: Optional[HyperparameterSearchConfig] = Field(
+        default=None,
+        description="Hyperparameter tuning configuration"
+    )
 
     @field_validator("training_sizes")
     def validate_training_sizes(cls, v: List[float]) -> List[float]:

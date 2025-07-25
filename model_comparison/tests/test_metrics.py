@@ -85,23 +85,26 @@ class TestComparisonMetrics:
         # Check all expected metrics are present
         expected_metrics = [
             "cod_accuracy",
-            "cod_accuracy_ci_lower",
-            "cod_accuracy_ci_upper",
+            "cod_accuracy_ci",
             "csmf_accuracy",
-            "csmf_accuracy_ci_lower",
-            "csmf_accuracy_ci_upper",
+            "csmf_accuracy_ci",
         ]
 
         for metric in expected_metrics:
             assert metric in metrics
-            assert isinstance(metrics[metric], (int, float))
-            assert 0 <= metrics[metric] <= 1
+            if metric.endswith("_ci"):
+                assert isinstance(metrics[metric], list)
+                assert len(metrics[metric]) == 2
+                assert 0 <= metrics[metric][0] <= metrics[metric][1] <= 1
+            else:
+                assert isinstance(metrics[metric], (int, float))
+                assert 0 <= metrics[metric] <= 1
 
         # Check confidence intervals make sense
-        assert metrics["cod_accuracy_ci_lower"] <= metrics["cod_accuracy"]
-        assert metrics["cod_accuracy"] <= metrics["cod_accuracy_ci_upper"]
-        assert metrics["csmf_accuracy_ci_lower"] <= metrics["csmf_accuracy"]
-        assert metrics["csmf_accuracy"] <= metrics["csmf_accuracy_ci_upper"]
+        assert metrics["cod_accuracy_ci"][0] <= metrics["cod_accuracy"]
+        assert metrics["cod_accuracy"] <= metrics["cod_accuracy_ci"][1]
+        assert metrics["csmf_accuracy_ci"][0] <= metrics["csmf_accuracy"]
+        assert metrics["csmf_accuracy"] <= metrics["csmf_accuracy_ci"][1]
 
     def test_calculate_per_cause_accuracy(self, sample_predictions):
         """Test per-cause accuracy calculation."""
@@ -159,3 +162,44 @@ class TestComparisonMetrics:
         pred_wrong = pd.Series(["D"] * 40 + ["B"] * 30 + ["C"] * 20 + ["A"] * 10)
         wrong_acc = calculate_csmf_accuracy(true_dist, pred_wrong.values)
         assert wrong_acc < slight_acc
+
+    def test_bootstrap_ci_list_format(self):
+        """Verify CIs are returned as lists."""
+        # Setup
+        y_true = pd.Series(["A"] * 50 + ["B"] * 30 + ["C"] * 20)
+        y_pred = y_true.copy()
+        y_pred.iloc[0:10] = "B"  # Introduce some errors
+        
+        # Test
+        metrics = calculate_metrics(y_true, y_pred, n_bootstrap=100)
+        
+        # Assertions
+        assert isinstance(metrics["cod_accuracy_ci"], list)
+        assert isinstance(metrics["csmf_accuracy_ci"], list)
+        assert len(metrics["cod_accuracy_ci"]) == 2
+        assert len(metrics["csmf_accuracy_ci"]) == 2
+
+    def test_bootstrap_iterations_configurable(self):
+        """Test different bootstrap iteration counts."""
+        y_true = pd.Series(np.random.choice(["A", "B", "C"], 100))
+        y_pred = y_true.copy()
+        
+        # Test with different iterations
+        for n_boot in [10, 100, 500]:
+            metrics = calculate_metrics(y_true, y_pred, n_bootstrap=n_boot)
+            assert "cod_accuracy_ci" in metrics
+            assert "csmf_accuracy_ci" in metrics
+
+    def test_bootstrap_edge_cases(self):
+        """Test edge cases that might break bootstrap."""
+        # Single class
+        y_single = pd.Series(["A"] * 50)
+        metrics = calculate_metrics(y_single, y_single.values, n_bootstrap=20)
+        assert metrics["cod_accuracy"] == 1.0
+        assert metrics["cod_accuracy_ci"] == [1.0, 1.0]
+        
+        # Very small sample
+        y_small = pd.Series(["A", "B", "A"])
+        y_pred = np.array(["A", "A", "B"])
+        metrics = calculate_metrics(y_small, y_pred, n_bootstrap=10)
+        assert "cod_accuracy_ci" in metrics

@@ -22,8 +22,6 @@ import asyncio
 import sys
 from pathlib import Path
 
-import ray
-from prefect import serve
 
 # Add parent directory to path for imports
 sys.path.append(str(Path(__file__).parent.parent.parent))
@@ -124,6 +122,37 @@ def parse_arguments():
         help="Disable Prefect dashboard",
     )
 
+    # Hyperparameter tuning arguments
+    parser.add_argument(
+        "--tune-hyperparameters",
+        action="store_true",
+        help="Enable hyperparameter tuning before training",
+    )
+    parser.add_argument(
+        "--tuning-method",
+        choices=["grid", "random", "optuna", "ray_tune"],
+        default="optuna",
+        help="Hyperparameter tuning method",
+    )
+    parser.add_argument(
+        "--tuning-trials",
+        type=int,
+        default=50,
+        help="Number of trials for hyperparameter tuning",
+    )
+    parser.add_argument(
+        "--tuning-timeout",
+        type=float,
+        default=1800,  # 30 minutes
+        help="Maximum time in seconds for tuning per model",
+    )
+    parser.add_argument(
+        "--tuning-metric",
+        choices=["csmf_accuracy", "cod_accuracy"],
+        default="csmf_accuracy",
+        help="Metric to optimize during tuning",
+    )
+
     # Output arguments
     parser.add_argument(
         "--output-dir",
@@ -158,6 +187,19 @@ async def main():
     """Main execution function."""
     args = parse_arguments()
 
+    # Create hyperparameter search config if enabled
+    hyperparameter_search = None
+    if args.tune_hyperparameters:
+        from model_comparison.experiments.experiment_config import HyperparameterSearchConfig
+        
+        hyperparameter_search = HyperparameterSearchConfig(
+            enabled=True,
+            method=args.tuning_method,
+            n_trials=args.tuning_trials,
+            timeout_seconds=args.tuning_timeout,
+            metric=args.tuning_metric,
+        )
+
     # Create configurations
     experiment_config = ExperimentConfig(
         data_path=args.data_path,
@@ -168,6 +210,7 @@ async def main():
         random_seed=args.random_seed,
         output_dir=args.output_dir,
         generate_plots=not args.no_plots,
+        hyperparameter_search=hyperparameter_search,
     )
 
     parallel_config = ParallelConfig(
@@ -187,6 +230,13 @@ async def main():
     logger.info(f"Models: {args.models}")
     logger.info(f"Workers: {args.n_workers}")
     logger.info(f"Output directory: {args.output_dir}")
+    
+    if args.tune_hyperparameters:
+        logger.info(f"Hyperparameter tuning: ENABLED")
+        logger.info(f"  Method: {args.tuning_method}")
+        logger.info(f"  Trials: {args.tuning_trials}")
+        logger.info(f"  Metric: {args.tuning_metric}")
+        logger.info(f"  Timeout: {args.tuning_timeout}s")
 
     # Clear checkpoints if requested
     if args.clear_checkpoints:
