@@ -82,11 +82,12 @@ baseline/
 - **model_comparison/**: Systematic algorithm evaluation with InSilicoVA baseline
 
 #### Current Development
-- **Task IM-052**: Fixing bootstrap confidence intervals in model comparison framework
-  - Critical for statistical validation of model performance differences
-  - Issue: Bootstrap CI not calculated despite n_bootstrap=100 being specified
-  - Root cause: Data format mismatch between ray_tasks.py expectations and metrics output
-  - Solution: Update metrics to return CI in [lower, upper] format and fix ExperimentResult serialization
+- **Task IM-053**: Implementing hyperparameter tuning for all ML models
+  - Critical for optimizing model performance across different VA datasets
+  - Objective: 10-30% improvement in CSMF accuracy through systematic tuning
+  - Approach: Ray Tune integration with existing distributed infrastructure
+  - Models: XGBoost, Random Forest, Logistic Regression with custom search spaces
+  - Integration: Seamless with run_distributed_comparison.py workflow
 
 ## Design Principles
 
