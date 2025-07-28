@@ -5,6 +5,48 @@ from typing import List, Optional
 from pydantic import BaseModel, Field, field_validator
 
 
+class TuningConfig(BaseModel):
+    """Configuration for hyperparameter tuning."""
+    
+    enabled: bool = Field(default=False, description="Enable hyperparameter tuning")
+    n_trials: int = Field(default=100, description="Number of tuning trials")
+    search_algorithm: str = Field(
+        default="bayesian", 
+        description="Search algorithm: 'grid', 'random', or 'bayesian'"
+    )
+    max_concurrent_trials: Optional[int] = Field(
+        default=None, 
+        description="Max parallel trials (None for automatic)"
+    )
+    cv_folds: int = Field(default=5, description="Cross-validation folds for tuning")
+    tuning_metric: str = Field(
+        default="csmf_accuracy", 
+        description="Metric to optimize during tuning"
+    )
+    n_cpus_per_trial: float = Field(
+        default=1.0,
+        description="Number of CPUs allocated per tuning trial"
+    )
+    
+    @field_validator("search_algorithm")
+    def validate_search_algorithm(cls, v: str) -> str:
+        """Validate search algorithm."""
+        valid_algorithms = ["grid", "random", "bayesian"]
+        if v not in valid_algorithms:
+            raise ValueError(f"Search algorithm {v} not in {valid_algorithms}")
+        return v
+    
+    @field_validator("tuning_metric")
+    def validate_tuning_metric(cls, v: str) -> str:
+        """Validate tuning metric."""
+        valid_metrics = ["csmf_accuracy", "cod_accuracy"]
+        if v not in valid_metrics:
+            raise ValueError(f"Tuning metric {v} not in {valid_metrics}")
+        return v
+    
+    model_config = {"validate_assignment": True}
+
+
 class ExperimentConfig(BaseModel):
     """Configuration for VA34 site comparison experiment."""
 
@@ -37,6 +79,12 @@ class ExperimentConfig(BaseModel):
     output_dir: str = Field(default="results/va34_comparison")
     save_predictions: bool = Field(default=True)
     generate_plots: bool = Field(default=True)
+    
+    # Tuning configuration
+    tuning: TuningConfig = Field(
+        default_factory=TuningConfig, 
+        description="Hyperparameter tuning configuration"
+    )
 
     @field_validator("training_sizes")
     def validate_training_sizes(cls, v: List[float]) -> List[float]:

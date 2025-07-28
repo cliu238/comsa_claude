@@ -15,6 +15,7 @@ import ray
 
 from baseline.utils import get_logger
 from model_comparison.orchestration.config import ExperimentResult
+from model_comparison.experiments.experiment_config import TuningConfig
 
 
 @ray.remote
@@ -210,6 +211,242 @@ def _preprocess_features(X: pd.DataFrame) -> pd.DataFrame:
     X_processed = X_processed.fillna(-1)
 
     return X_processed
+
+
+@ray.remote
+def tune_and_train_model(
+    model_name: str,
+    train_data: Tuple[pd.DataFrame, pd.Series],
+    test_data: Tuple[pd.DataFrame, pd.Series],
+    experiment_metadata: Dict,
+    tuning_config: Optional[Dict] = None,
+    n_bootstrap: int = 100,
+) -> ExperimentResult:
+    """Tune hyperparameters and train model.
+    
+    This function performs hyperparameter tuning if enabled, then trains
+    the model with the best parameters found.
+    
+    Args:
+        model_name: Name of the model to train
+        train_data: Tuple of (X_train, y_train)
+        test_data: Tuple of (X_test, y_test)
+        experiment_metadata: Dictionary with experiment details
+        tuning_config: Tuning configuration dictionary
+        n_bootstrap: Number of bootstrap iterations for metrics
+        
+    Returns:
+        ExperimentResult with metrics and metadata
+    """
+    start_time = time.time()
+    retry_count = experiment_metadata.get("retry_count", 0)
+    
+    try:
+        # Import inside remote function for serialization
+        from baseline.models.insilico_model import InSilicoVAModel
+        from baseline.models.xgboost_model import XGBoostModel
+        from baseline.models.random_forest_model import RandomForestModel
+        from baseline.models.logistic_regression_model import LogisticRegressionModel
+        from model_comparison.hyperparameter_tuning.ray_tuner import RayTuner
+        from model_comparison.hyperparameter_tuning.search_spaces import (
+            get_xgboost_search_space,
+            get_random_forest_search_space,
+            get_logistic_regression_search_space,
+        )
+        from model_comparison.metrics.comparison_metrics import calculate_metrics
+        
+        # Set up logging for worker
+        logger = get_logger(__name__, component="orchestration", console=False)
+        logger.info(
+            f"Worker starting: {model_name} - {experiment_metadata.get('experiment_id')} "
+            f"(tuning enabled: {tuning_config and tuning_config.get('enabled', False)})"
+        )
+        
+        # Unpack data
+        X_train, y_train = train_data
+        X_test, y_test = test_data
+        
+        # Apply training size subsampling if specified
+        training_size = experiment_metadata.get("training_size", 1.0)
+        if training_size < 1.0:
+            from sklearn.model_selection import train_test_split
+            
+            try:
+                X_train, _, y_train, _ = train_test_split(
+                    X_train, y_train, 
+                    train_size=training_size, 
+                    random_state=42,
+                    stratify=y_train
+                )
+                logger.info(
+                    f"Subsampled training data from {len(train_data[0])} to {len(X_train)} samples "
+                    f"(training_size={training_size})"
+                )
+            except ValueError as e:
+                logger.warning(f"Stratified sampling failed: {e}. Using random sampling.")
+                X_train, _, y_train, _ = train_test_split(
+                    X_train, y_train, 
+                    train_size=training_size, 
+                    random_state=42
+                )
+        
+        # Initialize model with default or tuned parameters
+        best_params = None
+        tuning_results = None
+        
+        # InSilicoVA doesn't support hyperparameter tuning
+        if model_name == "insilico":
+            model = InSilicoVAModel()
+            X_train_processed = X_train
+            X_test_processed = X_test
+        else:
+            # Preprocess features for ML models
+            X_train_processed = _preprocess_features(X_train)
+            X_test_processed = _preprocess_features(X_test)
+            
+            # Check if tuning is enabled and applicable
+            if tuning_config and tuning_config.get("enabled", False):
+                logger.info(f"Starting hyperparameter tuning for {model_name}")
+                
+                # Get model class and search space
+                model_classes = {
+                    "xgboost": (XGBoostModel, get_xgboost_search_space()),
+                    "random_forest": (RandomForestModel, get_random_forest_search_space()),
+                    "logistic_regression": (LogisticRegressionModel, get_logistic_regression_search_space())
+                }
+                
+                if model_name not in model_classes:
+                    raise ValueError(f"Unknown model for tuning: {model_name}")
+                
+                model_class, search_space = model_classes[model_name]
+                
+                # Create tuner
+                tuner = RayTuner(
+                    n_trials=tuning_config.get("n_trials", 100),
+                    search_algorithm=tuning_config.get("search_algorithm", "bayesian"),
+                    metric=tuning_config.get("tuning_metric", "csmf_accuracy"),
+                    n_cpus_per_trial=tuning_config.get("n_cpus_per_trial", 1.0),
+                    max_concurrent_trials=tuning_config.get("max_concurrent_trials"),
+                )
+                
+                # Run tuning on a subset of data if it's large
+                tuning_data_size = min(len(X_train_processed), 5000)
+                if tuning_data_size < len(X_train_processed):
+                    from sklearn.model_selection import train_test_split
+                    X_tune, _, y_tune, _ = train_test_split(
+                        X_train_processed, y_train,
+                        train_size=tuning_data_size,
+                        random_state=42,
+                        stratify=y_train
+                    )
+                    logger.info(f"Using {tuning_data_size} samples for tuning")
+                else:
+                    X_tune, y_tune = X_train_processed, y_train
+                
+                # Run tuning
+                tuning_results = tuner.tune_model(
+                    model_name=model_name,
+                    search_space=search_space,
+                    train_data=(X_tune, y_tune),
+                    cv_folds=tuning_config.get("cv_folds", 5),
+                    experiment_name=f"{experiment_metadata.get('experiment_id')}_{model_name}",
+                )
+                
+                best_params = tuning_results["best_params"]
+                logger.info(
+                    f"Tuning completed. Best {tuning_config.get('tuning_metric', 'csmf_accuracy')}: "
+                    f"{tuning_results['best_score']:.4f}"
+                )
+                
+                # Create model with best parameters
+                model = model_class()
+                model.set_params(**best_params)
+            else:
+                # Use default parameters
+                if model_name == "xgboost":
+                    model = XGBoostModel()
+                elif model_name == "random_forest":
+                    model = RandomForestModel()
+                elif model_name == "logistic_regression":
+                    model = LogisticRegressionModel()
+                else:
+                    raise ValueError(f"Unknown model: {model_name}")
+        
+        # Train model
+        logger.info(f"Training {model_name} on {len(X_train)} samples")
+        model.fit(X_train_processed, y_train)
+        
+        # Make predictions
+        y_pred = model.predict(X_test_processed)
+        y_proba = None
+        if hasattr(model, "predict_proba"):
+            try:
+                y_proba = model.predict_proba(X_test_processed)
+            except Exception as e:
+                logger.warning(f"Could not get probabilities: {e}")
+        
+        # Calculate metrics
+        metrics = calculate_metrics(
+            y_true=y_test, y_pred=y_pred, y_proba=y_proba, n_bootstrap=n_bootstrap
+        )
+        
+        # Add tuning metadata to experiment metadata
+        if tuning_results:
+            experiment_metadata["tuning_results"] = {
+                "best_params": best_params,
+                "best_score": tuning_results["best_score"],
+                "n_trials": tuning_results["n_trials_completed"],
+            }
+        
+        # Create result
+        result = ExperimentResult(
+            experiment_id=experiment_metadata["experiment_id"],
+            model_name=model_name,
+            experiment_type=experiment_metadata["experiment_type"],
+            train_site=experiment_metadata["train_site"],
+            test_site=experiment_metadata["test_site"],
+            training_size=experiment_metadata.get("training_size", 1.0),
+            csmf_accuracy=metrics["csmf_accuracy"],
+            cod_accuracy=metrics["cod_accuracy"],
+            csmf_accuracy_ci=metrics.get("csmf_accuracy_ci") if isinstance(metrics.get("csmf_accuracy_ci"), list) else None,
+            cod_accuracy_ci=metrics.get("cod_accuracy_ci") if isinstance(metrics.get("cod_accuracy_ci"), list) else None,
+            n_train=len(y_train),
+            n_test=len(y_test),
+            execution_time_seconds=time.time() - start_time,
+            worker_id=ray.get_runtime_context().get_worker_id(),
+            retry_count=retry_count,
+        )
+        
+        logger.info(
+            f"Completed: {model_name} - CSMF: {metrics['csmf_accuracy']:.3f}, "
+            f"COD: {metrics['cod_accuracy']:.3f}"
+        )
+        
+        return result
+        
+    except Exception as e:
+        # Log error
+        error_msg = f"Error in {model_name}: {str(e)}\n{traceback.format_exc()}"
+        logger = get_logger(__name__, component="orchestration", console=False)
+        logger.error(error_msg)
+        
+        # Return result with error
+        return ExperimentResult(
+            experiment_id=experiment_metadata["experiment_id"],
+            model_name=model_name,
+            experiment_type=experiment_metadata["experiment_type"],
+            train_site=experiment_metadata["train_site"],
+            test_site=experiment_metadata["test_site"],
+            training_size=experiment_metadata.get("training_size", 1.0),
+            csmf_accuracy=0.0,
+            cod_accuracy=0.0,
+            n_train=0,
+            n_test=0,
+            execution_time_seconds=time.time() - start_time,
+            worker_id=ray.get_runtime_context().get_worker_id(),
+            retry_count=retry_count,
+            error=str(e),
+        )
 
 
 @ray.remote

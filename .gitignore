@@ -24,3 +24,14 @@ examples/dataset_splitting_v2.py
 # Log files
 *.log
 va34_comparison.log
+
+# Ray Tune results
+ray_results/
+
+# Temporary analysis outputs
+analysis_results.json
+hyperparameter_analysis.py
+hyperparameter_analysis_report.md
+
+# Test integration scripts
+**/test_tuning_integration.py
