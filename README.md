@@ -467,6 +467,7 @@ The VA34 site-based model comparison has been fully integrated into the distribu
 - **XGBoost**: Gradient boosting model with excellent accuracy
 - **Random Forest**: Ensemble model with robust feature importance analysis
 - **Logistic Regression**: Fast linear model with L1/L2 regularization options
+- **CategoricalNB**: Naive Bayes model optimized for categorical VA data (NEW)
 
 ### Latest Performance Results
 
@@ -630,9 +631,9 @@ The `--n-workers` parameter should be adjusted based on your system:
 For a quick test with fewer experiments:
 ```bash
 poetry run python model_comparison/scripts/run_distributed_comparison.py \
-    --data-path data/raw/PHMRC/IHME_PHMRC_VA_DATA_ADULT_Y2013M09D11_0.csv \
+    --data-path va-data/data/phmrc/IHME_PHMRC_VA_DATA_ADULT_Y2013M09D11_0.csv \
     --sites Mexico AP UP \
-    --models logistic_regression random_forest xgboost insilico \
+    --models logistic_regression random_forest xgboost categorical_nb insilico \
     --n-workers 8 \
     --training-sizes 0.5 1.0 \
     --n-bootstrap 10 \
@@ -643,9 +644,9 @@ poetry run python model_comparison/scripts/run_distributed_comparison.py \
 For full evaluation (recommended to run in terminal due to long execution time):
 ```bash
 poetry run python model_comparison/scripts/run_distributed_comparison.py \
-    --data-path data/raw/PHMRC/IHME_PHMRC_VA_DATA_ADULT_Y2013M09D11_0.csv \
+    --data-path va-data/data/phmrc/IHME_PHMRC_VA_DATA_ADULT_Y2013M09D11_0.csv \
     --sites Mexico AP UP \
-    --models logistic_regression random_forest xgboost insilico \
+    --models logistic_regression random_forest xgboost categorical_nb insilico \
     --n-workers 12 \
     --training-sizes 0.25 0.5 0.75 1.0 \
     --n-bootstrap 100 \
@@ -656,15 +657,38 @@ poetry run python model_comparison/scripts/run_distributed_comparison.py \
 For all sites with maximum parallelization:
 ```bash
 poetry run python model_comparison/scripts/run_distributed_comparison.py \
-    --data-path data/raw/PHMRC/IHME_PHMRC_VA_DATA_ADULT_Y2013M09D11_0.csv \
+    --data-path va-data/data/phmrc/IHME_PHMRC_VA_DATA_ADULT_Y2013M09D11_0.csv \
     --sites Mexico AP UP Dar Bohol Pemba \
-    --models logistic_regression random_forest xgboost insilico \
+    --models logistic_regression random_forest xgboost categorical_nb insilico \
     --n-workers 14 \
     --training-sizes 0.25 0.5 0.75 1.0 \
     --n-bootstrap 100 \
     --batch-size 100 \
     --output-dir results/model_comparison_all_sites \
     --no-plots
+```
+
+Full comprehensive run with hyperparameter tuning enabled:
+```bash
+python model_comparison/scripts/run_distributed_comparison.py \
+    --data-path va-data/data/phmrc/IHME_PHMRC_VA_DATA_ADULT_Y2013M09D11_0.csv \
+    --sites AP Bohol Dar Mexico Pemba UP \
+    --models xgboost random_forest logistic_regression categorical_nb insilico \
+    --training-sizes 0.25 0.5 0.75 1.0 \
+    --n-bootstrap 100 \
+    --enable-tuning \
+    --tuning-trials 100 \
+    --tuning-algorithm bayesian \
+    --tuning-metric csmf_accuracy \
+    --tuning-cv-folds 5 \
+    --tuning-cpus-per-trial 1.0 \
+    --n-workers -1 \
+    --memory-per-worker 4GB \
+    --batch-size 50 \
+    --checkpoint-interval 10 \
+    --ray-dashboard-port 8265 \
+    --output-dir results/full_comparison_$(date +%Y%m%d_%H%M%S) \
+    --random-seed 42
 ```
 
 ### Command Line Options

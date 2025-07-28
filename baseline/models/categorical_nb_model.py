@@ -1,7 +1,7 @@
 """CategoricalNB model implementation for VA cause-of-death prediction."""
 
 import logging
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
@@ -48,6 +48,7 @@ class CategoricalNBModel(BaseEstimator, ClassifierMixin):
         self._is_fitted = False
         self._single_class = False
         self._single_class_label = None
+        self._n_categories_per_feature: Optional[np.ndarray] = None
 
     def get_params(self, deep: bool = True) -> Dict[str, Any]:
         """Get parameters for this estimator.
@@ -152,8 +153,13 @@ class CategoricalNBModel(BaseEstimator, ClassifierMixin):
                 "Ignoring sample_weight parameter."
             )
 
-        # Prepare categorical features
-        X_categorical = self._prepare_categorical_features(X)
+        # Prepare categorical features and determine number of categories per feature
+        X_categorical = self._prepare_categorical_features_for_training(X)
+        
+        # Store the number of categories per feature based on what we see in training
+        self._n_categories_per_feature = np.array([
+            len(np.unique(X_categorical[:, i])) for i in range(X_categorical.shape[1])
+        ])
 
         # Convert config to sklearn parameters
         sklearn_params = self._get_sklearn_params()
@@ -201,7 +207,7 @@ class CategoricalNBModel(BaseEstimator, ClassifierMixin):
             return np.array([self._single_class_label] * len(X))
 
         # Prepare categorical features
-        X_categorical = self._prepare_categorical_features(X)
+        X_categorical = self._prepare_categorical_features_for_prediction(X)
 
         # Get predictions
         y_pred_encoded = self.model_.predict(X_categorical)
@@ -238,13 +244,13 @@ class CategoricalNBModel(BaseEstimator, ClassifierMixin):
             return np.ones((len(X), 1))
 
         # Prepare categorical features
-        X_categorical = self._prepare_categorical_features(X)
+        X_categorical = self._prepare_categorical_features_for_prediction(X)
 
         # Get probability predictions
         return self.model_.predict_proba(X_categorical)
 
-    def _prepare_categorical_features(self, X: pd.DataFrame) -> np.ndarray:
-        """Prepare categorical features for CategoricalNB.
+    def _prepare_categorical_features_for_training(self, X: pd.DataFrame) -> np.ndarray:
+        """Prepare categorical features for CategoricalNB during training.
 
         CategoricalNB expects integer-encoded categorical features without NaN values.
         This method handles VA-specific categorical encoding where Y/N/.'/DK/missing
@@ -302,6 +308,30 @@ class CategoricalNBModel(BaseEstimator, ClassifierMixin):
                         )
 
         logger.debug(f"Categorical encoding completed. Shape: {X_encoded.shape}")
+        return X_encoded
+
+    def _prepare_categorical_features_for_prediction(self, X: pd.DataFrame) -> np.ndarray:
+        """Prepare categorical features for prediction, handling unseen categories.
+        
+        This method ensures that features with fewer categories than expected
+        are handled correctly by mapping all unseen values to valid categories.
+        
+        Args:
+            X: DataFrame with categorical data
+            
+        Returns:
+            2D numpy array with integer-encoded categorical features
+        """
+        # First, use the standard encoding
+        X_encoded = self._prepare_categorical_features_for_training(X)
+        
+        # Now ensure each feature doesn't exceed the number of categories seen during training
+        if self._n_categories_per_feature is not None:
+            for col_idx in range(X_encoded.shape[1]):
+                max_category = self._n_categories_per_feature[col_idx] - 1
+                # Any value >= n_categories is invalid, map to the last valid category
+                X_encoded[:, col_idx] = np.minimum(X_encoded[:, col_idx], max_category)
+        
         return X_encoded
 
     def get_feature_importance(self) -> pd.DataFrame:

@@ -115,7 +115,7 @@ def filter_params_for_model(params: Dict[str, Any], model_name: str) -> Dict[str
     
     Args:
         params: Dictionary of parameters
-        model_name: Name of the model ('xgboost', 'random_forest', 'logistic_regression')
+        model_name: Name of the model ('xgboost', 'random_forest', 'logistic_regression', 'categorical_nb')
         
     Returns:
         Filtered parameter dictionary
@@ -126,6 +126,8 @@ def filter_params_for_model(params: Dict[str, Any], model_name: str) -> Dict[str
         # Remove l1_ratio if not using elasticnet penalty
         if filtered_params.get("config__penalty") != "elasticnet":
             filtered_params.pop("config__l1_ratio", None)
+    
+    # CategoricalNB doesn't need special filtering, all parameters are always valid
     
     return filtered_params
 

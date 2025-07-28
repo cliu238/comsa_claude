@@ -109,6 +109,10 @@ def train_and_evaluate_model(
             # InSilicoVA needs the original "Y"/"." format
             X_train_processed = X_train
             X_test_processed = X_test
+        elif model_name == "categorical_nb":
+            # CategoricalNB has its own preprocessing in _prepare_categorical_features
+            X_train_processed = X_train
+            X_test_processed = X_test
         else:
             # Other models need numeric encoding
             X_train_processed = _preprocess_features(X_train)
@@ -299,17 +303,26 @@ def tune_and_train_model(
         best_params = None
         tuning_results = None
         
-        # InSilicoVA doesn't support hyperparameter tuning
+        # Preprocess features based on model type
         if model_name == "insilico":
-            model = InSilicoVAModel()
+            # InSilicoVA needs the original "Y"/"." format
+            X_train_processed = X_train
+            X_test_processed = X_test
+        elif model_name == "categorical_nb":
+            # CategoricalNB has its own preprocessing in _prepare_categorical_features
             X_train_processed = X_train
             X_test_processed = X_test
         else:
-            # Preprocess features for ML models
+            # Other models need numeric encoding
             X_train_processed = _preprocess_features(X_train)
             X_test_processed = _preprocess_features(X_test)
-            
-            # Check if tuning is enabled and applicable
+        
+        # Handle hyperparameter tuning for supported models
+        if model_name == "insilico":
+            # InSilicoVA doesn't support hyperparameter tuning
+            model = InSilicoVAModel()
+        else:
+            # Check if tuning is enabled
             if tuning_config and tuning_config.get("enabled", False):
                 logger.info(f"Starting hyperparameter tuning for {model_name}")
                 
@@ -336,18 +349,19 @@ def tune_and_train_model(
                 )
                 
                 # Run tuning on a subset of data if it's large
-                tuning_data_size = min(len(X_train_processed), 5000)
-                if tuning_data_size < len(X_train_processed):
+                tuning_data_size = min(len(X_train), 5000)
+                if tuning_data_size < len(X_train):
                     from sklearn.model_selection import train_test_split
+                    # Use original data for tuning split, not preprocessed
                     X_tune, _, y_tune, _ = train_test_split(
-                        X_train_processed, y_train,
+                        X_train, y_train,
                         train_size=tuning_data_size,
                         random_state=42,
                         stratify=y_train
                     )
                     logger.info(f"Using {tuning_data_size} samples for tuning")
                 else:
-                    X_tune, y_tune = X_train_processed, y_train
+                    X_tune, y_tune = X_train, y_train
                 
                 # Run tuning
                 tuning_results = tuner.tune_model(

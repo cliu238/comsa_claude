@@ -18,6 +18,7 @@ from ray.tune.search.optuna import OptunaSearch
 from baseline.models.logistic_regression_model import LogisticRegressionModel
 from baseline.models.random_forest_model import RandomForestModel
 from baseline.models.xgboost_model import XGBoostModel
+from baseline.models.categorical_nb_model import CategoricalNBModel
 from baseline.utils import get_logger
 from model_comparison.hyperparameter_tuning.search_spaces import (
     filter_params_for_model,
@@ -97,6 +98,7 @@ class RayTuner:
             "xgboost": XGBoostModel,
             "random_forest": RandomForestModel,
             "logistic_regression": LogisticRegressionModel,
+            "categorical_nb": CategoricalNBModel,
         }
         
         if model_name not in model_classes:
@@ -126,11 +128,25 @@ class RayTuner:
                     cod_acc = (y_val == y_pred).mean()
                 else:
                     # Use cross-validation
-                    cv_results = model.cross_validate(
-                        X_train, y_train, cv=cv_folds, stratified=True
-                    )
-                    csmf_acc = cv_results["csmf_accuracy_mean"]
-                    cod_acc = cv_results["cod_accuracy_mean"]
+                    try:
+                        cv_results = model.cross_validate(
+                            X_train, y_train, cv=cv_folds, stratified=True
+                        )
+                        csmf_acc = cv_results["csmf_accuracy_mean"]
+                        cod_acc = cv_results["cod_accuracy_mean"]
+                    except (ValueError, IndexError) as e:
+                        # Handle cases where stratified CV fails or data issues
+                        logger.warning(f"CV failed with stratified=True: {e}. Trying non-stratified.")
+                        try:
+                            cv_results = model.cross_validate(
+                                X_train, y_train, cv=cv_folds, stratified=False
+                            )
+                            csmf_acc = cv_results["csmf_accuracy_mean"]
+                            cod_acc = cv_results["cod_accuracy_mean"]
+                        except Exception as e2:
+                            logger.error(f"CV failed completely: {e2}")
+                            csmf_acc = 0.0
+                            cod_acc = 0.0
                 
                 # Report results to Ray Tune
                 tune.report({
@@ -289,6 +305,7 @@ def quick_tune_model(
         "xgboost": XGBoostModel,
         "random_forest": RandomForestModel,
         "logistic_regression": LogisticRegressionModel,
+        "categorical_nb": CategoricalNBModel,
     }
     
     # Train final model with best parameters
