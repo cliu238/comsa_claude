@@ -86,6 +86,27 @@ def get_logistic_regression_search_space() -> Dict[str, Any]:
     }
 
 
+def get_categorical_nb_search_space() -> Dict[str, Any]:
+    """Get CategoricalNB hyperparameter search space.
+    
+    The search space is designed for categorical features common in VA data,
+    with focus on smoothing parameters to handle sparse categories.
+    
+    Returns:
+        Dictionary mapping parameter names to Ray Tune search spaces
+    """
+    return {
+        # Smoothing parameter (Laplace/Lidstone)
+        'config__alpha': tune.choice([0.001, 0.01, 0.1, 0.5, 1.0, 2.0]),
+        
+        # Whether to use the same alpha for all features
+        'config__force_alpha': tune.choice([True, False]),
+        
+        # Whether to learn class priors
+        'config__fit_prior': tune.choice([True, False]),
+    }
+
+
 def filter_params_for_model(params: Dict[str, Any], model_name: str) -> Dict[str, Any]:
     """Filter parameters based on model-specific requirements.
     
@@ -125,6 +146,7 @@ def get_search_space_for_model(model_name: str) -> Dict[str, Any]:
         "xgboost": get_xgboost_search_space,
         "random_forest": get_random_forest_search_space,
         "logistic_regression": get_logistic_regression_search_space,
+        "categorical_nb": get_categorical_nb_search_space,
     }
     
     if model_name not in search_spaces:

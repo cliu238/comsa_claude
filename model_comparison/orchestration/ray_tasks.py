@@ -49,6 +49,7 @@ def train_and_evaluate_model(
         from baseline.models.insilico_model import InSilicoVAModel
         from baseline.models.xgboost_model import XGBoostModel
         from baseline.models.random_forest_model import RandomForestModel
+        from baseline.models.categorical_nb_model import CategoricalNBModel
         from model_comparison.metrics.comparison_metrics import calculate_metrics
 
         # Set up logging for worker
@@ -98,6 +99,8 @@ def train_and_evaluate_model(
         elif model_name == "logistic_regression":
             from baseline.models.logistic_regression_model import LogisticRegressionModel
             model = LogisticRegressionModel()
+        elif model_name == "categorical_nb":
+            model = CategoricalNBModel()
         else:
             raise ValueError(f"Unknown model: {model_name}")
 
@@ -247,11 +250,13 @@ def tune_and_train_model(
         from baseline.models.xgboost_model import XGBoostModel
         from baseline.models.random_forest_model import RandomForestModel
         from baseline.models.logistic_regression_model import LogisticRegressionModel
+        from baseline.models.categorical_nb_model import CategoricalNBModel
         from model_comparison.hyperparameter_tuning.ray_tuner import RayTuner
         from model_comparison.hyperparameter_tuning.search_spaces import (
             get_xgboost_search_space,
             get_random_forest_search_space,
             get_logistic_regression_search_space,
+            get_categorical_nb_search_space,
         )
         from model_comparison.metrics.comparison_metrics import calculate_metrics
         
@@ -312,7 +317,8 @@ def tune_and_train_model(
                 model_classes = {
                     "xgboost": (XGBoostModel, get_xgboost_search_space()),
                     "random_forest": (RandomForestModel, get_random_forest_search_space()),
-                    "logistic_regression": (LogisticRegressionModel, get_logistic_regression_search_space())
+                    "logistic_regression": (LogisticRegressionModel, get_logistic_regression_search_space()),
+                    "categorical_nb": (CategoricalNBModel, get_categorical_nb_search_space())
                 }
                 
                 if model_name not in model_classes:
@@ -369,6 +375,8 @@ def tune_and_train_model(
                     model = RandomForestModel()
                 elif model_name == "logistic_regression":
                     model = LogisticRegressionModel()
+                elif model_name == "categorical_nb":
+                    model = CategoricalNBModel()
                 else:
                     raise ValueError(f"Unknown model: {model_name}")
         
