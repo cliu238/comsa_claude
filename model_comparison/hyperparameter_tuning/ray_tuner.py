@@ -6,6 +6,8 @@ tuning using Ray Tune, integrated with the existing VA model comparison framewor
 
 import json
 import os
+import uuid
+from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, Optional, Tuple
 
@@ -115,7 +117,13 @@ class RayTuner:
                 
                 # Create model with config
                 model = model_class()
-                model.set_params(**filtered_config)
+                try:
+                    # Keep the config__ prefix for nested parameters
+                    model.set_params(**filtered_config)
+                except Exception as param_error:
+                    logger.error(f"Failed to set params for {model_name}: {param_error}")
+                    logger.error(f"Attempted params: {filtered_config}")
+                    raise
                 
                 if val_data is not None:
                     # Use validation set
@@ -190,7 +198,7 @@ class RayTuner:
                 max_concurrent_trials=self.max_concurrent_trials,
             ),
             run_config=RunConfig(
-                name=experiment_name or f"{model_name}_tuning",
+                name=experiment_name or f"{model_name}_tuning_{datetime.now().strftime('%Y%m%d_%H%M%S')}_{uuid.uuid4().hex[:8]}",
                 storage_path=os.path.abspath("./ray_results"),
                 verbose=1,
             ),

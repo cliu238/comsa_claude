@@ -111,7 +111,8 @@ def filter_params_for_model(params: Dict[str, Any], model_name: str) -> Dict[str
     """Filter parameters based on model-specific requirements.
     
     Some parameters are conditional and should only be used with
-    specific configurations.
+    specific configurations. This function ensures only valid parameters
+    for each model type are returned.
     
     Args:
         params: Dictionary of parameters
@@ -120,14 +121,40 @@ def filter_params_for_model(params: Dict[str, Any], model_name: str) -> Dict[str
     Returns:
         Filtered parameter dictionary
     """
-    filtered_params = params.copy()
+    # Define valid parameters for each model type
+    valid_params = {
+        "xgboost": [
+            "config__max_depth", "config__learning_rate", "config__n_estimators",
+            "config__subsample", "config__colsample_bytree", "config__reg_alpha",
+            "config__reg_lambda"
+        ],
+        "random_forest": [
+            "config__n_estimators", "config__max_depth", "config__min_samples_split",
+            "config__min_samples_leaf", "config__max_features", "config__bootstrap"
+        ],
+        "logistic_regression": [
+            "config__C", "config__penalty", "config__solver", "config__l1_ratio",
+            "config__max_iter"
+        ],
+        "categorical_nb": [
+            "config__alpha", "config__force_alpha", "config__fit_prior"
+        ]
+    }
     
+    if model_name not in valid_params:
+        raise ValueError(f"Unknown model: {model_name}")
+    
+    # Filter to only include valid parameters for this model
+    filtered_params = {}
+    for key, value in params.items():
+        if key in valid_params[model_name]:
+            filtered_params[key] = value
+    
+    # Special handling for logistic regression
     if model_name == "logistic_regression":
         # Remove l1_ratio if not using elasticnet penalty
         if filtered_params.get("config__penalty") != "elasticnet":
             filtered_params.pop("config__l1_ratio", None)
-    
-    # CategoricalNB doesn't need special filtering, all parameters are always valid
     
     return filtered_params
 

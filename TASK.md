@@ -378,6 +378,21 @@ Tasks are numbered using the following scheme:
       4. Site-Specific Performance Patterns
       5. Recommendations for XGBoost Improvements
       6. Future Research Directions
+- [RD-019] ✅ Comprehensive VA model comparison across all PHMRC sites with confidence intervals
+  - **Priority**: High
+  - **Dependencies**: IM-035, IM-051, all ML baseline models
+  - **Completed**: 2025-07-29
+  - **Issue**: Analysis task
+  - **Notes**: Comprehensive comparison of 3 models (InSilicoVA, XGBoost, CategoricalNB) across all 6 sites:
+    - **Experiments**: 111 total (37 per model) with confidence interval calculations
+    - **Key Results**: InSilicoVA best generalization (0.525±0.173 CSMF), XGBoost highest in-domain (0.826±0.070), CategoricalNB lowest but stable (0.329±0.176)
+    - **Deliverables**: 
+      - Comprehensive RESEARCH_FIND.md report in reports/ directory
+      - Analysis script at model_comparison/scripts/analysis/va_analysis_report.py
+      - Improved visualization with error handling
+      - Enhanced CategoricalNB cross-validation
+    - **Major Finding**: InSilicoVA maintains best cross-site generalization (-42.4% CSMF drop) vs XGBoost (-56.5%) despite lower in-domain performance
+    - **Infrastructure**: Reorganized docs structure, moved completed tasks to docs/completed_tasks/
 
 ## Milestones
 
@@ -460,6 +475,7 @@ Task ID Format: [Category-Number] where Category is CF/IM/DO/RD/MS
 - [IM-052] ✅ Fix bootstrap confidence intervals in model comparison framework - 2025-07-25 (PR #26)
 - [IM-048] ✅ CategoricalNB baseline model - 2025-07-25 (Issue #30)
 - [IM-053] ✅ Implement hyperparameter tuning for all ML models - 2025-07-25 (PR #29)
+- [RD-019] ✅ Comprehensive VA model comparison across all PHMRC sites with confidence intervals - 2025-07-29
 
 ### In Progress
 

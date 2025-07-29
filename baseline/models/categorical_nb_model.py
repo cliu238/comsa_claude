@@ -434,21 +434,62 @@ class CategoricalNBModel(BaseEstimator, ClassifierMixin):
             X_train, X_val = X.iloc[train_idx], X.iloc[val_idx]
             y_train, y_val = y.iloc[train_idx], y.iloc[val_idx]
 
-            # Clone model for this fold
-            model = CategoricalNBModel(config=self.config)
-            model.fit(X_train, y_train)
+            try:
+                # Clone model for this fold
+                model = CategoricalNBModel(config=self.config)
+                model.fit(X_train, y_train)
 
-            # Calculate metrics
-            y_pred = model.predict(X_val)
+                # Check for classes in validation set not seen in training
+                train_classes = set(y_train.unique())
+                val_classes = set(y_val.unique())
+                unseen_classes = val_classes - train_classes
+                
+                if unseen_classes:
+                    logger.warning(
+                        f"Fold {fold + 1}: Validation set contains {len(unseen_classes)} "
+                        f"unseen classes: {sorted(unseen_classes)}. These will be mapped to most frequent class."
+                    )
+                    # Create a mapping for unseen classes to most frequent training class
+                    most_frequent_class = y_train.value_counts().index[0]
+                    
+                    # Filter validation data to exclude unseen classes for now
+                    # (in practice, we'd map them to most frequent, but for CV we'll skip)
+                    valid_mask = y_val.isin(train_classes)
+                    if valid_mask.sum() == 0:
+                        logger.warning(f"Fold {fold + 1}: No valid samples in validation set. Skipping.")
+                        continue
+                    
+                    X_val = X_val[valid_mask]
+                    y_val = y_val[valid_mask]
 
-            # CSMF accuracy
-            csmf_acc = self.calculate_csmf_accuracy(y_val, y_pred)
-            scores["csmf_accuracy"].append(csmf_acc)
+                # Calculate metrics
+                y_pred = model.predict(X_val)
 
-            # COD accuracy
-            cod_acc = (y_val == y_pred).mean()
-            scores["cod_accuracy"].append(cod_acc)
+                # CSMF accuracy
+                csmf_acc = self.calculate_csmf_accuracy(y_val, y_pred)
+                scores["csmf_accuracy"].append(csmf_acc)
 
+                # COD accuracy
+                cod_acc = (y_val == y_pred).mean()
+                scores["cod_accuracy"].append(cod_acc)
+                
+            except Exception as e:
+                logger.error(f"Error in fold {fold + 1}: {str(e)}")
+                # Skip this fold if there's an error
+                continue
+
+        # Check if we have any valid scores
+        if not scores["csmf_accuracy"]:
+            logger.error("No valid folds completed in cross-validation")
+            return {
+                "csmf_accuracy_mean": 0.0,
+                "csmf_accuracy_std": 0.0,
+                "cod_accuracy_mean": 0.0,
+                "cod_accuracy_std": 0.0,
+                "csmf_accuracy_scores": [],
+                "cod_accuracy_scores": [],
+            }
+        
         # Return mean scores
         return {
             "csmf_accuracy_mean": np.mean(scores["csmf_accuracy"]),

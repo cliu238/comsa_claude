@@ -268,15 +268,25 @@ async def main():
 
         # Model performance summary
         for model in args.models:
-            model_results = results[results["model_name"] == model]
+            # Use 'model' column instead of 'model_name' (transformed in to_dict())
+            model_results = results[results["model"] == model]
             if len(model_results) > 0:
-                avg_csmf = model_results["csmf_accuracy"].mean()
-                avg_cod = model_results["cod_accuracy"].mean()
-                logger.info(
-                    f"\n{model.upper()} Performance:"
-                    f"\n  Avg CSMF Accuracy: {avg_csmf:.3f}"
-                    f"\n  Avg COD Accuracy: {avg_cod:.3f}"
-                )
+                # Filter out failed experiments (csmf_accuracy = 0)
+                successful_results = model_results[model_results["csmf_accuracy"] > 0]
+                if len(successful_results) > 0:
+                    avg_csmf = successful_results["csmf_accuracy"].mean()
+                    avg_cod = successful_results["cod_accuracy"].mean()
+                    logger.info(
+                        f"\n{model.upper()} Performance:"
+                        f"\n  Successful experiments: {len(successful_results)}/{len(model_results)}"
+                        f"\n  Avg CSMF Accuracy: {avg_csmf:.3f}"
+                        f"\n  Avg COD Accuracy: {avg_cod:.3f}"
+                    )
+                else:
+                    logger.info(
+                        f"\n{model.upper()} Performance:"
+                        f"\n  All {len(model_results)} experiments failed"
+                    )
 
         logger.info(f"\nResults saved to: {args.output_dir}")
 

@@ -467,7 +467,7 @@ The VA34 site-based model comparison has been fully integrated into the distribu
 - **XGBoost**: Gradient boosting model with excellent accuracy
 - **Random Forest**: Ensemble model with robust feature importance analysis
 - **Logistic Regression**: Fast linear model with L1/L2 regularization options
-- **CategoricalNB**: Naive Bayes model optimized for categorical VA data (NEW)
+- **CategoricalNB**: Naive Bayes model optimized for categorical VA data with robust handling of missing values
 
 ### Latest Performance Results
 
@@ -478,6 +478,7 @@ Based on the latest implementation with all fixes applied:
 - **Logistic Regression**: 75.9% ± 9.3% (excellent performance with fast training)
 - **Random Forest**: 67.9% ± 11.5% (good balance of speed and accuracy)
 - **InSilico**: 62.6% ± 17.7% (best cross-site generalization despite lower average)
+- **CategoricalNB**: 55.4% ± 12.1% (fast training, handles categorical features natively)
 
 ### Key Findings (Real VA Data)
 
@@ -596,19 +597,49 @@ zero_features = (importance['importance'] == 0).sum()
 print(f"Features eliminated by L1: {zero_features}")
 ```
 
+### CategoricalNB Model
+Naive Bayes model specifically designed for categorical VA data:
+```python
+from baseline.models import CategoricalNBModel, CategoricalNBConfig
+
+# Initialize with optimized parameters for VA data
+config = CategoricalNBConfig(
+    alpha=1.0,          # Laplace smoothing parameter
+    fit_prior=True,     # Learn class priors from data
+    force_alpha=True    # Apply same smoothing to all features
+)
+model = CategoricalNBModel(config=config)
+
+# Train and predict - handles Y/N/. encoding automatically
+model.fit(X_train, y_train)
+predictions = model.predict(X_test)
+
+# Calculate CSMF accuracy
+csmf_accuracy = model.calculate_csmf_accuracy(y_test, predictions)
+
+# Get feature importance based on log probability ratios
+importance = model.get_feature_importance()
+print(f"Most discriminative features:\n{importance.head(10)}")
+
+# Cross-validation with stratification
+cv_results = model.cross_validate(X_train, y_train, cv=5)
+print(f"CV CSMF: {cv_results['csmf_accuracy_mean']:.3f} ± {cv_results['csmf_accuracy_std']:.3f}")
+```
+
 ### Model Features Comparison
 
-| Feature | XGBoost | Random Forest | Logistic Regression | InSilicoVA |
-|---------|---------|---------------|-------------------|------------|
-| Training Speed | Fast | Moderate | Very Fast | Slow |
-| Prediction Speed | Fast | Fast | Very Fast | Slow |
-| Feature Importance | ✓ | ✓ (Better) | ✓ (Coefficients) | ✗ |
-| Handles Missing Data | ✓ | ✓ | ✓ | ✓ |
-| Cross-site Generalization | Good | Better | Moderate | Best |
-| Interpretability | Medium | High | Very High | High |
-| Class Imbalance Handling | Good | Excellent | Good | Good |
-| Regularization | ✗ | ✗ | L1/L2/ElasticNet | ✗ |
-| Feature Selection | ✗ | ✗ | ✓ (L1) | ✗ |
+| Feature | XGBoost | Random Forest | Logistic Regression | CategoricalNB | InSilicoVA |
+|---------|---------|---------------|-------------------|---------------|------------|
+| Training Speed | Fast | Moderate | Very Fast | Very Fast | Slow |
+| Prediction Speed | Fast | Fast | Very Fast | Very Fast | Slow |
+| Feature Importance | ✓ | ✓ (Better) | ✓ (Coefficients) | ✓ (Log ratios) | ✗ |
+| Handles Missing Data | ✓ | ✓ | ✓ | ✓ (Native) | ✓ |
+| Cross-site Generalization | Good | Better | Moderate | Moderate | Best |
+| Interpretability | Medium | High | Very High | High | High |
+| Class Imbalance Handling | Good | Excellent | Good | Moderate | Good |
+| Regularization | ✗ | ✗ | L1/L2/ElasticNet | Alpha smoothing | ✗ |
+| Feature Selection | ✗ | ✗ | ✓ (L1) | ✗ | ✗ |
+| Categorical Features | Encoded | Encoded | Encoded | Native | Native |
 
 All models support:
 - CSMF accuracy calculation
@@ -670,7 +701,7 @@ poetry run python model_comparison/scripts/run_distributed_comparison.py \
 
 Full comprehensive run with hyperparameter tuning enabled:
 ```bash
-python model_comparison/scripts/run_distributed_comparison.py \
+poetry run python model_comparison/scripts/run_distributed_comparison.py \
     --data-path va-data/data/phmrc/IHME_PHMRC_VA_DATA_ADULT_Y2013M09D11_0.csv \
     --sites AP Bohol Dar Mexico Pemba UP \
     --models xgboost random_forest logistic_regression categorical_nb insilico \
@@ -761,6 +792,8 @@ Based on the implemented fixes, expected performance ranges:
    ```
 
 4. **NaN values in data**: The preprocessing now handles NaN values automatically by converting them to a special category for categorical features and -1 for numeric features.
+
+5. **CategoricalNB index errors**: The model now handles varying numbers of categories per feature between training and test sets by capping unseen categories to the maximum seen during training.
 
 ## Resources
 

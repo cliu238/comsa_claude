@@ -8,6 +8,7 @@ This module ensures consistent data preprocessing across all models:
 
 import time
 import traceback
+import uuid
 from typing import Dict, Optional, Tuple
 
 import pandas as pd
@@ -352,24 +353,68 @@ def tune_and_train_model(
                 tuning_data_size = min(len(X_train), 5000)
                 if tuning_data_size < len(X_train):
                     from sklearn.model_selection import train_test_split
+                    
+                    # Filter out rare classes for tuning to avoid CV issues
+                    min_samples_per_class = max(tuning_config.get("cv_folds", 5) * 2, 10)
+                    class_counts = y_train.value_counts()
+                    valid_classes = class_counts[class_counts >= min_samples_per_class].index
+                    
+                    if len(valid_classes) < len(class_counts):
+                        # Filter to only include samples from valid classes
+                        valid_mask = y_train.isin(valid_classes)
+                        X_train_filtered = X_train[valid_mask]
+                        y_train_filtered = y_train[valid_mask]
+                        logger.info(
+                            f"Filtered {len(class_counts) - len(valid_classes)} rare classes "
+                            f"(< {min_samples_per_class} samples) for tuning. "
+                            f"Keeping {len(valid_classes)} classes with {len(X_train_filtered)} samples."
+                        )
+                    else:
+                        X_train_filtered = X_train
+                        y_train_filtered = y_train
+                    
                     # Use original data for tuning split, not preprocessed
-                    X_tune, _, y_tune, _ = train_test_split(
-                        X_train, y_train,
-                        train_size=tuning_data_size,
-                        random_state=42,
-                        stratify=y_train
-                    )
-                    logger.info(f"Using {tuning_data_size} samples for tuning")
+                    try:
+                        X_tune, _, y_tune, _ = train_test_split(
+                            X_train_filtered, y_train_filtered,
+                            train_size=min(tuning_data_size, len(X_train_filtered)),
+                            random_state=42,
+                            stratify=y_train_filtered
+                        )
+                        logger.info(f"Using {len(X_tune)} samples for tuning with {len(y_tune.unique())} classes")
+                    except ValueError as e:
+                        # If stratification still fails, use random sampling
+                        logger.warning(f"Stratified sampling failed for tuning: {e}. Using random sampling.")
+                        X_tune, _, y_tune, _ = train_test_split(
+                            X_train_filtered, y_train_filtered,
+                            train_size=min(tuning_data_size, len(X_train_filtered)),
+                            random_state=42
+                        )
                 else:
-                    X_tune, y_tune = X_train, y_train
+                    # Check if we need to filter rare classes even with full data
+                    min_samples_per_class = max(tuning_config.get("cv_folds", 5) * 2, 10)
+                    class_counts = y_train.value_counts()
+                    valid_classes = class_counts[class_counts >= min_samples_per_class].index
+                    
+                    if len(valid_classes) < len(class_counts):
+                        valid_mask = y_train.isin(valid_classes)
+                        X_tune = X_train[valid_mask]
+                        y_tune = y_train[valid_mask]
+                        logger.info(
+                            f"Filtered {len(class_counts) - len(valid_classes)} rare classes for tuning. "
+                            f"Using {len(X_tune)} samples with {len(valid_classes)} classes."
+                        )
+                    else:
+                        X_tune, y_tune = X_train, y_train
                 
-                # Run tuning
+                # Run tuning with unique experiment name
+                unique_experiment_name = f"{experiment_metadata.get('experiment_id')}_{model_name}_{uuid.uuid4().hex[:8]}"
                 tuning_results = tuner.tune_model(
                     model_name=model_name,
                     search_space=search_space,
                     train_data=(X_tune, y_tune),
                     cv_folds=tuning_config.get("cv_folds", 5),
-                    experiment_name=f"{experiment_metadata.get('experiment_id')}_{model_name}",
+                    experiment_name=unique_experiment_name,
                 )
                 
                 best_params = tuning_results["best_params"]
@@ -379,6 +424,7 @@ def tune_and_train_model(
                 )
                 
                 # Create model with best parameters
+                # Keep the config__ prefix for nested parameters
                 model = model_class()
                 model.set_params(**best_params)
             else:

@@ -51,54 +51,94 @@ def plot_model_comparison(results: pd.DataFrame, output_path: str):
 
 def plot_domain_comparison(results: pd.DataFrame, ax):
     """Plot in-domain vs out-domain performance."""
-    # Filter data
-    domain_data = results[results["experiment_type"].isin(["in_domain", "out_domain"])]
+    # Filter data and exclude failed experiments
+    domain_data = results[
+        (results["experiment_type"].isin(["in_domain", "out_domain"])) &
+        (results["csmf_accuracy"] > 0)  # Exclude failed experiments
+    ]
 
     if domain_data.empty:
         ax.text(0.5, 0.5, "No domain comparison data", ha="center", va="center")
+        ax.set_title("CSMF Accuracy: In-domain vs Out-domain")
+        return
+
+    # Get unique models that have successful experiments
+    successful_models = sorted(domain_data["model"].unique())
+    
+    if not successful_models:
+        ax.text(0.5, 0.5, "No successful experiments", ha="center", va="center")
+        ax.set_title("CSMF Accuracy: In-domain vs Out-domain")
         return
 
     # Calculate means and confidence intervals
-    summary = (
-        domain_data.groupby(["experiment_type", "model"])
-        .agg(
-            {
-                "csmf_accuracy": ["mean", "std"],
-                "csmf_accuracy_ci_lower": "mean",
-                "csmf_accuracy_ci_upper": "mean",
-            }
-        )
-        .reset_index()
-    )
-
-    # Flatten column names
-    summary.columns = ["_".join(col).strip("_") for col in summary.columns]
+    summary_data = []
+    for exp_type in ["in_domain", "out_domain"]:
+        for model in successful_models:
+            model_data = domain_data[
+                (domain_data["experiment_type"] == exp_type) & 
+                (domain_data["model"] == model)
+            ]
+            
+            if not model_data.empty:
+                # Calculate mean and CI bounds
+                mean_acc = model_data["csmf_accuracy"].mean()
+                
+                # Check if CI values are available
+                ci_lower_vals = model_data["csmf_accuracy_ci_lower"].dropna()
+                ci_upper_vals = model_data["csmf_accuracy_ci_upper"].dropna()
+                
+                if len(ci_lower_vals) > 0 and len(ci_upper_vals) > 0:
+                    ci_lower_mean = ci_lower_vals.mean()
+                    ci_upper_mean = ci_upper_vals.mean()
+                else:
+                    # Use standard error if no CI available
+                    std_err = model_data["csmf_accuracy"].std() / np.sqrt(len(model_data))
+                    ci_lower_mean = mean_acc - 1.96 * std_err
+                    ci_upper_mean = mean_acc + 1.96 * std_err
+                
+                summary_data.append({
+                    "experiment_type": exp_type,
+                    "model": model,
+                    "csmf_accuracy_mean": mean_acc,
+                    "csmf_accuracy_ci_lower_mean": ci_lower_mean,
+                    "csmf_accuracy_ci_upper_mean": ci_upper_mean,
+                })
+    
+    if not summary_data:
+        ax.text(0.5, 0.5, "No data to plot", ha="center", va="center")
+        ax.set_title("CSMF Accuracy: In-domain vs Out-domain")
+        return
+        
+    summary = pd.DataFrame(summary_data)
 
     # Create grouped bar plot
-    x = np.arange(len(summary["model"].unique()))
+    x = np.arange(len(successful_models))
     width = 0.35
 
     for i, exp_type in enumerate(["in_domain", "out_domain"]):
         data = summary[summary["experiment_type"] == exp_type]
-        offset = width * (i - 0.5)
+        
+        if not data.empty:
+            offset = width * (i - 0.5)
+            
+            # Calculate error bars (ensure non-negative)
+            yerr_lower = np.maximum(0, data["csmf_accuracy_mean"] - data["csmf_accuracy_ci_lower_mean"])
+            yerr_upper = np.maximum(0, data["csmf_accuracy_ci_upper_mean"] - data["csmf_accuracy_mean"])
 
-        bars = ax.bar(
-            x + offset,
-            data["csmf_accuracy_mean"],
-            width,
-            label=exp_type.replace("_", " ").title(),
-            yerr=[
-                data["csmf_accuracy_mean"] - data["csmf_accuracy_ci_lower_mean"],
-                data["csmf_accuracy_ci_upper_mean"] - data["csmf_accuracy_mean"],
-            ],
-            capsize=5,
-        )
+            bars = ax.bar(
+                x + offset,
+                data["csmf_accuracy_mean"],
+                width,
+                label=exp_type.replace("_", " ").title(),
+                yerr=[yerr_lower, yerr_upper],
+                capsize=5,
+            )
 
     ax.set_xlabel("Model")
     ax.set_ylabel("CSMF Accuracy")
     ax.set_title("CSMF Accuracy: In-domain vs Out-domain")
     ax.set_xticks(x)
-    ax.set_xticklabels(summary["model"].unique())
+    ax.set_xticklabels(successful_models)
     ax.legend()
     ax.set_ylim(0, 1)
     ax.grid(axis="y", alpha=0.3)
@@ -106,28 +146,40 @@ def plot_domain_comparison(results: pd.DataFrame, ax):
 
 def plot_training_size_impact(results: pd.DataFrame, ax):
     """Plot impact of training data size on performance."""
-    # Filter data
-    size_data = results[results["experiment_type"] == "training_size"]
+    # Filter data and exclude failed experiments
+    size_data = results[
+        (results["experiment_type"] == "training_size") &
+        (results["csmf_accuracy"] > 0)
+    ]
 
     if size_data.empty:
         ax.text(0.5, 0.5, "No training size data", ha="center", va="center")
+        ax.set_title("Impact of Training Data Size")
         return
 
     # Group by training fraction and model
-    for model in size_data["model"].unique():
+    for model in sorted(size_data["model"].unique()):
         model_data = size_data[size_data["model"] == model]
 
         # Sort by training fraction
         model_data = model_data.sort_values("training_fraction")
 
+        # Check if CI values are available
+        has_ci = model_data["csmf_accuracy_ci_lower"].notna().any() and model_data["csmf_accuracy_ci_upper"].notna().any()
+        
+        if has_ci:
+            # Calculate error bars (ensure non-negative)
+            yerr_lower = np.maximum(0, model_data["csmf_accuracy"] - model_data["csmf_accuracy_ci_lower"])
+            yerr_upper = np.maximum(0, model_data["csmf_accuracy_ci_upper"] - model_data["csmf_accuracy"])
+            yerr = [yerr_lower, yerr_upper]
+        else:
+            yerr = None
+
         # Plot with error bars
         ax.errorbar(
             model_data["training_fraction"],
             model_data["csmf_accuracy"],
-            yerr=[
-                model_data["csmf_accuracy"] - model_data["csmf_accuracy_ci_lower"],
-                model_data["csmf_accuracy_ci_upper"] - model_data["csmf_accuracy"],
-            ],
+            yerr=yerr,
             label=model,
             marker="o",
             capsize=5,
@@ -145,30 +197,39 @@ def plot_training_size_impact(results: pd.DataFrame, ax):
 
 def plot_site_heatmap(results: pd.DataFrame, ax):
     """Plot site-specific performance heatmap."""
-    # Filter out-domain results
-    out_domain = results[results["experiment_type"] == "out_domain"]
+    # Filter out-domain results and exclude failed experiments
+    out_domain = results[
+        (results["experiment_type"] == "out_domain") &
+        (results["csmf_accuracy"] > 0)
+    ]
 
     if out_domain.empty:
         ax.text(0.5, 0.5, "No out-domain data", ha="center", va="center")
+        ax.set_title("Cross-Site CSMF Accuracy")
         return
 
-    # Get unique models
+    # Get unique models with successful experiments
     models = sorted(out_domain["model"].unique())
+    
+    if not models:
+        ax.text(0.5, 0.5, "No successful out-domain experiments", ha="center", va="center")
+        ax.set_title("Cross-Site CSMF Accuracy")
+        return
 
-    # Create pivot table for each model
+    # Create pivot table for the first model with data
     for i, model in enumerate(models):
         model_data = out_domain[out_domain["model"] == model]
 
-        # Pivot to create matrix
-        pivot = model_data.pivot_table(
-            values="csmf_accuracy",
-            index="test_site",
-            columns="train_site",
-            aggfunc="mean",
-        )
+        if not model_data.empty:
+            # Pivot to create matrix
+            pivot = model_data.pivot_table(
+                values="csmf_accuracy",
+                index="test_site",
+                columns="train_site",
+                aggfunc="mean",
+            )
 
-        # Create subplot
-        if i == 0:
+            # Create subplot (only show first model)
             im = ax.imshow(pivot.values, cmap="YlOrRd", aspect="auto", vmin=0, vmax=1)
             ax.set_xticks(range(len(pivot.columns)))
             ax.set_yticks(range(len(pivot.index)))
@@ -181,15 +242,19 @@ def plot_site_heatmap(results: pd.DataFrame, ax):
             # Add colorbar
             cbar = plt.colorbar(im, ax=ax)
             cbar.set_label("CSMF Accuracy")
+            break  # Only show first model
 
 
 def plot_metric_distributions(results: pd.DataFrame, ax):
     """Plot distribution of metrics across experiments."""
-    # Prepare data for box plot
+    # Prepare data for box plot, excluding failed experiments
     plot_data = []
 
     for exp_type in ["in_domain", "out_domain"]:
-        exp_data = results[results["experiment_type"] == exp_type]
+        exp_data = results[
+            (results["experiment_type"] == exp_type) &
+            (results["csmf_accuracy"] > 0)
+        ]
 
         for model in exp_data["model"].unique():
             model_data = exp_data[exp_data["model"] == model]
@@ -205,6 +270,7 @@ def plot_metric_distributions(results: pd.DataFrame, ax):
 
     if not plot_data:
         ax.text(0.5, 0.5, "No distribution data", ha="center", va="center")
+        ax.set_title("CSMF Accuracy Distribution")
         return
 
     plot_df = pd.DataFrame(plot_data)
@@ -220,9 +286,20 @@ def plot_model_performance(results: pd.DataFrame, output_path: str):
     """Create detailed model performance comparison plot."""
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 6))
 
+    # Filter out failed experiments
+    successful_results = results[results["csmf_accuracy"] > 0]
+    
+    if successful_results.empty:
+        ax1.text(0.5, 0.5, "No successful experiments", ha="center", va="center")
+        ax2.text(0.5, 0.5, "No successful experiments", ha="center", va="center")
+        plt.tight_layout()
+        plt.savefig(output_path, dpi=300, bbox_inches="tight")
+        plt.close()
+        return
+
     # CSMF Accuracy comparison
     model_summary = (
-        results.groupby("model")
+        successful_results.groupby("model")
         .agg(
             {
                 "csmf_accuracy": ["mean", "std", "min", "max"],
@@ -260,14 +337,17 @@ def plot_model_performance(results: pd.DataFrame, output_path: str):
 
 def plot_generalization_gap(results: pd.DataFrame, output_path: str):
     """Plot generalization gap analysis."""
+    # Filter out failed experiments
+    successful_results = results[results["csmf_accuracy"] > 0]
+    
     # Calculate generalization gap
     in_domain = (
-        results[results["experiment_type"] == "in_domain"]
+        successful_results[successful_results["experiment_type"] == "in_domain"]
         .groupby("model")["csmf_accuracy"]
         .mean()
     )
     out_domain = (
-        results[results["experiment_type"] == "out_domain"]
+        successful_results[successful_results["experiment_type"] == "out_domain"]
         .groupby("model")["csmf_accuracy"]
         .mean()
     )

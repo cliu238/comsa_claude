@@ -185,6 +185,37 @@ class ExperimentResult(BaseModel):
 
     def to_dict(self) -> Dict:
         """Convert to dictionary for DataFrame creation."""
-        return self.model_dump()
+        data = self.model_dump()
+        
+        # Transform field names to match visualization expectations
+        data["model"] = data.pop("model_name")
+        data["training_fraction"] = data.pop("training_size")
+        
+        # Convert CI lists to separate lower/upper fields
+        csmf_ci = data.get("csmf_accuracy_ci")
+        if csmf_ci and isinstance(csmf_ci, list) and len(csmf_ci) >= 2:
+            data["csmf_accuracy_ci_lower"] = csmf_ci[0]
+            data["csmf_accuracy_ci_upper"] = csmf_ci[1]
+            # Keep the original CI list for debugging
+            data["csmf_accuracy_ci"] = csmf_ci
+        else:
+            # If no CI provided, don't set CI bounds (let visualization handle it)
+            data.pop("csmf_accuracy_ci", None)
+            data["csmf_accuracy_ci_lower"] = None
+            data["csmf_accuracy_ci_upper"] = None
+            
+        cod_ci = data.get("cod_accuracy_ci")
+        if cod_ci and isinstance(cod_ci, list) and len(cod_ci) >= 2:
+            data["cod_accuracy_ci_lower"] = cod_ci[0]
+            data["cod_accuracy_ci_upper"] = cod_ci[1]
+            # Keep the original CI list for debugging
+            data["cod_accuracy_ci"] = cod_ci
+        else:
+            # If no CI provided, don't set CI bounds (let visualization handle it)
+            data.pop("cod_accuracy_ci", None)
+            data["cod_accuracy_ci_lower"] = None
+            data["cod_accuracy_ci_upper"] = None
+        
+        return data
 
     model_config = {"validate_assignment": True}
