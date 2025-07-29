@@ -11,6 +11,36 @@ from pathlib import Path
 from typing import Optional
 
 
+class RayLogFilter(logging.Filter):
+    """Filter to remove repetitive Ray trial status tables and verbose output."""
+    
+    def __init__(self):
+        super().__init__()
+        self.filtered_patterns = [
+            "Trial status:",
+            "Current time:",
+            "Logical resource usage:",
+            "╭─",  # Ray table borders
+            "├─",
+            "╰─",
+            "│ Trial name",
+            "objective_",  # Trial name patterns
+            "(tune_and_train_model pid=",  # Ray process messages
+        ]
+    
+    def filter(self, record):
+        """Return False to filter out the record."""
+        message = record.getMessage()
+        
+        # Filter out messages that contain any of the patterns
+        for pattern in self.filtered_patterns:
+            if pattern in message:
+                return False
+        
+        # Keep all other messages
+        return True
+
+
 def setup_logging(
     name: str,
     log_dir: Optional[str] = None,
@@ -54,6 +84,8 @@ def setup_logging(
         console_handler = logging.StreamHandler()
         console_handler.setLevel(logging.INFO)
         console_handler.setFormatter(simple_formatter)
+        # Add Ray log filter to console output
+        console_handler.addFilter(RayLogFilter())
         logger.addHandler(console_handler)
     
     # File handler

@@ -68,6 +68,13 @@ class ProgressTracker:
         # Log progress periodically
         if self.completed_experiments % 10 == 0:
             self._log_progress()
+        
+        # Log errors immediately
+        if result.error:
+            logger.warning(
+                f"Experiment failed: {result.experiment_id} - "
+                f"Model: {result.model_name} - Error: {result.error}"
+            )
 
     def _update_postfix(self) -> None:
         """Update tqdm postfix with current statistics."""
@@ -106,11 +113,24 @@ class ProgressTracker:
         eta_seconds = remaining_experiments / rate if rate > 0 else 0
         eta = timedelta(seconds=int(eta_seconds))
 
+        # Get current best model performance
+        best_info = ""
+        if self.results:
+            successful_results = [r for r in self.results if not r.error]
+            if successful_results:
+                best_result = max(successful_results, key=lambda r: r.csmf_accuracy)
+                best_info = f" - Best: {best_result.model_name} (CSMF: {best_result.csmf_accuracy:.3f})"
+
         logger.info(
-            f"Progress: {self.completed_experiments}/{self.total_experiments} "
-            f"({self.get_completion_percentage():.1f}%) - "
-            f"Failed: {self.failed_experiments} - "
-            f"Rate: {rate:.2f} exp/s - ETA: {eta}"
+            f"\n{'='*60}\n"
+            f"PROGRESS UPDATE: {self.completed_experiments}/{self.total_experiments} experiments "
+            f"({self.get_completion_percentage():.1f}%)\n"
+            f"  • Success Rate: {((self.completed_experiments - self.failed_experiments) / max(self.completed_experiments, 1) * 100):.1f}%\n"
+            f"  • Failed: {self.failed_experiments}\n"
+            f"  • Runtime: {timedelta(seconds=int(elapsed))}\n"
+            f"  • Speed: {rate:.2f} exp/s\n"
+            f"  • ETA: {eta}{best_info}\n"
+            f"{'='*60}"
         )
 
     def get_completion_percentage(self) -> float:

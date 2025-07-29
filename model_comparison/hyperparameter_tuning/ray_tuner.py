@@ -200,7 +200,7 @@ class RayTuner:
             run_config=RunConfig(
                 name=experiment_name or f"{model_name}_tuning_{datetime.now().strftime('%Y%m%d_%H%M%S')}_{uuid.uuid4().hex[:8]}",
                 storage_path=os.path.abspath("./ray_results"),
-                verbose=1,
+                verbose=0,
             ),
         )
         

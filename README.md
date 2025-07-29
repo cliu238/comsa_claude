@@ -662,27 +662,20 @@ The `--n-workers` parameter should be adjusted based on your system:
 For a quick test with fewer experiments:
 ```bash
 poetry run python model_comparison/scripts/run_distributed_comparison.py \
-    --data-path va-data/data/phmrc/IHME_PHMRC_VA_DATA_ADULT_Y2013M09D11_0.csv \
-    --sites Mexico AP UP \
-    --models logistic_regression random_forest xgboost categorical_nb insilico \
-    --n-workers 8 \
-    --training-sizes 0.5 1.0 \
-    --n-bootstrap 10 \
-    --output-dir results/model_comparison_quick \
-    --no-plots
-```
-
-For full evaluation (recommended to run in terminal due to long execution time):
-```bash
-poetry run python model_comparison/scripts/run_distributed_comparison.py \
-    --data-path va-data/data/phmrc/IHME_PHMRC_VA_DATA_ADULT_Y2013M09D11_0.csv \
-    --sites Mexico AP UP \
-    --models logistic_regression random_forest xgboost categorical_nb insilico \
-    --n-workers 12 \
-    --training-sizes 0.25 0.5 0.75 1.0 \
-    --n-bootstrap 100 \
-    --output-dir results/model_comparison_full \
-    --no-plots
+   --data-path va-data/data/phmrc/IHME_PHMRC_VA_DATA_ADULT_Y2013M09D11_0.csv \
+   --sites Mexico AP \
+   --models xgboost insilico \
+   --n-workers 8 \
+   --training-sizes 1.0 \
+   --n-bootstrap 10 \
+   --enable-tuning \
+   --tuning-algorithm bayesian \
+   --tuning-trials 3 \
+   --tuning-cv-folds 3 \
+   --memory-per-worker 4GB \
+   --track-component-times \
+   --output-dir results/full_comparison_$(date +%Y%m%d_%H%M%S) \
+   --no-plots
 ```
 
 For all sites with maximum parallelization:
@@ -705,7 +698,6 @@ poetry run python model_comparison/scripts/run_distributed_comparison.py \
     --data-path va-data/data/phmrc/IHME_PHMRC_VA_DATA_ADULT_Y2013M09D11_0.csv \
     --sites AP Bohol Dar Mexico Pemba UP \
     --models xgboost random_forest logistic_regression categorical_nb insilico \
-    --training-sizes 0.25 0.5 0.75 1.0 \
     --n-bootstrap 100 \
     --enable-tuning \
     --tuning-trials 100 \
@@ -719,6 +711,7 @@ poetry run python model_comparison/scripts/run_distributed_comparison.py \
     --checkpoint-interval 10 \
     --ray-dashboard-port 8265 \
     --output-dir results/full_comparison_$(date +%Y%m%d_%H%M%S) \
+    --track-component-times \
     --random-seed 42
 ```
 
@@ -734,6 +727,7 @@ poetry run python model_comparison/scripts/run_distributed_comparison.py \
 - `--no-plots`: Skip generating visualization plots
 - `--resume`: Resume from checkpoint if available
 - `--clear-checkpoints`: Clear existing checkpoints before starting
+- `--track-component-times`: Track separate timing for tuning, training, and inference components
 
 ### Execution Time Considerations
 
@@ -776,6 +770,34 @@ Based on the implemented fixes, expected performance ranges:
 - **XGBoost**: 60-74% CSMF accuracy (in-domain)
 - **Logistic Regression**: 65-70% CSMF accuracy (in-domain)
 - **InSilico**: 70-74% CSMF accuracy (cross-site validation)
+
+### Tracking Computational Performance
+
+The `--track-component-times` flag enables detailed timing breakdown to understand where computational time is spent:
+
+```bash
+poetry run python model_comparison/scripts/run_distributed_comparison.py \
+    --data-path va-data/data/phmrc/IHME_PHMRC_VA_DATA_ADULT_Y2013M09D11_0.csv \
+    --sites Mexico AP UP \
+    --models logistic_regression xgboost \
+    --n-workers 8 \
+    --enable-tuning \
+    --tuning-trials 10 \
+    --track-component-times \
+    --output-dir results/timing_analysis
+```
+
+When enabled, the output CSV will include additional columns:
+- `tuning_time_seconds`: Time spent on hyperparameter optimization (if tuning enabled)
+- `training_time_seconds`: Time to fit the model with final parameters
+- `inference_time_seconds`: Time for predictions and metric calculation
+- `execution_time_seconds`: Total time (maintained for backward compatibility)
+
+**Notes on timing comparisons:**
+- **InSilicoVA**: No tuning time (deterministic model), only training and inference
+- **XGBoost/Random Forest/Logistic Regression**: Include tuning time when `--enable-tuning` is used
+- **Fair comparison**: Compare inference times for deployment scenarios, as tuning is a one-time cost
+- **Tuning overhead**: With Bayesian optimization (10 trials × 5-fold CV = 50 model fits), tuning can dominate total time
 
 ### Troubleshooting
 

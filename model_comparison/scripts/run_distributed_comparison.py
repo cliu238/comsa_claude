@@ -173,6 +173,13 @@ def parse_arguments():
         help="CPUs allocated per tuning trial",
     )
     
+    # Timing tracking arguments
+    parser.add_argument(
+        "--track-component-times",
+        action="store_true",
+        help="Track separate timing for tuning, training, and inference components",
+    )
+    
     # Other arguments
     parser.add_argument(
         "--random-seed", type=int, default=42, help="Random seed for reproducibility"

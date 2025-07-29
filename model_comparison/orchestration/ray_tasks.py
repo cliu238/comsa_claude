@@ -121,9 +121,12 @@ def train_and_evaluate_model(
 
         # Train model
         logger.info(f"Training {model_name} on {len(X_train)} samples (training_size={training_size})")
+        training_start = time.time()
         model.fit(X_train_processed, y_train)
+        training_time = time.time() - training_start
 
         # Make predictions
+        inference_start = time.time()
         y_pred = model.predict(X_test_processed)
         y_proba = None
         if hasattr(model, "predict_proba"):
@@ -136,6 +139,7 @@ def train_and_evaluate_model(
         metrics = calculate_metrics(
             y_true=y_test, y_pred=y_pred, y_proba=y_proba, n_bootstrap=n_bootstrap
         )
+        inference_time = time.time() - inference_start
 
         # Create result
         result = ExperimentResult(
@@ -152,6 +156,8 @@ def train_and_evaluate_model(
             n_train=len(y_train),
             n_test=len(y_test),
             execution_time_seconds=time.time() - start_time,
+            training_time_seconds=training_time,
+            inference_time_seconds=inference_time,
             worker_id=ray.get_runtime_context().get_worker_id(),
             retry_count=retry_count,
         )
@@ -326,6 +332,7 @@ def tune_and_train_model(
             # Check if tuning is enabled
             if tuning_config and tuning_config.get("enabled", False):
                 logger.info(f"Starting hyperparameter tuning for {model_name}")
+                tuning_start = time.time()
                 
                 # Get model class and search space
                 model_classes = {
@@ -417,9 +424,10 @@ def tune_and_train_model(
                     experiment_name=unique_experiment_name,
                 )
                 
+                tuning_time = time.time() - tuning_start
                 best_params = tuning_results["best_params"]
                 logger.info(
-                    f"Tuning completed. Best {tuning_config.get('tuning_metric', 'csmf_accuracy')}: "
+                    f"Tuning completed in {tuning_time:.1f}s. Best {tuning_config.get('tuning_metric', 'csmf_accuracy')}: "
                     f"{tuning_results['best_score']:.4f}"
                 )
                 
@@ -442,9 +450,12 @@ def tune_and_train_model(
         
         # Train model
         logger.info(f"Training {model_name} on {len(X_train)} samples")
+        training_start = time.time()
         model.fit(X_train_processed, y_train)
+        training_time = time.time() - training_start
         
         # Make predictions
+        inference_start = time.time()
         y_pred = model.predict(X_test_processed)
         y_proba = None
         if hasattr(model, "predict_proba"):
@@ -457,6 +468,7 @@ def tune_and_train_model(
         metrics = calculate_metrics(
             y_true=y_test, y_pred=y_pred, y_proba=y_proba, n_bootstrap=n_bootstrap
         )
+        inference_time = time.time() - inference_start
         
         # Add tuning metadata to experiment metadata
         if tuning_results:
@@ -481,6 +493,9 @@ def tune_and_train_model(
             n_train=len(y_train),
             n_test=len(y_test),
             execution_time_seconds=time.time() - start_time,
+            tuning_time_seconds=tuning_time if 'tuning_time' in locals() else None,
+            training_time_seconds=training_time,
+            inference_time_seconds=inference_time,
             worker_id=ray.get_runtime_context().get_worker_id(),
             retry_count=retry_count,
         )

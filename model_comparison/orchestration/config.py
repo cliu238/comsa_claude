@@ -68,9 +68,15 @@ class ParallelConfig(BaseModel):
 
     def to_ray_init_kwargs(self) -> Dict:
         """Convert to Ray initialization kwargs."""
+        # Set environment variables for cleaner logging
+        import os
+        os.environ["RAY_DEDUP_LOGS"] = "1"  # Deduplicate repetitive log messages
+        os.environ["RAY_BACKEND_LOG_LEVEL"] = "warning"  # Only show warnings and errors
+        
         kwargs = {
             "dashboard_host": "0.0.0.0" if self.ray_dashboard else None,
             "dashboard_port": self.ray_dashboard_port if self.ray_dashboard else None,
+            "log_to_driver": False,  # Reduce driver logging
         }
 
         if self.n_workers > 0:
@@ -178,7 +184,10 @@ class ExperimentResult(BaseModel):
     )
 
     # Execution metadata
-    execution_time_seconds: float = Field(..., description="Execution time in seconds")
+    execution_time_seconds: float = Field(..., description="Total execution time in seconds")
+    tuning_time_seconds: Optional[float] = Field(default=None, description="Hyperparameter tuning time in seconds")
+    training_time_seconds: Optional[float] = Field(default=None, description="Model training time in seconds")
+    inference_time_seconds: Optional[float] = Field(default=None, description="Model inference/prediction time in seconds")
     worker_id: Optional[str] = Field(default=None, description="Ray worker ID")
     retry_count: int = Field(default=0, description="Number of retries")
     error: Optional[str] = Field(default=None, description="Error message if failed")

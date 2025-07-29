@@ -393,6 +393,19 @@ Tasks are numbered using the following scheme:
       - Enhanced CategoricalNB cross-validation
     - **Major Finding**: InSilicoVA maintains best cross-site generalization (-42.4% CSMF drop) vs XGBoost (-56.5%) despite lower in-domain performance
     - **Infrastructure**: Reorganized docs structure, moved completed tasks to docs/completed_tasks/
+- [RD-020] ✅ Comprehensive VA baseline benchmark analysis and research findings documentation
+  - **Priority**: High
+  - **Dependencies**: All ML baseline models, model comparison framework
+  - **Completed**: 2025-07-29
+  - **Notes**: Created detailed RESEARCH_FIND.md with experimental findings:
+    - **Experiments**: 74 experiments comparing InSilicoVA and XGBoost across 6 sites
+    - **Performance Analysis**: In-domain (CSMF: 0.833±0.059, COD: 0.448±0.103) vs out-domain (CSMF: 0.430±0.172, COD: 0.207±0.101)
+    - **Site-Specific Findings**: Documented performance variations and transfer learning challenges
+    - **Infrastructure Improvements**:
+      - Enhanced logging with RayLogFilter to reduce verbose Ray output
+      - Improved progress tracking with real-time best model display
+      - Added test_timing_quick.sh for component timing validation
+    - **Key Finding**: InSilicoVA shows 42.4% CSMF drop vs XGBoost's 53.9% drop in cross-site transfer
 
 ## Milestones
 
@@ -476,6 +489,7 @@ Task ID Format: [Category-Number] where Category is CF/IM/DO/RD/MS
 - [IM-048] ✅ CategoricalNB baseline model - 2025-07-25 (Issue #30)
 - [IM-053] ✅ Implement hyperparameter tuning for all ML models - 2025-07-25 (PR #29)
 - [RD-019] ✅ Comprehensive VA model comparison across all PHMRC sites with confidence intervals - 2025-07-29
+- [RD-020] ✅ Comprehensive VA baseline benchmark analysis and research findings documentation - 2025-07-29
 
 ### In Progress
 
