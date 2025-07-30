@@ -172,6 +172,12 @@ def parse_arguments():
         default=1.0,
         help="CPUs allocated per tuning trial",
     )
+    parser.add_argument(
+        "--tuning-max-concurrent-trials",
+        type=int,
+        default=2,
+        help="Maximum concurrent tuning trials (prevents resource explosion)",
+    )
     
     # Timing tracking arguments
     parser.add_argument(
@@ -210,6 +216,7 @@ async def main():
         tuning_metric=args.tuning_metric,
         cv_folds=args.tuning_cv_folds,
         n_cpus_per_trial=args.tuning_cpus_per_trial,
+        max_concurrent_tuning_trials=args.tuning_max_concurrent_trials,
     )
     
     # Create configurations
@@ -242,6 +249,23 @@ async def main():
     logger.info(f"Models: {args.models}")
     logger.info(f"Workers: {args.n_workers}")
     logger.info(f"Output directory: {args.output_dir}")
+    
+    # Warn about resource usage with high tuning trials
+    if args.enable_tuning and args.tuning_trials > 100 and args.n_workers == -1:
+        logger.warning(
+            f"WARNING: High tuning trials ({args.tuning_trials}) with unlimited workers "
+            f"may cause resource exhaustion. Consider setting --n-workers to a specific value."
+        )
+    
+    if args.enable_tuning:
+        total_tuning_operations = (
+            len(args.models) * args.tuning_trials * args.tuning_cv_folds
+        )
+        logger.info(
+            f"Tuning enabled: {args.tuning_trials} trials × {len(args.models)} models "
+            f"× {args.tuning_cv_folds} CV folds = {total_tuning_operations} total model trainings per experiment"
+        )
+        logger.info(f"Max concurrent tuning trials: {args.tuning_max_concurrent_trials}")
 
     # Clear checkpoints if requested
     if args.clear_checkpoints:

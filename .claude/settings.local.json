@@ -71,7 +71,9 @@
       "Bash(cut:*)",
       "mcp__context7__resolve-library-id",
       "Bash(md5sum:*)",
-      "Bash(grep -n \"<<<<<<< HEAD\" PLANNING.md TASK.md)"
+      "Bash(grep -n \"<<<<<<< HEAD\" PLANNING.md TASK.md)",
+      "Bash(tar:*)",
+      "Bash(awk:*)"
     ],
     "deny": []
   }

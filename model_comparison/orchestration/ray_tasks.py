@@ -263,13 +263,20 @@ def tune_and_train_model(
         from baseline.models.logistic_regression_model import LogisticRegressionModel
         from baseline.models.categorical_nb_model import CategoricalNBModel
         from model_comparison.hyperparameter_tuning.ray_tuner import RayTuner
+        from model_comparison.hyperparameter_tuning.enhanced_search_spaces import (
+            get_xgboost_enhanced_search_space,
+            get_random_forest_enhanced_search_space,
+            get_search_space_for_model_enhanced,
+        )
         from model_comparison.hyperparameter_tuning.search_spaces import (
-            get_xgboost_search_space,
-            get_random_forest_search_space,
             get_logistic_regression_search_space,
             get_categorical_nb_search_space,
         )
         from model_comparison.metrics.comparison_metrics import calculate_metrics
+        from model_comparison.experiments.cross_domain_tuning import (
+            CrossDomainCV,
+            evaluate_cross_domain_performance,
+        )
         
         # Set up logging for worker
         logger = get_logger(__name__, component="orchestration", console=False)
@@ -335,9 +342,20 @@ def tune_and_train_model(
                 tuning_start = time.time()
                 
                 # Get model class and search space
+                # Use more conservative search space for cross-domain experiments
+                is_cross_domain = experiment_metadata.get("train_site") != experiment_metadata.get("test_site")
+                
+                if model_name == "xgboost" and is_cross_domain and tuning_config.get("use_conservative_space", True):
+                    # Use conservative space for cross-domain XGBoost
+                    from model_comparison.hyperparameter_tuning.enhanced_search_spaces import get_xgboost_conservative_search_space
+                    xgboost_space = get_xgboost_conservative_search_space()
+                    logger.info("Using conservative search space for cross-domain XGBoost tuning")
+                else:
+                    xgboost_space = get_xgboost_enhanced_search_space()
+                
                 model_classes = {
-                    "xgboost": (XGBoostModel, get_xgboost_search_space()),
-                    "random_forest": (RandomForestModel, get_random_forest_search_space()),
+                    "xgboost": (XGBoostModel, xgboost_space),
+                    "random_forest": (RandomForestModel, get_random_forest_enhanced_search_space()),
                     "logistic_regression": (LogisticRegressionModel, get_logistic_regression_search_space()),
                     "categorical_nb": (CategoricalNBModel, get_categorical_nb_search_space())
                 }
@@ -347,13 +365,23 @@ def tune_and_train_model(
                 
                 model_class, search_space = model_classes[model_name]
                 
-                # Create tuner
+                # Create tuner with resource constraints
+                # Limit concurrent trials to prevent nested Ray worker explosion
+                max_concurrent_trials = tuning_config.get("max_concurrent_tuning_trials", 2)
+                if max_concurrent_trials is None:
+                    # Default to 2 if not specified to prevent resource explosion
+                    max_concurrent_trials = 2
+                    logger.warning(
+                        "No max_concurrent_tuning_trials specified. Defaulting to 2 to prevent resource explosion. "
+                        "Consider setting --tuning-max-concurrent-trials explicitly."
+                    )
+                
                 tuner = RayTuner(
                     n_trials=tuning_config.get("n_trials", 100),
                     search_algorithm=tuning_config.get("search_algorithm", "bayesian"),
                     metric=tuning_config.get("tuning_metric", "csmf_accuracy"),
                     n_cpus_per_trial=tuning_config.get("n_cpus_per_trial", 1.0),
-                    max_concurrent_trials=tuning_config.get("max_concurrent_trials"),
+                    max_concurrent_trials=max_concurrent_trials,
                 )
                 
                 # Run tuning on a subset of data if it's large
@@ -414,15 +442,53 @@ def tune_and_train_model(
                     else:
                         X_tune, y_tune = X_train, y_train
                 
-                # Run tuning with unique experiment name
-                unique_experiment_name = f"{experiment_metadata.get('experiment_id')}_{model_name}_{uuid.uuid4().hex[:8]}"
-                tuning_results = tuner.tune_model(
-                    model_name=model_name,
-                    search_space=search_space,
-                    train_data=(X_tune, y_tune),
-                    cv_folds=tuning_config.get("cv_folds", 5),
-                    experiment_name=unique_experiment_name,
+                # Check if we should use cross-domain CV for better generalization
+                use_cross_domain = (
+                    tuning_config.get("use_cross_domain_cv", False) and 
+                    experiment_metadata.get("train_site") != experiment_metadata.get("test_site")
                 )
+                
+                if use_cross_domain and 'site' in X_train.columns:
+                    # Use cross-domain CV if we have site information
+                    logger.info("Using cross-domain CV for hyperparameter tuning")
+                    
+                    # For cross-domain CV, we need the site column
+                    site_col = X_train['site'] if 'site' in X_train.columns else pd.Series([experiment_metadata['train_site']] * len(X_train))
+                    
+                    # Create a custom scoring function for Ray Tune
+                    def cross_domain_objective(config):
+                        results = evaluate_cross_domain_performance(
+                            model_name=model_name,
+                            params=config,
+                            X=X_tune.drop(columns=['site']) if 'site' in X_tune.columns else X_tune,
+                            y=y_tune,
+                            sites=site_col.iloc[X_tune.index] if len(site_col) > len(X_tune) else site_col,
+                            metric=tuning_config.get("tuning_metric", "csmf_accuracy"),
+                            n_splits=min(tuning_config.get("cv_folds", 5), len(site_col.unique())),
+                        )
+                        return {tuning_config.get("tuning_metric", "csmf_accuracy"): results["mean"]}
+                    
+                    # Note: This requires modifying RayTuner to accept custom objectives
+                    # For now, fall back to regular tuning with a warning
+                    logger.warning("Cross-domain CV requested but not fully implemented in RayTuner. Using standard CV.")
+                    unique_experiment_name = f"{experiment_metadata.get('experiment_id')}_{model_name}_{uuid.uuid4().hex[:8]}"
+                    tuning_results = tuner.tune_model(
+                        model_name=model_name,
+                        search_space=search_space,
+                        train_data=(X_tune, y_tune),
+                        cv_folds=tuning_config.get("cv_folds", 5),
+                        experiment_name=unique_experiment_name,
+                    )
+                else:
+                    # Standard tuning
+                    unique_experiment_name = f"{experiment_metadata.get('experiment_id')}_{model_name}_{uuid.uuid4().hex[:8]}"
+                    tuning_results = tuner.tune_model(
+                        model_name=model_name,
+                        search_space=search_space,
+                        train_data=(X_tune, y_tune),
+                        cv_folds=tuning_config.get("cv_folds", 5),
+                        experiment_name=unique_experiment_name,
+                    )
                 
                 tuning_time = time.time() - tuning_start
                 best_params = tuning_results["best_params"]

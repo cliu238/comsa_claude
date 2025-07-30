@@ -27,6 +27,18 @@ class TuningConfig(BaseModel):
         default=1.0,
         description="Number of CPUs allocated per tuning trial"
     )
+    use_cross_domain_cv: bool = Field(
+        default=False,
+        description="Use cross-domain CV for tuning (experimental)"
+    )
+    use_conservative_space: bool = Field(
+        default=True,
+        description="Use conservative search space for cross-domain experiments"
+    )
+    max_concurrent_tuning_trials: int = Field(
+        default=2,
+        description="Maximum concurrent tuning trials to prevent resource explosion"
+    )
     
     @field_validator("search_algorithm")
     def validate_search_algorithm(cls, v: str) -> str:

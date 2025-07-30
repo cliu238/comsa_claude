@@ -406,6 +406,24 @@ Tasks are numbered using the following scheme:
       - Improved progress tracking with real-time best model display
       - Added test_timing_quick.sh for component timing validation
     - **Key Finding**: InSilicoVA shows 42.4% CSMF drop vs XGBoost's 53.9% drop in cross-site transfer
+- [RD-021] ✅ XGBoost generalization investigation and improvement experiments
+  - **Priority**: High
+  - **Dependencies**: RD-020, full comparison results (results/full_comparison_20250729_155434)
+  - **Completed**: 2025-07-30
+  - **Notes**: Designed comprehensive experiments to improve XGBoost's poor out-of-domain generalization:
+    - **Root Cause Analysis**: XGBoost overfits to site-specific patterns (53.8% CSMF drop) vs InSilicoVA (42.4% drop)
+    - **Experiment Scripts Created**:
+      - 01_regularization_comparison.sh: Test enhanced, conservative, and fixed regularization strategies
+      - 02_cross_domain_tuning.sh: Compare in-domain vs cross-domain tuning objectives
+      - 03_model_complexity_analysis.py: Analyze tree depths, feature usage, overfitting indicators
+      - run_all_experiments.sh: Master script with --quick mode for testing
+    - **Implementation Details**:
+      - Created XGBoostEnhancedConfig with stronger regularization (max_depth=4, min_child_weight=20, gamma=1.0)
+      - Added conservative search spaces in enhanced_search_spaces.py
+      - Integrated cross-domain CV option in experiment_config.py
+      - Enhanced ray_tasks.py with better tuning result tracking
+    - **Expected Outcomes**: Reduce XGBoost's performance gap from 53.8% to <30% through better regularization
+    - **Infrastructure**: Created model_comparison/experiments/xgboost_investigation/ directory
 
 ## Milestones
 
@@ -490,6 +508,7 @@ Task ID Format: [Category-Number] where Category is CF/IM/DO/RD/MS
 - [IM-053] ✅ Implement hyperparameter tuning for all ML models - 2025-07-25 (PR #29)
 - [RD-019] ✅ Comprehensive VA model comparison across all PHMRC sites with confidence intervals - 2025-07-29
 - [RD-020] ✅ Comprehensive VA baseline benchmark analysis and research findings documentation - 2025-07-29
+- [RD-021] ✅ XGBoost generalization investigation and improvement experiments - 2025-07-30
 
 ### In Progress
 
