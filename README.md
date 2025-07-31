@@ -817,6 +817,102 @@ When enabled, the output CSV will include additional columns:
 
 5. **CategoricalNB index errors**: The model now handles varying numbers of categories per feature between training and test sets by capping unseen categories to the maximum seen during training.
 
+## XGBoost Generalization Investigation
+
+The project includes comprehensive experiments to investigate and improve XGBoost's poor out-of-domain generalization compared to InSilicoVA. These experiments are designed to reduce XGBoost's performance gap from 53.8% to <30% through better regularization strategies.
+
+### Running the Investigation
+
+The investigation includes three focused experiments that can be run together or separately:
+
+#### Quick Test (Reduced Parameters)
+```bash
+# Run all experiments with reduced parameters for testing (~30 minutes)
+./model_comparison/experiments/xgboost_investigation/run_all_experiments.sh --quick
+```
+
+#### Full Investigation
+```bash
+# Run complete investigation with full parameters (~4-6 hours)
+./model_comparison/experiments/xgboost_investigation/run_all_experiments.sh
+```
+
+#### Individual Experiments
+```bash
+# Run only regularization comparison
+./model_comparison/experiments/xgboost_investigation/run_all_experiments.sh --regularization-only
+
+# Run only cross-domain tuning experiment  
+./model_comparison/experiments/xgboost_investigation/run_all_experiments.sh --cross-domain-only
+
+# Run only complexity analysis
+./model_comparison/experiments/xgboost_investigation/run_all_experiments.sh --complexity-only
+```
+
+### Experiment Details
+
+1. **Regularization Comparison** (`01_regularization_comparison.sh`)
+   - Tests three XGBoost configurations: standard enhanced, conservative, and fixed conservative
+   - Compares in-domain vs out-domain performance gaps
+   - Identifies optimal regularization parameters
+
+2. **Cross-Domain Tuning** (`02_cross_domain_tuning.sh`)
+   - Compares models tuned for in-domain vs out-domain performance
+   - Tests leave-one-site-out cross-validation
+   - Evaluates transfer-focused optimization
+
+3. **Model Complexity Analysis** (`03_model_complexity_analysis.py`)
+   - Analyzes tree depth distributions
+   - Examines feature usage patterns
+   - Calculates overfitting indicators
+
+### Expected Outcomes
+
+The investigation aims to:
+- Reduce XGBoost's out-domain performance gap from 53.8% to <30%
+- Identify optimal regularization strategies for cross-site generalization
+- Provide actionable recommendations for production deployment
+
+### Output Structure
+
+Results are saved to `results/xgboost_investigation/`:
+```
+results/xgboost_investigation/
+├── regularization_comparison/
+│   ├── enhanced_*/           # Enhanced config results
+│   ├── conservative_*/       # Conservative config results
+│   └── fixed_conservative_*/ # Fixed conservative results
+├── cross_domain_tuning/
+│   ├── in_domain_tuning_*/   # Standard tuning results
+│   ├── cross_domain_tuning_*/ # Cross-domain CV results
+│   └── mexico_transfer_*/    # Transfer optimization results
+└── final_report_*/
+    ├── investigation_log.txt
+    ├── experiment_summary.csv
+    ├── performance_gap_comparison.png
+    └── README.md
+```
+
+### System Requirements
+
+- Python 3.8+ with Poetry
+- At least 8GB RAM (16GB recommended)
+- Multiple CPU cores for parallel execution
+- Docker (for InSilicoVA comparison)
+
+### Troubleshooting
+
+1. **Virtual environment issues**: The scripts now use Poetry directly without requiring virtual environment activation
+
+2. **Long execution times**: Use `--quick` mode for testing or run in screen/tmux:
+   ```bash
+   screen -S xgb_investigation
+   ./model_comparison/experiments/xgboost_investigation/run_all_experiments.sh
+   # Detach with Ctrl+A, D
+   ```
+
+3. **Memory issues**: Reduce parallelism in the scripts by modifying `--n-workers` parameter
+
 ## Resources
 
 - [Claude Code Documentation](https://docs.anthropic.com/en/docs/claude-code)

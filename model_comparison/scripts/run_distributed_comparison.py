@@ -186,6 +186,23 @@ def parse_arguments():
         help="Track separate timing for tuning, training, and inference components",
     )
     
+    # XGBoost configuration arguments
+    parser.add_argument(
+        "--use-conservative-xgboost",
+        action="store_true",
+        help="Use conservative XGBoost configuration for better generalization",
+    )
+    parser.add_argument(
+        "--use-adaptive-xgboost",
+        action="store_true",
+        help="Use adaptive XGBoost configuration based on data characteristics",
+    )
+    parser.add_argument(
+        "--use-cross-domain-cv",
+        action="store_true",
+        help="Use cross-domain CV for hyperparameter tuning (better generalization)",
+    )
+    
     # Other arguments
     parser.add_argument(
         "--random-seed", type=int, default=42, help="Random seed for reproducibility"
@@ -217,6 +234,7 @@ async def main():
         cv_folds=args.tuning_cv_folds,
         n_cpus_per_trial=args.tuning_cpus_per_trial,
         max_concurrent_tuning_trials=args.tuning_max_concurrent_trials,
+        use_cross_domain_cv=args.use_cross_domain_cv,
     )
     
     # Create configurations
@@ -284,10 +302,23 @@ async def main():
         logger.info("Prefect dashboard available at: http://localhost:4200")
         logger.info("Start Prefect server with: prefect server start")
 
+    # Add XGBoost configuration metadata
+    experiment_metadata = {}
+    if args.use_conservative_xgboost:
+        experiment_metadata["use_conservative_config"] = True
+        logger.info("Using conservative XGBoost configuration")
+    if args.use_adaptive_xgboost:
+        experiment_metadata["use_adaptive_config"] = True
+        logger.info("Using adaptive XGBoost configuration")
+    
     try:
         # Run the flow
         logger.info("Starting Prefect flow execution")
-        results = await va34_comparison_flow(experiment_config, parallel_config)
+        results = await va34_comparison_flow(
+            experiment_config, 
+            parallel_config,
+            experiment_metadata=experiment_metadata
+        )
 
         # Summary statistics
         logger.info("\n" + "=" * 50)

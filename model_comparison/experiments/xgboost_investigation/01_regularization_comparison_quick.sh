@@ -36,7 +36,7 @@ poetry run python model_comparison/scripts/run_distributed_comparison.py \
     --data-path "$DATA_PATH" \
     --sites $SITES \
     --models xgboost insilico \
-    --n-bootstrap 50 \
+    --n-bootstrap 10 \
     --enable-tuning \
     --tuning-trials 25 \
     --tuning-algorithm bayesian \
@@ -71,7 +71,7 @@ poetry run python model_comparison/scripts/run_distributed_comparison.py \
     --data-path "$DATA_PATH" \
     --sites $SITES \
     --models xgboost insilico \
-    --n-bootstrap 50 \
+    --n-bootstrap 10 \
     --enable-tuning \
     --tuning-trials 25 \
     --tuning-algorithm bayesian \
@@ -100,7 +100,7 @@ poetry run python model_comparison/scripts/run_distributed_comparison.py \
     --data-path "$DATA_PATH" \
     --sites $SITES \
     --models xgboost insilico \
-    --n-bootstrap 50 \
+    --n-bootstrap 10 \
     --n-workers -1 \
     --memory-per-worker 4GB \
     --batch-size 25 \

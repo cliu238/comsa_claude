@@ -33,11 +33,11 @@ def get_xgboost_enhanced_search_space() -> Dict[str, Any]:
         'config__learning_rate': tune.loguniform(0.005, 0.1),
         'config__n_estimators': tune.choice([300, 500, 800, 1000]),
         
-        # Aggressive subsampling to reduce overfitting
-        'config__subsample': tune.uniform(0.4, 0.7),
-        'config__colsample_bytree': tune.uniform(0.3, 0.6),
-        'config__colsample_bylevel': tune.uniform(0.3, 0.6),
-        'config__colsample_bynode': tune.uniform(0.3, 0.6),
+        # Optimized subsampling for VA data - narrower ranges around optimal values
+        'config__subsample': tune.uniform(0.65, 0.80),  # Higher range for better diversity
+        'config__colsample_bytree': tune.uniform(0.45, 0.60),  # Moderate range ~100-120 features
+        'config__colsample_bylevel': tune.uniform(0.50, 0.65),  # Slightly higher for level diversity
+        'config__colsample_bynode': tune.uniform(0.60, 0.75),  # Higher for node split quality
         
         # Strong regularization
         'config__reg_alpha': tune.loguniform(1.0, 100.0),  # L1 regularization
@@ -63,9 +63,11 @@ def get_xgboost_conservative_search_space() -> Dict[str, Any]:
         'config__learning_rate': tune.loguniform(0.001, 0.05),
         'config__n_estimators': tune.choice([500, 1000, 1500]),
         
-        # Heavy subsampling
-        'config__subsample': tune.uniform(0.3, 0.5),
-        'config__colsample_bytree': tune.uniform(0.2, 0.4),
+        # Conservative subsampling (less aggressive than before)
+        'config__subsample': tune.uniform(0.4, 0.6),
+        'config__colsample_bytree': tune.uniform(0.3, 0.5),
+        'config__colsample_bylevel': tune.uniform(0.3, 0.5),
+        'config__colsample_bynode': tune.uniform(0.3, 0.5),
         
         # Very strong regularization
         'config__reg_alpha': tune.loguniform(10.0, 1000.0),

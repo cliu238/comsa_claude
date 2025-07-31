@@ -9,7 +9,6 @@ echo "Cross-Domain Tuning Experiment"
 echo "==========================================="
 
 # Configuration
-VENV_DIR="venv_linux"
 DATA_PATH="va-data/data/phmrc/IHME_PHMRC_VA_DATA_ADULT_Y2013M09D11_0.csv"
 OUTPUT_BASE="results/xgboost_investigation/cross_domain_tuning"
 TIMESTAMP=$(date +%Y%m%d_%H%M%S)
@@ -29,12 +28,14 @@ echo ""
 echo ">>> Experiment 2a: In-Domain Tuning (Standard Approach)"
 echo "Optimizing for in-domain CSMF accuracy"
 
-source $VENV_DIR/bin/activate
+# Create output directory
+mkdir -p "$OUTPUT_BASE/in_domain_tuning_${TIMESTAMP}"
+
 poetry run python model_comparison/scripts/run_distributed_comparison.py \
     --data-path "$DATA_PATH" \
     --sites $SITES \
     --models xgboost \
-    --n-bootstrap 30 \
+    --n-bootstrap 100 \
     --enable-tuning \
     --tuning-trials 75 \
     --tuning-algorithm bayesian \
@@ -49,7 +50,6 @@ poetry run python model_comparison/scripts/run_distributed_comparison.py \
     --output-dir "$OUTPUT_BASE/in_domain_tuning_${TIMESTAMP}" \
     --track-component-times \
     --random-seed 42 \
-    --save-trained-models \
     2>&1 | tee "$OUTPUT_BASE/in_domain_tuning_${TIMESTAMP}.log"
 
 # Experiment 2b: Cross-Domain Tuning
@@ -57,30 +57,17 @@ echo ""
 echo ">>> Experiment 2b: Cross-Domain Tuning"
 echo "Optimizing for out-of-domain performance using leave-one-site-out CV"
 
-# Note: This requires implementing --use-cross-domain-cv flag
-# For now, we'll simulate by using a balanced metric
-poetry run python model_comparison/scripts/run_distributed_comparison.py \
+# Create output directory
+mkdir -p "$OUTPUT_BASE/cross_domain_tuning_${TIMESTAMP}"
+
+# Run true cross-domain optimization
+poetry run python model_comparison/experiments/xgboost_investigation/run_cross_domain_tuning.py \
     --data-path "$DATA_PATH" \
     --sites $SITES \
-    --models xgboost \
-    --n-bootstrap 30 \
-    --enable-tuning \
-    --tuning-trials 75 \
-    --tuning-algorithm bayesian \
-    --tuning-metric csmf_accuracy \
-    --tuning-cv-folds 5 \
-    --use-cross-domain-cv \
-    --tuning-cpus-per-trial 1.0 \
-    --use-conservative-space \
-    --n-workers -1 \
-    --memory-per-worker 4GB \
-    --batch-size 30 \
-    --checkpoint-interval 10 \
-    --ray-dashboard-port 8266 \
+    --n-trials 75 \
+    --in-domain-weight 0.3 \
     --output-dir "$OUTPUT_BASE/cross_domain_tuning_${TIMESTAMP}" \
-    --track-component-times \
-    --random-seed 42 \
-    --save-trained-models \
+    --n-jobs 4 \
     2>&1 | tee "$OUTPUT_BASE/cross_domain_tuning_${TIMESTAMP}.log"
 
 # Experiment 2c: Multi-Objective Tuning
@@ -88,19 +75,21 @@ echo ""
 echo ">>> Experiment 2c: Multi-Objective Tuning Simulation"
 echo "Training separate models for each objective and comparing"
 
+# Create output directory
+mkdir -p "$OUTPUT_BASE/mexico_transfer_${TIMESTAMP}"
+
 # Train a model optimized for Mexico->Others transfer
 poetry run python model_comparison/scripts/run_distributed_comparison.py \
     --data-path "$DATA_PATH" \
     --sites Mexico \
     --test-sites AP UP Pemba Bohol Dar \
     --models xgboost \
-    --n-bootstrap 30 \
+    --n-bootstrap 100 \
     --enable-tuning \
     --tuning-trials 50 \
     --tuning-algorithm bayesian \
     --tuning-metric csmf_accuracy \
     --tuning-cv-folds 5 \
-    --use-conservative-space \
     --tuning-cpus-per-trial 1.0 \
     --n-workers -1 \
     --memory-per-worker 4GB \
@@ -110,7 +99,6 @@ poetry run python model_comparison/scripts/run_distributed_comparison.py \
     --output-dir "$OUTPUT_BASE/mexico_transfer_${TIMESTAMP}" \
     --track-component-times \
     --random-seed 42 \
-    --save-trained-models \
     2>&1 | tee "$OUTPUT_BASE/mexico_transfer_${TIMESTAMP}.log"
 
 # Generate comparison report
@@ -135,7 +123,7 @@ configs = {
 }
 
 for config_key, config_name in configs.items():
-    dirs = list(base_path.glob(f'{config_key}_*'))
+    dirs = [d for d in base_path.glob(f'{config_key}_*') if d.is_dir()]
     if dirs:
         latest_dir = max(dirs, key=lambda x: x.stat().st_mtime)
         csv_path = latest_dir / 'va34_comparison_results.csv'

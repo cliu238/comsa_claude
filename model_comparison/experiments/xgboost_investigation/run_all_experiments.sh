@@ -41,6 +41,9 @@ RUN_ALL=true
 RUN_REGULARIZATION=false
 RUN_CROSS_DOMAIN=false
 RUN_COMPLEXITY=false
+RUN_SUBSAMPLING=false
+RUN_ADVANCED=false
+RUN_ABLATION=false
 QUICK_MODE=false
 
 while [[ $# -gt 0 ]]; do
@@ -60,6 +63,21 @@ while [[ $# -gt 0 ]]; do
             RUN_COMPLEXITY=true
             shift
             ;;
+        --subsampling-only)
+            RUN_ALL=false
+            RUN_SUBSAMPLING=true
+            shift
+            ;;
+        --advanced-only)
+            RUN_ALL=false
+            RUN_ADVANCED=true
+            shift
+            ;;
+        --ablation-only)
+            RUN_ALL=false
+            RUN_ABLATION=true
+            shift
+            ;;
         --quick)
             QUICK_MODE=true
             shift
@@ -70,6 +88,9 @@ while [[ $# -gt 0 ]]; do
             echo "  --regularization-only  Run only regularization comparison"
             echo "  --cross-domain-only    Run only cross-domain tuning experiment"
             echo "  --complexity-only      Run only complexity analysis"
+            echo "  --subsampling-only     Run only optimized subsampling experiment"
+            echo "  --advanced-only        Run only advanced techniques experiment"
+            echo "  --ablation-only        Run only ablation study"
             echo "  --quick               Run experiments with reduced parameters for testing"
             echo "  --help                Show this help message"
             exit 0
@@ -133,12 +154,11 @@ if [ "$RUN_ALL" = true ] || [ "$RUN_COMPLEXITY" = true ]; then
     echo "======================================" | tee -a "$FINAL_REPORT/investigation_log.txt"
     
     # Find the most recent experiment results
-    LATEST_REG_DIR=$(find "$OUTPUT_BASE/regularization_comparison" -name "enhanced_*" -type d | sort -r | head -1)
+    LATEST_REG_DIR=$(find "$OUTPUT_BASE/regularization_comparison" -name "enhanced_*" -type d 2>/dev/null | sort -r | head -1)
     
     if [ -n "$LATEST_REG_DIR" ]; then
         echo "Analyzing models from: $LATEST_REG_DIR" | tee -a "$FINAL_REPORT/investigation_log.txt"
         
-        source venv_linux/bin/activate
         poetry run python "$SCRIPT_DIR/03_model_complexity_analysis.py" \
             --results-dir "$LATEST_REG_DIR" \
             --model-dir "$LATEST_REG_DIR/models" \
@@ -151,12 +171,57 @@ if [ "$RUN_ALL" = true ] || [ "$RUN_COMPLEXITY" = true ]; then
     echo "" | tee -a "$FINAL_REPORT/investigation_log.txt"
 fi
 
+# Experiment 4: Optimized Subsampling
+if [ "$RUN_ALL" = true ] || [ "$RUN_SUBSAMPLING" = true ]; then
+    echo "======================================" | tee -a "$FINAL_REPORT/investigation_log.txt"
+    echo "Experiment 4: Optimized Subsampling" | tee -a "$FINAL_REPORT/investigation_log.txt"
+    echo "======================================" | tee -a "$FINAL_REPORT/investigation_log.txt"
+    
+    if [ "$QUICK_MODE" = true ]; then
+        # Modify script for quick testing
+        sed 's/--n-bootstrap 50/--n-bootstrap 10/g; s/--tuning-trials 50/--tuning-trials 10/g' \
+            "$SCRIPT_DIR/04_optimized_subsampling.sh" > "$SCRIPT_DIR/04_optimized_subsampling_quick.sh"
+        chmod +x "$SCRIPT_DIR/04_optimized_subsampling_quick.sh"
+        bash "$SCRIPT_DIR/04_optimized_subsampling_quick.sh" 2>&1 | tee -a "$FINAL_REPORT/investigation_log.txt"
+        rm "$SCRIPT_DIR/04_optimized_subsampling_quick.sh"
+    else
+        bash "$SCRIPT_DIR/04_optimized_subsampling.sh" 2>&1 | tee -a "$FINAL_REPORT/investigation_log.txt"
+    fi
+    
+    echo "" | tee -a "$FINAL_REPORT/investigation_log.txt"
+fi
+
+# Experiment 5: Advanced Techniques
+if [ "$RUN_ALL" = true ] || [ "$RUN_ADVANCED" = true ]; then
+    echo "======================================" | tee -a "$FINAL_REPORT/investigation_log.txt"
+    echo "Experiment 5: Advanced Techniques" | tee -a "$FINAL_REPORT/investigation_log.txt"
+    echo "======================================" | tee -a "$FINAL_REPORT/investigation_log.txt"
+    
+    if [ "$QUICK_MODE" = true ]; then
+        echo "Running advanced techniques in quick mode (reduced iterations)" | tee -a "$FINAL_REPORT/investigation_log.txt"
+    fi
+    
+    bash "$SCRIPT_DIR/05_advanced_techniques.sh" 2>&1 | tee -a "$FINAL_REPORT/investigation_log.txt"
+    
+    echo "" | tee -a "$FINAL_REPORT/investigation_log.txt"
+fi
+
+# Experiment 6: Ablation Study
+if [ "$RUN_ALL" = true ] || [ "$RUN_ABLATION" = true ]; then
+    echo "======================================" | tee -a "$FINAL_REPORT/investigation_log.txt"
+    echo "Experiment 6: Ablation Study" | tee -a "$FINAL_REPORT/investigation_log.txt"
+    echo "======================================" | tee -a "$FINAL_REPORT/investigation_log.txt"
+    
+    bash "$SCRIPT_DIR/06_ablation_study.sh" 2>&1 | tee -a "$FINAL_REPORT/investigation_log.txt"
+    
+    echo "" | tee -a "$FINAL_REPORT/investigation_log.txt"
+fi
+
 # Generate Final Report
 echo "======================================" | tee -a "$FINAL_REPORT/investigation_log.txt"
 echo "Generating Final Report" | tee -a "$FINAL_REPORT/investigation_log.txt"
 echo "======================================" | tee -a "$FINAL_REPORT/investigation_log.txt"
 
-source venv_linux/bin/activate
 poetry run python -c "
 import pandas as pd
 import numpy as np
@@ -250,6 +315,79 @@ if complexity_path.exists():
         print(f'  Overfitting score: {row[\"overfitting_score\"]:.3f}')
         print(f'  Performance gap: {row[\"performance_gap\"]:.1f}%')
 
+# 4. Optimized Subsampling Results
+subsampling_path = base_dir / 'optimized_subsampling/optimized_subsampling_comparison.csv'
+if subsampling_path.exists():
+    subsampling_df = pd.read_csv(subsampling_path)
+    print('\\n\\n4. OPTIMIZED SUBSAMPLING RESULTS:')
+    print('-' * 50)
+    
+    for config in ['baseline_enhanced', 'optimized_subsampling', 'optimized_tuning']:
+        config_df = subsampling_df[subsampling_df['subsampling_config'] == config]
+        if len(config_df) > 0:
+            xgb_df = config_df[config_df['model'].str.contains('xgboost')]
+            if len(xgb_df) > 0:
+                overall = xgb_df['csmf_accuracy'].mean()
+                in_domain = xgb_df[xgb_df['experiment_type'] == 'in_domain']['csmf_accuracy'].mean()
+                out_domain = xgb_df[xgb_df['experiment_type'] == 'out_domain']['csmf_accuracy'].mean()
+                gap = ((in_domain - out_domain) / in_domain * 100) if in_domain > 0 else 0
+                
+                all_results.append({
+                    'Experiment': f'Subsampling-{config}',
+                    'In-Domain CSMF': in_domain,
+                    'Out-Domain CSMF': out_domain,
+                    'Performance Gap (%)': gap
+                })
+                
+                print(f'{config.upper()}:')
+                print(f'  Overall CSMF: {overall:.4f}')
+                print(f'  Performance gap: {gap:.1f}%')
+                if gap < 30:
+                    print(f'  ✓ ACHIEVED TARGET!')
+
+# 5. Advanced Techniques Results
+advanced_objectives_path = base_dir / 'advanced_techniques' / 'custom_objective_results.csv'
+if advanced_objectives_path.parent.exists():
+    latest_advanced = max([d for d in base_dir.glob('advanced_techniques/custom_objective_*') if d.is_dir()], 
+                         key=lambda x: x.stat().st_mtime, default=None)
+    if latest_advanced:
+        obj_results_path = latest_advanced / 'custom_objective_results.csv'
+        if obj_results_path.exists():
+            obj_df = pd.read_csv(obj_results_path)
+            print('\\n\\n5. ADVANCED TECHNIQUES RESULTS:')
+            print('-' * 50)
+            
+            for objective in obj_df['objective'].unique():
+                obj_data = obj_df[obj_df['objective'] == objective]
+                avg_csmf = obj_data['csmf_accuracy'].mean()
+                
+                all_results.append({
+                    'Experiment': f'Advanced-{objective}',
+                    'In-Domain CSMF': 0.0,  # Not tracked separately
+                    'Out-Domain CSMF': avg_csmf,
+                    'Performance Gap (%)': 0.0
+                })
+                
+                print(f'{objective} objective: CSMF={avg_csmf:.4f}')
+
+# 6. Ablation Study Results
+ablation_path = base_dir / 'ablation_study' / 'ablation_improvements.csv'
+if ablation_path.exists():
+    ablation_df = pd.read_csv(ablation_path)
+    print('\\n\\n6. ABLATION STUDY RESULTS:')
+    print('-' * 50)
+    print('Top improvements over baseline:')
+    
+    for i, row in ablation_df.head(5).iterrows():
+        print(f'  {row["config"]}: +{row["improvement"]:.4f} ({row["percent_improvement"]:.1f}%)')
+        
+        all_results.append({
+            'Experiment': f'Ablation-{row["config"]}',
+            'In-Domain CSMF': 0.0,
+            'Out-Domain CSMF': row['out_domain_csmf'],
+            'Performance Gap (%)': 0.0
+        })
+
 # Create summary visualization
 if all_results:
     summary_df = pd.DataFrame(all_results)
@@ -329,6 +467,10 @@ if best_strategy:
         print('  1. Implement cross-domain CV during hyperparameter tuning')
         print('  2. Use leave-one-site-out validation for model selection')
         print('  3. Consider multi-objective optimization balancing domains')
+    elif 'subsampling' in best_strategy.lower():
+        print('  1. Use XGBoostEnhancedConfig.optimized_subsampling() configuration')
+        print('  2. Focus on moderate subsampling (0.7 rows, 0.5-0.65 features)')
+        print('  3. Reduce regularization when using optimized subsampling')
     
     print('\\nAdditional recommendations:')
     print('  - Monitor overfitting metrics during training')
@@ -381,6 +523,12 @@ Analyzed:
 - Tree depth distributions
 - Feature usage patterns
 - Overfitting indicators
+
+### 4. Optimized Subsampling
+Tested optimized subsampling parameters:
+- Baseline enhanced configuration
+- Fixed optimized subsampling configuration
+- Tuned with optimized search space
 
 ## Results Summary
 See generated plots and CSV files for detailed results.

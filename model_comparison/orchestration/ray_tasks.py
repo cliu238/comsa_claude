@@ -94,7 +94,14 @@ def train_and_evaluate_model(
         if model_name == "insilico":
             model = InSilicoVAModel()
         elif model_name == "xgboost":
-            model = XGBoostModel()
+            # Check if conservative configuration should be used
+            use_conservative = experiment_metadata.get("use_conservative_config", False)
+            if use_conservative:
+                from baseline.models.xgboost_enhanced_config import XGBoostEnhancedConfig
+                logger.info("Using conservative XGBoost configuration")
+                model = XGBoostModel(config=XGBoostEnhancedConfig.conservative())
+            else:
+                model = XGBoostModel()
         elif model_name == "random_forest":
             model = RandomForestModel()
         elif model_name == "logistic_regression":
@@ -502,9 +509,16 @@ def tune_and_train_model(
                 model = model_class()
                 model.set_params(**best_params)
             else:
-                # Use default parameters
+                # Use default parameters or conservative config if specified
                 if model_name == "xgboost":
-                    model = XGBoostModel()
+                    # Check if conservative configuration should be used
+                    use_conservative = experiment_metadata.get("use_conservative_config", False)
+                    if use_conservative:
+                        from baseline.models.xgboost_enhanced_config import XGBoostEnhancedConfig
+                        logger.info("Using conservative XGBoost configuration (no tuning)")
+                        model = XGBoostModel(config=XGBoostEnhancedConfig.conservative())
+                    else:
+                        model = XGBoostModel()
                 elif model_name == "random_forest":
                     model = RandomForestModel()
                 elif model_name == "logistic_regression":

@@ -407,6 +407,18 @@ class XGBoostModel(BaseEstimator, ClassifierMixin):
             "eval_metric": "mlogloss",
             "seed": 42,  # For reproducibility
         }
+        
+        # Add enhanced parameters if using XGBoostEnhancedConfig
+        if hasattr(self.config, '_enhanced_params'):
+            # These parameters come from XGBoostEnhancedConfig
+            params.update(self.config._enhanced_params)
+        elif hasattr(self.config, 'to_dict'):
+            # Use to_dict() method if available (for enhanced configs)
+            config_dict = self.config.to_dict()
+            # Update with any missing parameters
+            for key in ['min_child_weight', 'gamma', 'colsample_bylevel', 'colsample_bynode']:
+                if key in config_dict and key not in params:
+                    params[key] = config_dict[key]
 
         # Remove None values
         params = {k: v for k, v in params.items() if v is not None}

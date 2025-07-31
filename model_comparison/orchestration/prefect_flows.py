@@ -3,7 +3,7 @@
 import asyncio
 import time
 from pathlib import Path
-from typing import Dict, List
+from typing import Dict, List, Optional
 
 import pandas as pd
 import ray
@@ -63,6 +63,7 @@ def generate_experiment_configs(
     config: ExperimentConfig,
     data_ref: ray.ObjectRef,
     checkpoint_manager: CheckpointManager,
+    additional_metadata: Optional[Dict] = None
 ) -> List[Dict]:
     """Generate all experiment configurations.
 
@@ -70,6 +71,7 @@ def generate_experiment_configs(
         config: Main experiment configuration
         data_ref: Ray object reference to data
         checkpoint_manager: Checkpoint manager for experiment IDs
+        additional_metadata: Optional additional metadata to add to experiments
 
     Returns:
         List of experiment configurations
@@ -98,6 +100,7 @@ def generate_experiment_configs(
                         "train_site": site,
                         "test_site": site,
                         "n_bootstrap": config.n_bootstrap,
+                        **(additional_metadata or {}),
                     },
                 }
             )
@@ -129,6 +132,7 @@ def generate_experiment_configs(
                             "train_site": train_site,
                             "test_site": test_site,
                             "n_bootstrap": config.n_bootstrap,
+                            **(additional_metadata or {}),
                         },
                     }
                 )
@@ -159,6 +163,8 @@ def generate_experiment_configs(
                             "train_site": primary_site,
                             "test_site": primary_site,
                             "training_size": training_size,
+                            "n_bootstrap": config.n_bootstrap,
+                            **(additional_metadata or {}),
                             "n_bootstrap": config.n_bootstrap,
                         },
                     }
@@ -288,13 +294,16 @@ def batch_experiments(experiments: List[Dict], batch_size: int) -> List[List[Dic
     persist_result=True,
 )
 async def va34_comparison_flow(
-    config: ExperimentConfig, parallel_config: ParallelConfig
+    config: ExperimentConfig, 
+    parallel_config: ParallelConfig,
+    experiment_metadata: Optional[Dict] = None
 ) -> pd.DataFrame:
     """Main Prefect flow for VA34 comparison experiments.
 
     Args:
         config: Experiment configuration
         parallel_config: Parallel execution configuration
+        experiment_metadata: Optional additional metadata for experiments
 
     Returns:
         DataFrame with all experiment results
@@ -370,7 +379,7 @@ async def va34_comparison_flow(
     data_openva_ref = ray.put(data_openva)
     
     # Generate experiment configurations
-    experiments = generate_experiment_configs(config, data_ref, checkpoint_manager)
+    experiments = generate_experiment_configs(config, data_ref, checkpoint_manager, experiment_metadata)
 
     # Check for existing checkpoint
     checkpoint = checkpoint_manager.load_checkpoint(config.model_dump())

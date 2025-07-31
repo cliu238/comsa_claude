@@ -73,7 +73,8 @@
       "Bash(md5sum:*)",
       "Bash(grep -n \"<<<<<<< HEAD\" PLANNING.md TASK.md)",
       "Bash(tar:*)",
-      "Bash(awk:*)"
+      "Bash(awk:*)",
+      "Bash(./model_comparison/experiments/xgboost_investigation/run_all_experiments.sh:*)"
     ],
     "deny": []
   }
