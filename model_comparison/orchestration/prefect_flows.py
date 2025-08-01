@@ -31,6 +31,78 @@ from model_comparison.orchestration.ray_tasks import (
 logger = get_logger(__name__, component="orchestration")
 
 
+def _generate_ensemble_configurations(config: ExperimentConfig) -> List[Dict]:
+    """Generate ensemble configurations based on experiment settings.
+    
+    Args:
+        config: Experiment configuration with ensemble settings
+        
+    Returns:
+        List of ensemble configuration dictionaries
+    """
+    if not config.ensemble:
+        return []
+        
+    ensemble_configs = []
+    base_models = config.ensemble.base_estimators
+    
+    # Generate configurations for each combination of parameters
+    for voting in config.ensemble.voting_strategies:
+        for weight_strategy in config.ensemble.weight_strategies:
+            for ensemble_size in config.ensemble.ensemble_sizes:
+                # Generate model combinations based on strategy
+                if config.ensemble.estimator_selection_strategy == "exhaustive":
+                    # Generate all possible combinations
+                    from itertools import combinations
+                    model_combos = list(combinations(base_models, ensemble_size))
+                    # Limit to max combinations if specified
+                    if hasattr(config.ensemble, 'max_combinations'):
+                        model_combos = model_combos[:config.ensemble.max_combinations]
+                elif config.ensemble.estimator_selection_strategy == "smart":
+                    # Smart selection: always include diverse models
+                    model_combos = []
+                    if ensemble_size >= 3:
+                        # Always include at least one of each type if available
+                        combo = []
+                        model_types = set(m[1] for m in base_models)
+                        
+                        # Add one of each type first
+                        for model_type in list(model_types)[:ensemble_size]:
+                            model = next((m for m in base_models if m[1] == model_type), None)
+                            if model:
+                                combo.append(model)
+                        
+                        # Fill remaining slots with best performers
+                        remaining = ensemble_size - len(combo)
+                        if remaining > 0:
+                            unused = [m for m in base_models if m not in combo]
+                            combo.extend(unused[:remaining])
+                        
+                        if len(combo) == ensemble_size:
+                            model_combos.append(tuple(combo))
+                    else:
+                        # For small ensembles, just take first N models
+                        model_combos = [tuple(base_models[:ensemble_size])]
+                else:
+                    # Default: just use first N models
+                    model_combos = [tuple(base_models[:ensemble_size])]
+                
+                # Create configuration for each combination
+                for i, estimators in enumerate(model_combos):
+                    ensemble_id = f"{voting}_{weight_strategy}_size{ensemble_size}_combo{i}"
+                    
+                    ensemble_configs.append({
+                        "id": ensemble_id,
+                        "voting": voting,
+                        "weight_optimization": weight_strategy,
+                        "estimators": list(estimators),
+                        "min_diversity": config.ensemble.min_diversity_threshold,
+                    })
+    
+    logger.info(f"Generated {len(ensemble_configs)} ensemble configurations")
+    return ensemble_configs
+
+
 @task(retries=3, retry_delay_seconds=60)
 async def run_single_experiment(experiment_config: Dict) -> ExperimentResult:
     """Run a single experiment with retry logic.
@@ -76,9 +148,83 @@ def generate_experiment_configs(
     """
     experiments = []
 
-    # In-domain experiments
+    # Handle ensemble experiments if enabled
+    if config.ensemble and config.ensemble.use_pretrained_base_models == False:
+        # Generate ensemble experiments
+        ensemble_configs = _generate_ensemble_configurations(config)
+        
+        # Add ensemble experiments for all experiment types
+        for ensemble_cfg in ensemble_configs:
+            # For each training size
+            for training_size in config.training_sizes:
+                # In-domain experiments
+                for site in config.sites:
+                    experiment_id = checkpoint_manager.create_experiment_id(
+                        model_name=f"ensemble_{ensemble_cfg['id']}",
+                        experiment_type="in_domain",
+                        train_site=site,
+                        test_site=site,
+                        training_size=training_size,
+                    )
+                    
+                    experiments.append({
+                        "model_name": "ensemble",
+                        "site": site,
+                        "training_size": training_size,
+                        "experiment_type": "in_domain",
+                        "data_ref": data_ref,
+                        "experiment_metadata": {
+                            "experiment_id": experiment_id,
+                            "experiment_type": "in_domain",
+                            "train_site": site,
+                            "test_site": site,
+                            "n_bootstrap": config.n_bootstrap,
+                            "ensemble_config": ensemble_cfg,
+                        },
+                    })
+            
+                # Out-domain experiments
+                for train_site in config.sites:
+                    for test_site in config.sites:
+                        if train_site == test_site:
+                            continue
+                        
+                        experiment_id = checkpoint_manager.create_experiment_id(
+                            model_name=f"ensemble_{ensemble_cfg['id']}",
+                            experiment_type="out_domain",
+                            train_site=train_site,
+                            test_site=test_site,
+                            training_size=training_size,
+                        )
+                        
+                        experiments.append({
+                            "model_name": "ensemble",
+                            "train_site": train_site,
+                            "test_site": test_site,
+                            "training_size": training_size,
+                            "experiment_type": "out_domain",
+                            "data_ref": data_ref,
+                            "experiment_metadata": {
+                                "experiment_id": experiment_id,
+                                "experiment_type": "out_domain",
+                                "train_site": train_site,
+                                "test_site": test_site,
+                                "n_bootstrap": config.n_bootstrap,
+                                "ensemble_config": ensemble_cfg,
+                            },
+                        })
+        
+        # Add non-ensemble experiments only if requested
+        if any(m != "ensemble" for m in config.models):
+            non_ensemble_models = [m for m in config.models if m != "ensemble"]
+        else:
+            non_ensemble_models = []
+    else:
+        non_ensemble_models = config.models
+
+    # In-domain experiments for non-ensemble models
     for site in config.sites:
-        for model_name in config.models:
+        for model_name in non_ensemble_models:
             experiment_id = checkpoint_manager.create_experiment_id(
                 model_name=model_name,
                 experiment_type="in_domain",
@@ -108,7 +254,7 @@ def generate_experiment_configs(
             if train_site == test_site:
                 continue
 
-            for model_name in config.models:
+            for model_name in non_ensemble_models:
                 experiment_id = checkpoint_manager.create_experiment_id(
                     model_name=model_name,
                     experiment_type="out_domain",
@@ -137,7 +283,7 @@ def generate_experiment_configs(
     primary_site = config.sites[0] if config.sites else None
     if primary_site:
         for training_size in config.training_sizes:
-            for model_name in config.models:
+            for model_name in non_ensemble_models:
                 experiment_id = checkpoint_manager.create_experiment_id(
                     model_name=model_name,
                     experiment_type="training_size",
@@ -241,6 +387,12 @@ def prepare_experiment_data(
             if site in data_refs:
                 exp_copy["train_data"] = data_refs[site]["train_data"]
                 exp_copy["test_data"] = data_refs[site]["test_data"]
+                
+                # Add OpenVA data for ensemble models
+                if model_name == "ensemble" and site_data_refs_openva and site in site_data_refs_openva:
+                    exp_copy["experiment_metadata"]["train_data_openva"] = site_data_refs_openva[site]["train_data"]
+                    exp_copy["experiment_metadata"]["test_data_openva"] = site_data_refs_openva[site]["test_data"]
+                    
                 updated_experiments.append(exp_copy)
 
         elif exp["experiment_type"] == "out_domain":
@@ -249,6 +401,13 @@ def prepare_experiment_data(
             if train_site in data_refs and test_site in data_refs:
                 exp_copy["train_data"] = data_refs[train_site]["train_data"]
                 exp_copy["test_data"] = data_refs[test_site]["test_data"]
+                
+                # Add OpenVA data for ensemble models
+                if model_name == "ensemble" and site_data_refs_openva:
+                    if train_site in site_data_refs_openva and test_site in site_data_refs_openva:
+                        exp_copy["experiment_metadata"]["train_data_openva"] = site_data_refs_openva[train_site]["train_data"]
+                        exp_copy["experiment_metadata"]["test_data_openva"] = site_data_refs_openva[test_site]["test_data"]
+                        
                 updated_experiments.append(exp_copy)
 
         elif exp["experiment_type"] == "training_size":
@@ -258,6 +417,12 @@ def prepare_experiment_data(
                 exp_copy["train_data"] = data_refs[site]["train_data"]
                 exp_copy["test_data"] = data_refs[site]["test_data"]
                 exp_copy["training_fraction"] = exp["training_size"]
+                
+                # Add OpenVA data for ensemble models
+                if model_name == "ensemble" and site_data_refs_openva and site in site_data_refs_openva:
+                    exp_copy["experiment_metadata"]["train_data_openva"] = site_data_refs_openva[site]["train_data"]
+                    exp_copy["experiment_metadata"]["test_data_openva"] = site_data_refs_openva[site]["test_data"]
+                    
                 updated_experiments.append(exp_copy)
 
     logger.info(

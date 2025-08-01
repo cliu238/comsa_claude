@@ -102,6 +102,23 @@ def train_and_evaluate_model(
             model = LogisticRegressionModel()
         elif model_name == "categorical_nb":
             model = CategoricalNBModel()
+        elif model_name == "ensemble":
+            # Handle ensemble model
+            from baseline.models.ensemble_model import DuckVotingEnsemble
+            from baseline.models.ensemble_config import EnsembleConfig
+            
+            # Get ensemble configuration from metadata
+            ensemble_metadata = experiment_metadata.get("ensemble_config", {})
+            
+            ensemble_config = EnsembleConfig(
+                voting=ensemble_metadata.get("voting", "soft"),
+                weight_optimization=ensemble_metadata.get("weight_optimization", "none"),
+                estimators=ensemble_metadata.get("estimators", []),
+                min_diversity=ensemble_metadata.get("min_diversity", 0.0),
+                random_seed=42,
+            )
+            
+            model = DuckVotingEnsemble(config=ensemble_config)
         else:
             raise ValueError(f"Unknown model: {model_name}")
 
@@ -122,18 +139,53 @@ def train_and_evaluate_model(
         # Train model
         logger.info(f"Training {model_name} on {len(X_train)} samples (training_size={training_size})")
         training_start = time.time()
-        model.fit(X_train_processed, y_train)
+        
+        if model_name == "ensemble":
+            # Get OpenVA data for ensemble if available
+            train_data_openva_ref = experiment_metadata.get("train_data_openva")
+            if train_data_openva_ref:
+                # Get data from Ray object store
+                train_data_openva = ray.get(train_data_openva_ref)
+                X_train_openva, _ = train_data_openva
+                model.fit(X_train_processed, y_train, X_openva=X_train_openva)
+            else:
+                model.fit(X_train_processed, y_train)
+        else:
+            model.fit(X_train_processed, y_train)
+            
         training_time = time.time() - training_start
 
         # Make predictions
         inference_start = time.time()
-        y_pred = model.predict(X_test_processed)
-        y_proba = None
-        if hasattr(model, "predict_proba"):
-            try:
-                y_proba = model.predict_proba(X_test_processed)
-            except Exception as e:
-                logger.warning(f"Could not get probabilities: {e}")
+        
+        if model_name == "ensemble":
+            # Get OpenVA test data for ensemble if available
+            test_data_openva_ref = experiment_metadata.get("test_data_openva")
+            if test_data_openva_ref:
+                # Get data from Ray object store
+                test_data_openva = ray.get(test_data_openva_ref)
+                X_test_openva, _ = test_data_openva
+                y_pred = model.predict(X_test_processed, X_openva=X_test_openva)
+                try:
+                    y_proba = model.predict_proba(X_test_processed, X_openva=X_test_openva)
+                except Exception as e:
+                    logger.warning(f"Could not get probabilities: {e}")
+                    y_proba = None
+            else:
+                y_pred = model.predict(X_test_processed)
+                try:
+                    y_proba = model.predict_proba(X_test_processed)
+                except Exception as e:
+                    logger.warning(f"Could not get probabilities: {e}")
+                    y_proba = None
+        else:
+            y_pred = model.predict(X_test_processed)
+            y_proba = None
+            if hasattr(model, "predict_proba"):
+                try:
+                    y_proba = model.predict_proba(X_test_processed)
+                except Exception as e:
+                    logger.warning(f"Could not get probabilities: {e}")
 
         # Calculate metrics
         metrics = calculate_metrics(

@@ -73,7 +73,20 @@
       "Bash(md5sum:*)",
       "Bash(grep -n \"<<<<<<< HEAD\" PLANNING.md TASK.md)",
       "Bash(tar:*)",
-      "Bash(awk:*)"
+      "Bash(awk:*)",
+      "Bash(--data-path va-data/data/phmrc/IHME_PHMRC_VA_DATA_ADULT_Y2013M09D11_0.csv )",
+      "Bash(--sites Pemba )",
+      "Bash(--base-results results/full_comparison_20250729_155434/va34_comparison_results.csv )",
+      "Bash(--phase voting )",
+      "Bash(--n-bootstrap 10 )",
+      "Bash(--batch-size 2 )",
+      "Bash(--output-dir results/ensemble_test_quick)",
+      "Bash(--data-path va-data/data/phmrc/IHME_PHMRC_VA_DATA_ADULT_Y2013M09D11_0.csv )",
+      "Bash(--sites Pemba )",
+      "Bash(--base-results results/full_comparison_20250729_155434/va34_comparison_results.csv )",
+      "Bash(--phase voting )",
+      "Bash(--n-bootstrap 10 )",
+      "Bash(--batch-size 2 )"
     ],
     "deny": []
   }

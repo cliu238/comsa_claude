@@ -647,6 +647,56 @@ All models support:
 - sklearn-compatible interface (fit, predict, predict_proba)
 - Integration with the model comparison framework
 
+## Ensemble Model Experiments
+
+Run multi-phase experiments to optimize ensemble models for VA prediction. Requires Phase 1 results from `run_distributed_comparison.py`.
+
+### Usage
+
+```bash
+# Phase 2: Compare voting strategies (soft vs hard)
+poetry run python model_comparison/scripts/run_ensemble_comparison.py \
+    --data-path va-data/data/phmrc/IHME_PHMRC_VA_DATA_ADULT_Y2013M09D11_0.csv \
+    --sites Pemba Bohol UP Mexico AP Dar \
+    --base-results results/full_comparison_20250729_155434/va34_comparison_results.csv \
+    --phase voting \
+    --n-bootstrap 100 \
+    --output-dir results/ensemble_phase2
+
+# Phase 3: Test weight optimization
+poetry run python model_comparison/scripts/run_ensemble_comparison.py \
+    --data-path va-data/data/phmrc/IHME_PHMRC_VA_DATA_ADULT_Y2013M09D11_0.csv \
+    --sites Pemba Bohol UP Mexico AP Dar \
+    --base-results results/full_comparison_20250729_155434/va34_comparison_results.csv \
+    --phase weights \
+    --n-bootstrap 100 \
+    --output-dir results/ensemble_phase3
+
+# Phase 4: Comprehensive optimization (all phases)
+poetry run python model_comparison/scripts/run_ensemble_comparison.py \
+    --data-path va-data/data/phmrc/IHME_PHMRC_VA_DATA_ADULT_Y2013M09D11_0.csv \
+    --sites Pemba Bohol UP Mexico AP Dar \
+    --base-results results/full_comparison_20250729_155434/va34_comparison_results.csv \
+    --phase all \
+    --voting-strategies soft \
+    --weight-strategies none \
+    --ensemble-sizes 3 5 7 \
+    --n-bootstrap 100 \
+    --output-dir results/ensemble_phase4
+```
+
+### Output
+
+Results saved to `--output-dir`:
+- `ensemble_results/ensemble_comparison_results.csv` - Performance metrics for each configuration
+- `ensemble_plots/` - Visualization plots:
+  - `voting_strategy_comparison.png` - Soft vs hard voting performance
+  - `weight_optimization_comparison.png` - Weight strategy impact
+  - `ensemble_size_impact.png` - Performance by ensemble size
+  - `diversity_analysis.png` - Model diversity metrics
+
+**Best configuration found**: Soft voting, equal weights, 3 models (99.7% CSMF accuracy, 12.6% improvement over best individual model)
+
 ## Distributed Model Comparison
 
 The project includes a distributed model comparison framework using Ray and Prefect for running large-scale experiments across multiple models and sites. This unified framework replaces the previous separate scripts and provides parallel execution capabilities for all model types.

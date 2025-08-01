@@ -21,6 +21,8 @@ from baseline.models.xgboost_config import XGBoostConfig
 from baseline.models.xgboost_model import XGBoostModel
 from baseline.models.categorical_nb_config import CategoricalNBConfig
 from baseline.models.categorical_nb_model import CategoricalNBModel
+from baseline.models.ensemble_config import EnsembleConfig
+from baseline.models.ensemble_model import DuckVotingEnsemble
 
 __all__ = [
     "InSilicoVAModel",
@@ -39,4 +41,6 @@ __all__ = [
     "CategoricalNBConfig",
     "CategoricalNBHyperparameterTuner",
     "quick_tune_categorical_nb",
+    "DuckVotingEnsemble",
+    "EnsembleConfig",
 ]

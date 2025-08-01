@@ -4,7 +4,7 @@ import hashlib
 import json
 import platform
 from datetime import datetime
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Any
 
 from pydantic import BaseModel, Field, field_validator
 
@@ -191,6 +191,9 @@ class ExperimentResult(BaseModel):
     worker_id: Optional[str] = Field(default=None, description="Ray worker ID")
     retry_count: int = Field(default=0, description="Number of retries")
     error: Optional[str] = Field(default=None, description="Error message if failed")
+    
+    # Additional experiment-specific metrics
+    additional_metrics: Optional[Dict[str, Any]] = Field(default=None, description="Additional experiment-specific metrics")
 
     def to_dict(self) -> Dict:
         """Convert to dictionary for DataFrame creation."""

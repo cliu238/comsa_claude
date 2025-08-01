@@ -1,6 +1,6 @@
 """Configuration for VA34 site comparison experiments."""
 
-from typing import List, Optional
+from typing import Dict, List, Optional, Tuple
 
 from pydantic import BaseModel, Field, field_validator
 
@@ -59,6 +59,81 @@ class TuningConfig(BaseModel):
     model_config = {"validate_assignment": True}
 
 
+class EnsembleExperimentConfig(BaseModel):
+    """Configuration for ensemble-specific experiments."""
+    
+    # Ensemble composition
+    base_estimators: List[Tuple[str, str]] = Field(
+        default=[
+            ("xgboost_best", "xgboost"),
+            ("rf_best", "random_forest"),
+            ("nb_best", "categorical_nb"),
+        ],
+        description="List of (name, model_type) tuples for ensemble"
+    )
+    
+    # Voting strategies to test
+    voting_strategies: List[str] = Field(
+        default=["soft", "hard"],
+        description="Voting strategies to compare"
+    )
+    
+    # Weight optimization strategies
+    weight_strategies: List[str] = Field(
+        default=["none", "performance"],
+        description="Weight optimization strategies to test"
+    )
+    
+    # Ensemble size experiments
+    ensemble_sizes: List[int] = Field(
+        default=[3, 5, 7],
+        description="Different ensemble sizes to test"
+    )
+    
+    # Diversity constraints
+    min_diversity_threshold: float = Field(
+        default=0.2,
+        description="Minimum diversity threshold for ensemble selection"
+    )
+    
+    # Base model selection
+    use_pretrained_base_models: bool = Field(
+        default=True,
+        description="Use models from Phase 1 results"
+    )
+    
+    base_model_results_path: Optional[str] = Field(
+        default=None,
+        description="Path to Phase 1 results for loading base models"
+    )
+    
+    # Selection strategy
+    estimator_selection_strategy: str = Field(
+        default="greedy",
+        description="Strategy for selecting base estimators"
+    )
+    
+    @field_validator("voting_strategies")
+    def validate_voting_strategies(cls, v: List[str]) -> List[str]:
+        """Validate voting strategies."""
+        valid_strategies = ["soft", "hard"]
+        for strategy in v:
+            if strategy not in valid_strategies:
+                raise ValueError(f"Voting strategy {strategy} not in {valid_strategies}")
+        return v
+    
+    @field_validator("weight_strategies")
+    def validate_weight_strategies(cls, v: List[str]) -> List[str]:
+        """Validate weight strategies."""
+        valid_strategies = ["none", "manual", "cv", "performance"]
+        for strategy in v:
+            if strategy not in valid_strategies:
+                raise ValueError(f"Weight strategy {strategy} not in {valid_strategies}")
+        return v
+    
+    model_config = {"validate_assignment": True}
+
+
 class ExperimentConfig(BaseModel):
     """Configuration for VA34 site comparison experiment."""
 
@@ -97,6 +172,12 @@ class ExperimentConfig(BaseModel):
         default_factory=TuningConfig, 
         description="Hyperparameter tuning configuration"
     )
+    
+    # Ensemble configuration
+    ensemble: Optional[EnsembleExperimentConfig] = Field(
+        default=None,
+        description="Ensemble-specific experiment configuration"
+    )
 
     @field_validator("training_sizes")
     def validate_training_sizes(cls, v: List[float]) -> List[float]:
@@ -109,7 +190,7 @@ class ExperimentConfig(BaseModel):
     @field_validator("models")
     def validate_models(cls, v: List[str]) -> List[str]:
         """Validate model names."""
-        valid_models = ["insilico", "xgboost", "random_forest", "logistic_regression", "categorical_nb"]
+        valid_models = ["insilico", "xgboost", "random_forest", "logistic_regression", "categorical_nb", "ensemble"]
         for model in v:
             if model not in valid_models:
                 raise ValueError(f"Model {model} not in {valid_models}")

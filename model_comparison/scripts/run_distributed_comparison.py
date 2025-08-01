@@ -62,7 +62,7 @@ def parse_arguments():
         "--models",
         nargs="+",
         default=["xgboost", "insilico"],
-        choices=["xgboost", "insilico", "random_forest", "logistic_regression", "categorical_nb"],
+        choices=["xgboost", "insilico", "random_forest", "logistic_regression", "categorical_nb", "ensemble"],
         help="Models to compare",
     )
 
@@ -186,6 +186,58 @@ def parse_arguments():
         help="Track separate timing for tuning, training, and inference components",
     )
     
+    # Ensemble-specific arguments
+    parser.add_argument(
+        "--enable-ensemble-exploration",
+        action="store_true",
+        help="Enable ensemble exploration experiments",
+    )
+    parser.add_argument(
+        "--ensemble-voting-strategies",
+        nargs="+",
+        default=["soft", "hard"],
+        choices=["soft", "hard"],
+        help="Voting strategies to test for ensembles",
+    )
+    parser.add_argument(
+        "--ensemble-weight-strategies",
+        nargs="+",
+        default=["none", "performance"],
+        choices=["none", "manual", "cv", "performance"],
+        help="Weight optimization strategies for ensembles",
+    )
+    parser.add_argument(
+        "--ensemble-sizes",
+        nargs="+",
+        type=int,
+        default=[3, 5],
+        help="Number of models in each ensemble",
+    )
+    parser.add_argument(
+        "--ensemble-base-models",
+        nargs="+",
+        default=["all"],
+        help="Base models to consider for ensembles ('all' or specific models)",
+    )
+    parser.add_argument(
+        "--ensemble-selection-metric",
+        default="combined",
+        choices=["in_domain", "out_domain", "combined"],
+        help="Metric to optimize when selecting ensemble members",
+    )
+    parser.add_argument(
+        "--ensemble-combination-strategy",
+        default="smart",
+        choices=["exhaustive", "greedy", "random", "smart"],
+        help="Strategy for generating ensemble combinations",
+    )
+    parser.add_argument(
+        "--ensemble-max-combinations",
+        type=int,
+        default=50,
+        help="Maximum number of ensemble combinations to test",
+    )
+    
     # Other arguments
     parser.add_argument(
         "--random-seed", type=int, default=42, help="Random seed for reproducibility"
@@ -219,6 +271,29 @@ async def main():
         max_concurrent_tuning_trials=args.tuning_max_concurrent_trials,
     )
     
+    # Create ensemble configuration if needed
+    ensemble_config = None
+    if args.enable_ensemble_exploration or "ensemble" in args.models:
+        from model_comparison.experiments.experiment_config import EnsembleExperimentConfig
+        
+        # Determine base models
+        base_models = args.ensemble_base_models
+        if "all" in base_models:
+            base_models = ["xgboost", "random_forest", "categorical_nb", "logistic_regression", "insilico"]
+        
+        # Create base estimators list
+        base_estimators = [(f"{model}_est", model) for model in base_models]
+        
+        ensemble_config = EnsembleExperimentConfig(
+            base_estimators=base_estimators,
+            voting_strategies=args.ensemble_voting_strategies,
+            weight_strategies=args.ensemble_weight_strategies,
+            ensemble_sizes=args.ensemble_sizes,
+            min_diversity_threshold=0.2,
+            use_pretrained_base_models=False,  # We'll train them fresh
+            estimator_selection_strategy=args.ensemble_combination_strategy,
+        )
+    
     # Create configurations
     experiment_config = ExperimentConfig(
         data_path=args.data_path,
@@ -230,6 +305,7 @@ async def main():
         output_dir=args.output_dir,
         generate_plots=not args.no_plots,
         tuning=tuning_config,
+        ensemble=ensemble_config,
     )
 
     parallel_config = ParallelConfig(

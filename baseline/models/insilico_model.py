@@ -14,6 +14,7 @@ from typing import Optional
 
 import numpy as np
 import pandas as pd
+from sklearn.base import BaseEstimator
 
 from baseline.models.model_config import InSilicoVAConfig
 from baseline.models.model_validator import InSilicoVAValidator
@@ -21,7 +22,7 @@ from baseline.models.model_validator import InSilicoVAValidator
 logger = logging.getLogger(__name__)
 
 
-class InSilicoVAModel:
+class InSilicoVAModel(BaseEstimator):
     """InSilicoVA model with sklearn-like interface.
     
     This model implements the InSilicoVA algorithm for verbal autopsy

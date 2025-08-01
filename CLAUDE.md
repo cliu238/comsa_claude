@@ -71,6 +71,7 @@ poetry run
   - `results/baseline/benchmark_results.csv`
   - `results/transfer/transfer_results.csv`
   - `results/active/active_learning_results.csv`
+- **After finish implementation, always run it once as confirmation. If it is timeout, you can assume it pass and tell the user run it itself**
 
 ### 🔄 Development Workflow
 
