@@ -1,0 +1,67 @@
+Investigation started at Thu Jul 31 15:54:58 EDT 2025
+Output directory: results/xgboost_investigation/final_report_20250731_155458
+
+======================================
+Experiment 1: Regularization Comparison
+======================================
+===========================================
+XGBoost Regularization Comparison Experiment
+===========================================
+Starting experiments at Thu Jul 31 15:54:58 EDT 2025
+Output directory: results/xgboost_investigation/regularization_comparison
+Sites: Mexico AP Pemba
+
+>>> Experiment 1a: Standard Enhanced Configuration
+Using enhanced search space with moderate regularization
+2025-07-31 15:55:00 - INFO - Logging to: logs/model_comparison/site_comparison_20250731_155500.log
+15:55:00.622 | INFO    | model_comparison.experiments.site_comparison - Logging to: logs/model_comparison/site_comparison_20250731_155500.log
+2025-07-31 15:55:00 - INFO - Logging to: logs/orchestration/progress_tracker_20250731_155500.log
+15:55:00.628 | INFO    | model_comparison.monitoring.progress_tracker - Logging to: logs/orchestration/progress_tracker_20250731_155500.log
+2025-07-31 15:55:00 - INFO - Logging to: logs/orchestration/checkpoint_manager_20250731_155500.log
+15:55:00.630 | INFO    | model_comparison.orchestration.checkpoint_manager - Logging to: logs/orchestration/checkpoint_manager_20250731_155500.log
+2025-07-31 15:55:00 - INFO - Logging to: logs/orchestration/prefect_flows_20250731_155500.log
+15:55:00.631 | INFO    | model_comparison.orchestration.prefect_flows - Logging to: logs/orchestration/prefect_flows_20250731_155500.log
+2025-07-31 15:55:00 - INFO - Logging to: logs/orchestration/__main___20250731_155500.log
+15:55:00.640 | INFO    | __main__ - Logging to: logs/orchestration/__main___20250731_155500.log
+2025-07-31 15:55:00 - INFO - Starting distributed VA34 comparison
+15:55:00.642 | INFO    | __main__ - Starting distributed VA34 comparison
+2025-07-31 15:55:00 - INFO - Data path: va-data/data/phmrc/IHME_PHMRC_VA_DATA_ADULT_Y2013M09D11_0.csv
+15:55:00.642 | INFO    | __main__ - Data path: va-data/data/phmrc/IHME_PHMRC_VA_DATA_ADULT_Y2013M09D11_0.csv
+2025-07-31 15:55:00 - INFO - Sites: ['Mexico', 'AP', 'Pemba']
+15:55:00.642 | INFO    | __main__ - Sites: ['Mexico', 'AP', 'Pemba']
+2025-07-31 15:55:00 - INFO - Models: ['xgboost', 'insilico']
+15:55:00.642 | INFO    | __main__ - Models: ['xgboost', 'insilico']
+2025-07-31 15:55:00 - INFO - Workers: -1
+15:55:00.642 | INFO    | __main__ - Workers: -1
+2025-07-31 15:55:00 - INFO - Output directory: results/xgboost_investigation/regularization_comparison/enhanced_20250731_155458
+15:55:00.642 | INFO    | __main__ - Output directory: results/xgboost_investigation/regularization_comparison/enhanced_20250731_155458
+2025-07-31 15:55:00 - INFO - Tuning enabled: 25 trials × 2 models × 5 CV folds = 250 total model trainings per experiment
+15:55:00.642 | INFO    | __main__ - Tuning enabled: 25 trials × 2 models × 5 CV folds = 250 total model trainings per experiment
+2025-07-31 15:55:00 - INFO - Max concurrent tuning trials: 2
+15:55:00.642 | INFO    | __main__ - Max concurrent tuning trials: 2
+2025-07-31 15:55:00 - INFO - Ray dashboard will be available at: http://localhost:8265
+15:55:00.642 | INFO    | __main__ - Ray dashboard will be available at: http://localhost:8265
+2025-07-31 15:55:00 - INFO - Prefect dashboard available at: http://localhost:4200
+15:55:00.643 | INFO    | __main__ - Prefect dashboard available at: http://localhost:4200
+2025-07-31 15:55:00 - INFO - Start Prefect server with: prefect server start
+15:55:00.643 | INFO    | __main__ - Start Prefect server with: prefect server start
+2025-07-31 15:55:00 - INFO - Starting Prefect flow execution
+15:55:00.643 | INFO    | __main__ - Starting Prefect flow execution
+15:55:02.691 | INFO    | prefect - Starting temporary server on http://127.0.0.1:8996
+See https://docs.prefect.io/3.0/manage/self-host#self-host-a-prefect-server for more information on running a dedicated Prefect server.
+15:55:05.394 | INFO    | Flow run 'stirring-sidewinder' - Beginning flow run 'stirring-sidewinder' for flow 'VA34 Comparison Experiment'
+2025-07-31 15:55:05 - INFO - Starting VA34 comparison flow
+15:55:05.395 | INFO    | model_comparison.orchestration.prefect_flows - Starting VA34 comparison flow
+2025-07-31 15:55:06,744	INFO worker.py:1927 -- Started a local Ray instance.
+[2025-07-31 15:55:06,746 I 49239 32844665] logging.cc:302: Set ray log level from environment variable RAY_BACKEND_LOG_LEVEL to 1
+2025-07-31 15:55:07 - INFO - Ray initialized with dashboard at http://localhost:8265
+15:55:07.508 | INFO    | model_comparison.orchestration.prefect_flows - Ray initialized with dashboard at http://localhost:8265
+2025-07-31 15:55:14 - INFO - Loaded ML data with shape: (3308, 172)
+15:55:14.906 | INFO    | model_comparison.orchestration.prefect_flows - Loaded ML data with shape: (3308, 172)
+2025-07-31 15:55:14 - INFO - Loaded OpenVA data with shape: (3308, 172)
+15:55:14.907 | INFO    | model_comparison.orchestration.prefect_flows - Loaded OpenVA data with shape: (3308, 172)
+2025-07-31 15:55:15 - INFO - Generated 26 experiment configurations
+15:55:15.095 | INFO    | model_comparison.orchestration.prefect_flows - Generated 26 experiment configurations
+15:55:15.237 | INFO    | Task run 'generate_experiment_configs-08a' - Finished in state Completed()
+2025-07-31 15:55:15 - INFO - No checkpoint found
+15:55:15.238 | INFO    | model_comparison.orchestration.checkpoint_manager - No checkpoint found

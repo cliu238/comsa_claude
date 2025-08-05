@@ -1,0 +1,6 @@
+model,avg_csmf_ci_width,avg_cod_ci_width,n_experiments
+InSilicoVA,0.1229,0.1092,40
+CategoricalNB,0.1101,0.0822,40
+RandomForest,0.1003,0.0849,40
+LogisticRegression,0.1041,0.0819,40
+XGBoost,0.1058,0.0979,40

@@ -1,0 +1,6 @@
+Individual_Model,Total_Comparisons,Total_Wins,Overall_Win_Rate,Combinations_Beaten,Average_Performance_Advantage
+xgboost,90,60.0,0.6666666666666666,"['XGBoost + Random Forest + Categorical NB', 'XGBoost + Categorical NB + InSilicoVA', 'XGBoost + Random Forest + InSilicoVA + Categorical NB + Logistic Regression', 'XGBoost + Random Forest + Categorical NB + Logistic Regression + InSilicoVA', 'XGBoost + Categorical NB + InSilicoVA + Random Forest + Logistic Regression']",0.09446343696372295
+random_forest,90,47.0,0.5222222222222223,['XGBoost + Random Forest + Categorical NB'],0.018378459410483123
+logistic_regression,90,44.0,0.4888888888888889,['XGBoost + Random Forest + Categorical NB'],-0.06839991591312046
+insilico,90,25.0,0.2777777777777778,['XGBoost + Random Forest + Categorical NB'],-0.040394523688495824
+categorical_nb,90,14.0,0.15555555555555556,[],-0.16960362982122817

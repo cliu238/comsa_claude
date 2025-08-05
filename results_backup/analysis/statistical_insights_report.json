@@ -1,0 +1,217 @@
+{
+  "variance_analysis": [
+    {
+      "Model": "InSilicoVA",
+      "In-Domain CV (CSMF)": 0.08380591041597485,
+      "Out-Domain CV (CSMF)": 0.2515990873451368,
+      "In-Domain CV (COD)": 0.1993379719483489,
+      "Out-Domain CV (COD)": 0.29680563151596034,
+      "Stability Score": 0.20788715030635524
+    },
+    {
+      "Model": "XGBoost",
+      "In-Domain CV (CSMF)": 0.06053984430227267,
+      "Out-Domain CV (CSMF)": 0.6810385646513961,
+      "In-Domain CV (COD)": 0.1121641237252389,
+      "Out-Domain CV (COD)": 0.7567191589808518,
+      "Stability Score": 0.4026154229149399
+    },
+    {
+      "Model": "RandomForest",
+      "In-Domain CV (CSMF)": 0.09746349271813858,
+      "Out-Domain CV (CSMF)": 0.786881090248382,
+      "In-Domain CV (COD)": 0.20059873830326727,
+      "Out-Domain CV (COD)": 0.8580319164422869,
+      "Stability Score": 0.4857438094280187
+    },
+    {
+      "Model": "LogisticRegression",
+      "In-Domain CV (CSMF)": 0.5618708179717996,
+      "Out-Domain CV (CSMF)": 0.6093039442384647,
+      "In-Domain CV (COD)": 0.6439024366701537,
+      "Out-Domain CV (COD)": 0.7525083043433293,
+      "Stability Score": 0.6418963758059368
+    },
+    {
+      "Model": "CategoricalNB",
+      "In-Domain CV (CSMF)": 0.7304203474143903,
+      "Out-Domain CV (CSMF)": 0.5177404611983897,
+      "In-Domain CV (COD)": 0.8291000343446139,
+      "Out-Domain CV (COD)": 0.641836330390486,
+      "Stability Score": 0.67977429333697
+    }
+  ],
+  "site_difficulty": [
+    {
+      "Site": "UP",
+      "Avg CSMF": 0.8058286731062532,
+      "Avg COD": 0.4718861209964412,
+      "CSMF Variance": 0.0044586453846112125,
+      "COD Variance": 0.0014665467762566319,
+      "Difficulty Score": 0.36114260294865286
+    },
+    {
+      "Site": "AP",
+      "Avg CSMF": 0.7851351351351351,
+      "Avg COD": 0.4134680134680135,
+      "CSMF Variance": 0.0051166453615777915,
+      "COD Variance": 0.0030064959357888645,
+      "Difficulty Score": 0.40069842569842573
+    },
+    {
+      "Site": "Dar",
+      "Avg CSMF": 0.7030997974238428,
+      "Avg COD": 0.3364197530864197,
+      "CSMF Variance": 0.07349983327820063,
+      "COD Variance": 0.02021890717878373,
+      "Difficulty Score": 0.4802402247448687
+    },
+    {
+      "Site": "Bohol",
+      "Avg CSMF": 0.6475792828685258,
+      "Avg COD": 0.3067729083665338,
+      "CSMF Variance": 0.05905390372851224,
+      "COD Variance": 0.013856922905985622,
+      "Difficulty Score": 0.5228239043824702
+    },
+    {
+      "Site": "Mexico",
+      "Avg CSMF": 0.5965627343833708,
+      "Avg COD": 0.27254901960784317,
+      "CSMF Variance": 0.05687516824687074,
+      "COD Variance": 0.018244051433209455,
+      "Difficulty Score": 0.565444123004393
+    },
+    {
+      "Site": "Pemba",
+      "Avg CSMF": 0.526271186440678,
+      "Avg COD": 0.3333333333333333,
+      "CSMF Variance": 0.19750925659931692,
+      "COD Variance": 0.08430555555555558,
+      "Difficulty Score": 0.5701977401129943
+    }
+  ],
+  "efficiency_metrics": [
+    {
+      "Model": "InSilicoVA",
+      "Avg CSMF": 0.5246495409996728,
+      "Avg COD": 0.25195796418903427,
+      "Avg Time (s)": 193.34167807166642,
+      "CSMF per Hour": 9.768914630495338,
+      "COD per Hour": 4.691428563810776,
+      "Combined Efficiency": 7.230171597153057
+    },
+    {
+      "Model": "XGBoost",
+      "Avg CSMF": 0.44999191414051654,
+      "Avg COD": 0.2394136650713441,
+      "Avg Time (s)": 6869.248394379744,
+      "CSMF per Hour": 0.23582942381749963,
+      "COD per Hour": 0.1254706693911398,
+      "Combined Efficiency": 0.18065004660431971
+    },
+    {
+      "Model": "RandomForest",
+      "Avg CSMF": 0.394626579054154,
+      "Avg COD": 0.20165113594295475,
+      "Avg Time (s)": 6698.123665545438,
+      "CSMF per Hour": 0.21209755978419495,
+      "COD per Hour": 0.10838021595940815,
+      "Combined Efficiency": 0.16023888787180154
+    },
+    {
+      "Model": "LogisticRegression",
+      "Avg CSMF": 0.38658816850675226,
+      "Avg COD": 0.16087241231091198,
+      "Avg Time (s)": 6942.4649928776,
+      "CSMF per Hour": 0.2004644471455162,
+      "COD per Hour": 0.08342003667478827,
+      "Combined Efficiency": 0.14194224191015226
+    },
+    {
+      "Model": "CategoricalNB",
+      "Avg CSMF": 0.31550760056988686,
+      "Avg COD": 0.12506808384882853,
+      "Avg Time (s)": 5893.870021491437,
+      "CSMF per Hour": 0.19271333740138585,
+      "COD per Hour": 0.07639209894585505,
+      "Combined Efficiency": 0.13455271817362047
+    }
+  ],
+  "size_robustness": [
+    {
+      "Model": "InSilicoVA",
+      "100% \u2192 75%": "157.8%",
+      "100% \u2192 50%": "156.5%",
+      "100% \u2192 25%": "146.2%",
+      "Avg Retention": "153.5%"
+    },
+    {
+      "Model": "CategoricalNB",
+      "100% \u2192 75%": "173.5%",
+      "100% \u2192 50%": "145.1%",
+      "100% \u2192 25%": "189.5%",
+      "Avg Retention": "169.4%"
+    },
+    {
+      "Model": "LogisticRegression",
+      "100% \u2192 75%": "80.1%",
+      "100% \u2192 50%": "218.5%",
+      "100% \u2192 25%": "145.9%",
+      "Avg Retention": "148.2%"
+    },
+    {
+      "Model": "RandomForest",
+      "100% \u2192 75%": "199.5%",
+      "100% \u2192 50%": "190.9%",
+      "100% \u2192 25%": "194.3%",
+      "Avg Retention": "194.9%"
+    },
+    {
+      "Model": "XGBoost",
+      "100% \u2192 75%": "190.7%",
+      "100% \u2192 50%": "196.7%",
+      "100% \u2192 25%": "179.4%",
+      "Avg Retention": "188.9%"
+    }
+  ],
+  "risk_assessment": [
+    {
+      "Model": "InSilicoVA",
+      "Domain Transfer Risk": "High",
+      "Stability Risk": "Low",
+      "Computational Risk": "Low"
+    },
+    {
+      "Model": "CategoricalNB",
+      "Domain Transfer Risk": "Medium",
+      "Stability Risk": "High",
+      "Computational Risk": "High"
+    },
+    {
+      "Model": "LogisticRegression",
+      "Domain Transfer Risk": "High",
+      "Stability Risk": "High",
+      "Computational Risk": "High"
+    },
+    {
+      "Model": "RandomForest",
+      "Domain Transfer Risk": "High",
+      "Stability Risk": "Low",
+      "Computational Risk": "High"
+    },
+    {
+      "Model": "XGBoost",
+      "Domain Transfer Risk": "High",
+      "Stability Risk": "Low",
+      "Computational Risk": "High"
+    }
+  ],
+  "recommendations": {
+    "High Accuracy Required": "InSilicoVA",
+    "Limited Computational Resources": "InSilicoVA",
+    "Cross-Domain Deployment": "InSilicoVA",
+    "Limited Training Data": "InSilicoVA",
+    "Real-time Processing": "InSilicoVA"
+  }
+}

@@ -1,0 +1,7 @@
+scenario,best_csmf_model,best_csmf_score,best_cod_model,best_cod_score
+In-Domain,XGBoost,0.8323,XGBoost,0.4573
+Out-Domain,InSilicoVA,0.4605,InSilicoVA,0.2145
+Small Training (25%),XGBoost,0.8074,XGBoost,0.3805
+Medium Training (50%),XGBoost,0.8851,LogisticRegression,0.4276
+Large Training (75%),XGBoost,0.8581,XGBoost,0.4646
+Full Training (100%),InSilicoVA,0.5246,InSilicoVA,0.252

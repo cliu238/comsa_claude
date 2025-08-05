@@ -1,0 +1,6 @@
+model,training_fraction,in_domain_csmf,out_domain_csmf,csmf_degradation,in_domain_cod,out_domain_cod,cod_degradation
+InSilicoVA,1.0,0.7997,0.4605,0.3392,0.4097,0.2145,0.1952
+CategoricalNB,1.0,0.3771,0.2901,0.087,0.1811,0.1064,0.0747
+RandomForest,1.0,0.7655,0.3057,0.4598,0.4338,0.1471,0.2866
+LogisticRegression,1.0,0.6124,0.3353,0.2772,0.2968,0.1288,0.168
+XGBoost,1.0,0.8323,0.3597,0.4727,0.4573,0.1871,0.2702

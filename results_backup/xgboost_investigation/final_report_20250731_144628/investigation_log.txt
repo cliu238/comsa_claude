@@ -1,0 +1,1076 @@
+Investigation started at Thu Jul 31 14:46:28 EDT 2025
+Output directory: results/xgboost_investigation/final_report_20250731_144628
+
+======================================
+Experiment 1: Regularization Comparison
+======================================
+===========================================
+XGBoost Regularization Comparison Experiment
+===========================================
+Starting experiments at Thu Jul 31 14:46:28 EDT 2025
+Output directory: results/xgboost_investigation/regularization_comparison
+Sites: Mexico AP Pemba
+
+>>> Experiment 1a: Standard Enhanced Configuration
+Using enhanced search space with moderate regularization
+2025-07-31 14:46:31 - INFO - Logging to: logs/model_comparison/site_comparison_20250731_144631.log
+14:46:31.574 | INFO    | model_comparison.experiments.site_comparison - Logging to: logs/model_comparison/site_comparison_20250731_144631.log
+2025-07-31 14:46:31 - INFO - Logging to: logs/orchestration/progress_tracker_20250731_144631.log
+14:46:31.581 | INFO    | model_comparison.monitoring.progress_tracker - Logging to: logs/orchestration/progress_tracker_20250731_144631.log
+2025-07-31 14:46:31 - INFO - Logging to: logs/orchestration/checkpoint_manager_20250731_144631.log
+14:46:31.582 | INFO    | model_comparison.orchestration.checkpoint_manager - Logging to: logs/orchestration/checkpoint_manager_20250731_144631.log
+2025-07-31 14:46:31 - INFO - Logging to: logs/orchestration/prefect_flows_20250731_144631.log
+14:46:31.584 | INFO    | model_comparison.orchestration.prefect_flows - Logging to: logs/orchestration/prefect_flows_20250731_144631.log
+2025-07-31 14:46:31 - INFO - Logging to: logs/orchestration/__main___20250731_144631.log
+14:46:31.591 | INFO    | __main__ - Logging to: logs/orchestration/__main___20250731_144631.log
+2025-07-31 14:46:31 - INFO - Starting distributed VA34 comparison
+14:46:31.592 | INFO    | __main__ - Starting distributed VA34 comparison
+2025-07-31 14:46:31 - INFO - Data path: va-data/data/phmrc/IHME_PHMRC_VA_DATA_ADULT_Y2013M09D11_0.csv
+14:46:31.592 | INFO    | __main__ - Data path: va-data/data/phmrc/IHME_PHMRC_VA_DATA_ADULT_Y2013M09D11_0.csv
+2025-07-31 14:46:31 - INFO - Sites: ['Mexico', 'AP', 'Pemba']
+14:46:31.592 | INFO    | __main__ - Sites: ['Mexico', 'AP', 'Pemba']
+2025-07-31 14:46:31 - INFO - Models: ['xgboost', 'insilico']
+14:46:31.593 | INFO    | __main__ - Models: ['xgboost', 'insilico']
+2025-07-31 14:46:31 - INFO - Workers: -1
+14:46:31.593 | INFO    | __main__ - Workers: -1
+2025-07-31 14:46:31 - INFO - Output directory: results/xgboost_investigation/regularization_comparison/enhanced_20250731_144628
+14:46:31.593 | INFO    | __main__ - Output directory: results/xgboost_investigation/regularization_comparison/enhanced_20250731_144628
+2025-07-31 14:46:31 - INFO - Tuning enabled: 25 trials × 2 models × 5 CV folds = 250 total model trainings per experiment
+14:46:31.593 | INFO    | __main__ - Tuning enabled: 25 trials × 2 models × 5 CV folds = 250 total model trainings per experiment
+2025-07-31 14:46:31 - INFO - Max concurrent tuning trials: 2
+14:46:31.593 | INFO    | __main__ - Max concurrent tuning trials: 2
+2025-07-31 14:46:31 - INFO - Ray dashboard will be available at: http://localhost:8265
+14:46:31.593 | INFO    | __main__ - Ray dashboard will be available at: http://localhost:8265
+2025-07-31 14:46:31 - INFO - Prefect dashboard available at: http://localhost:4200
+14:46:31.593 | INFO    | __main__ - Prefect dashboard available at: http://localhost:4200
+2025-07-31 14:46:31 - INFO - Start Prefect server with: prefect server start
+14:46:31.593 | INFO    | __main__ - Start Prefect server with: prefect server start
+2025-07-31 14:46:31 - INFO - Starting Prefect flow execution
+14:46:31.593 | INFO    | __main__ - Starting Prefect flow execution
+14:46:32.357 | INFO    | prefect - Starting temporary server on http://127.0.0.1:8308
+See https://docs.prefect.io/3.0/manage/self-host#self-host-a-prefect-server for more information on running a dedicated Prefect server.
+14:46:34.238 | INFO    | Flow run 'portable-kangaroo' - Beginning flow run 'portable-kangaroo' for flow 'VA34 Comparison Experiment'
+2025-07-31 14:46:34 - INFO - Starting VA34 comparison flow
+14:46:34.240 | INFO    | model_comparison.orchestration.prefect_flows - Starting VA34 comparison flow
+2025-07-31 14:46:35,236	INFO worker.py:1927 -- Started a local Ray instance.
+[2025-07-31 14:46:35,238 I 14569 32504890] logging.cc:302: Set ray log level from environment variable RAY_BACKEND_LOG_LEVEL to 1
+2025-07-31 14:46:35 - INFO - Ray initialized with dashboard at http://localhost:8265
+14:46:35.940 | INFO    | model_comparison.orchestration.prefect_flows - Ray initialized with dashboard at http://localhost:8265
+2025-07-31 14:46:42 - INFO - Loaded ML data with shape: (3308, 172)
+14:46:42.965 | INFO    | model_comparison.orchestration.prefect_flows - Loaded ML data with shape: (3308, 172)
+2025-07-31 14:46:42 - INFO - Loaded OpenVA data with shape: (3308, 172)
+14:46:42.965 | INFO    | model_comparison.orchestration.prefect_flows - Loaded OpenVA data with shape: (3308, 172)
+2025-07-31 14:46:43 - INFO - Generated 26 experiment configurations
+14:46:43.029 | INFO    | model_comparison.orchestration.prefect_flows - Generated 26 experiment configurations
+14:46:43.032 | INFO    | Task run 'generate_experiment_configs-534' - Finished in state Completed()
+2025-07-31 14:46:43 - INFO - No checkpoint found
+14:46:43.032 | INFO    | model_comparison.orchestration.checkpoint_manager - No checkpoint found
+2025-07-31 14:46:44 - INFO - Prepared data for 26/26 experiments
+14:46:44.357 | INFO    | model_comparison.orchestration.prefect_flows - Prepared data for 26/26 experiments
+14:46:44.361 | INFO    | Task run 'prepare_experiment_data-dd0' - Finished in state Completed()
+VA34 Experiments:   0%|          | 0.00/26.0 [00:00<?, ?exp/s]VA34 Experiments:   0%|          | 0.00/26.0 [00:00<?, ?exp/s, Success=0.0%, Failed=0]2025-07-31 14:46:44 - INFO - Processing batch 1/2
+14:46:44.383 | INFO    | model_comparison.orchestration.prefect_flows - Processing batch 1/2
+VA34 Experiments:   4%|▍         | 1.00/26.0 [00:24<10:21, 24.9s/exp, Success=0.0%, Failed=0]VA34 Experiments:   4%|▍         | 1.00/26.0 [00:24<10:21, 24.9s/exp, Success=100.0%, Failed=0, CSMF=0.881, COD=0.533]VA34 Experiments:   8%|▊         | 2.00/26.0 [00:40<07:41, 19.2s/exp, Success=100.0%, Failed=0, CSMF=0.881, COD=0.533]VA34 Experiments:   8%|▊         | 2.00/26.0 [00:40<07:41, 19.2s/exp, Success=100.0%, Failed=0, CSMF=0.591, COD=0.350]VA34 Experiments:  12%|█▏        | 3.00/26.0 [00:41<04:10, 10.9s/exp, Success=100.0%, Failed=0, CSMF=0.591, COD=0.350]VA34 Experiments:  12%|█▏        | 3.00/26.0 [00:41<04:10, 10.9s/exp, Success=100.0%, Failed=0, CSMF=0.516, COD=0.311]VA34 Experiments:  15%|█▌        | 4.00/26.0 [01:24<08:37, 23.5s/exp, Success=100.0%, Failed=0, CSMF=0.516, COD=0.311]VA34 Experiments:  15%|█▌        | 4.00/26.0 [01:24<08:37, 23.5s/exp, Success=100.0%, Failed=0, CSMF=0.471, COD=0.270]VA34 Experiments:  19%|█▉        | 5.00/26.0 [01:24<05:17, 15.1s/exp, Success=100.0%, Failed=0, CSMF=0.471, COD=0.270]VA34 Experiments:  19%|█▉        | 5.00/26.0 [01:24<05:17, 15.1s/exp, Success=100.0%, Failed=0, CSMF=0.428, COD=0.234]VA34 Experiments:  23%|██▎       | 6.00/26.0 [02:04<07:53, 23.7s/exp, Success=100.0%, Failed=0, CSMF=0.428, COD=0.234]VA34 Experiments:  23%|██▎       | 6.00/26.0 [02:04<07:53, 23.7s/exp, Success=100.0%, Failed=0, CSMF=0.482, COD=0.240]VA34 Experiments:  27%|██▋       | 7.00/26.0 [02:08<05:25, 17.1s/exp, Success=100.0%, Failed=0, CSMF=0.482, COD=0.240]VA34 Experiments:  27%|██▋       | 7.00/26.0 [02:08<05:25, 17.1s/exp, Success=100.0%, Failed=0, CSMF=0.469, COD=0.235]VA34 Experiments:  31%|███       | 8.00/26.0 [02:14<04:04, 13.6s/exp, Success=100.0%, Failed=0, CSMF=0.469, COD=0.235]VA34 Experiments:  31%|███       | 8.00/26.0 [02:14<04:04, 13.6s/exp, Success=100.0%, Failed=0, CSMF=0.503, COD=0.250]VA34 Experiments:  35%|███▍      | 9.00/26.0 [02:16<02:53, 10.2s/exp, Success=100.0%, Failed=0, CSMF=0.503, COD=0.250]VA34 Experiments:  35%|███▍      | 9.00/26.0 [02:16<02:53, 10.2s/exp, Success=100.0%, Failed=0, CSMF=0.529, COD=0.253]VA34 Experiments:  38%|███▊      | 10.0/26.0 [02:20<02:09, 8.08s/exp, Success=100.0%, Failed=0, CSMF=0.529, COD=0.253]VA34 Experiments:  38%|███▊      | 10.0/26.0 [02:20<02:09, 8.08s/exp, Success=100.0%, Failed=0, CSMF=0.556, COD=0.270]2025-07-31 14:49:04 - INFO - 
+============================================================
+PROGRESS UPDATE: 10/26 experiments (38.5%)
+  • Success Rate: 100.0%
+  • Failed: 0
+  • Runtime: 0:02:20
+  • Speed: 0.07 exp/s
+  • ETA: 0:03:44 - Best: insilico (CSMF: 0.881)
+============================================================
+14:49:04.590 | INFO    | model_comparison.monitoring.progress_tracker - 
+============================================================
+PROGRESS UPDATE: 10/26 experiments (38.5%)
+  • Success Rate: 100.0%
+  • Failed: 0
+  • Runtime: 0:02:20
+  • Speed: 0.07 exp/s
+  • ETA: 0:03:44 - Best: insilico (CSMF: 0.881)
+============================================================
+VA34 Experiments:  42%|████▏     | 11.0/26.0 [02:25<01:47, 7.16s/exp, Success=100.0%, Failed=0, CSMF=0.556, COD=0.270]VA34 Experiments:  42%|████▏     | 11.0/26.0 [02:25<01:47, 7.16s/exp, Success=100.0%, Failed=0, CSMF=0.558, COD=0.269]VA34 Experiments:  46%|████▌     | 12.0/26.0 [02:26<01:13, 5.27s/exp, Success=100.0%, Failed=0, CSMF=0.558, COD=0.269]VA34 Experiments:  46%|████▌     | 12.0/26.0 [02:26<01:13, 5.27s/exp, Success=100.0%, Failed=0, CSMF=0.574, COD=0.273]VA34 Experiments:  50%|█████     | 13.0/26.0 [08:14<23:38, 109s/exp, Success=100.0%, Failed=0, CSMF=0.574, COD=0.273] VA34 Experiments:  50%|█████     | 13.0/26.0 [08:14<23:38, 109s/exp, Success=100.0%, Failed=0, CSMF=0.598, COD=0.290]VA34 Experiments:  54%|█████▍    | 14.0/26.0 [09:06<18:24, 92.1s/exp, Success=100.0%, Failed=0, CSMF=0.598, COD=0.290]VA34 Experiments:  54%|█████▍    | 14.0/26.0 [09:06<18:24, 92.1s/exp, Success=100.0%, Failed=0, CSMF=0.614, COD=0.313]VA34 Experiments:  58%|█████▊    | 15.0/26.0 [09:10<12:00, 65.5s/exp, Success=100.0%, Failed=0, CSMF=0.614, COD=0.313]VA34 Experiments:  58%|█████▊    | 15.0/26.0 [09:10<12:00, 65.5s/exp, Success=100.0%, Failed=0, CSMF=0.630, COD=0.320]VA34 Experiments:  62%|██████▏   | 16.0/26.0 [09:55<09:53, 59.3s/exp, Success=100.0%, Failed=0, CSMF=0.630, COD=0.320]VA34 Experiments:  62%|██████▏   | 16.0/26.0 [09:55<09:53, 59.3s/exp, Success=100.0%, Failed=0, CSMF=0.608, COD=0.306]VA34 Experiments:  65%|██████▌   | 17.0/26.0 [10:25<07:34, 50.5s/exp, Success=100.0%, Failed=0, CSMF=0.608, COD=0.306]VA34 Experiments:  65%|██████▌   | 17.0/26.0 [10:25<07:34, 50.5s/exp, Success=100.0%, Failed=0, CSMF=0.583, COD=0.290]VA34 Experiments:  69%|██████▉   | 18.0/26.0 [10:31<04:57, 37.2s/exp, Success=100.0%, Failed=0, CSMF=0.583, COD=0.290]VA34 Experiments:  69%|██████▉   | 18.0/26.0 [10:31<04:57, 37.2s/exp, Success=100.0%, Failed=0, CSMF=0.570, COD=0.286]VA34 Experiments:  73%|███████▎  | 19.0/26.0 [10:33<03:05, 26.6s/exp, Success=100.0%, Failed=0, CSMF=0.570, COD=0.286]VA34 Experiments:  73%|███████▎  | 19.0/26.0 [10:33<03:05, 26.6s/exp, Success=100.0%, Failed=0, CSMF=0.561, COD=0.286]VA34 Experiments:  77%|███████▋  | 20.0/26.0 [10:35<01:53, 19.0s/exp, Success=100.0%, Failed=0, CSMF=0.561, COD=0.286]VA34 Experiments:  77%|███████▋  | 20.0/26.0 [10:35<01:53, 19.0s/exp, Success=100.0%, Failed=0, CSMF=0.574, COD=0.291]2025-07-31 14:57:19 - INFO - 
+============================================================
+PROGRESS UPDATE: 20/26 experiments (76.9%)
+  • Success Rate: 100.0%
+  • Failed: 0
+  • Runtime: 0:10:35
+  • Speed: 0.03 exp/s
+  • ETA: 0:03:10 - Best: xgboost (CSMF: 0.885)
+============================================================
+14:57:19.549 | INFO    | model_comparison.monitoring.progress_tracker - 
+============================================================
+PROGRESS UPDATE: 20/26 experiments (76.9%)
+  • Success Rate: 100.0%
+  • Failed: 0
+  • Runtime: 0:10:35
+  • Speed: 0.03 exp/s
+  • ETA: 0:03:10 - Best: xgboost (CSMF: 0.885)
+============================================================
+VA34 Experiments:  81%|████████  | 21.0/26.0 [10:40<01:14, 15.0s/exp, Success=100.0%, Failed=0, CSMF=0.574, COD=0.291]VA34 Experiments:  81%|████████  | 21.0/26.0 [10:40<01:14, 15.0s/exp, Success=100.0%, Failed=0, CSMF=0.572, COD=0.285]VA34 Experiments:  85%|████████▍ | 22.0/26.0 [10:42<00:44, 11.1s/exp, Success=100.0%, Failed=0, CSMF=0.572, COD=0.285]VA34 Experiments:  85%|████████▍ | 22.0/26.0 [10:42<00:44, 11.1s/exp, Success=100.0%, Failed=0, CSMF=0.598, COD=0.296]VA34 Experiments:  88%|████████▊ | 23.0/26.0 [11:02<00:40, 13.6s/exp, Success=100.0%, Failed=0, CSMF=0.598, COD=0.296]VA34 Experiments:  88%|████████▊ | 23.0/26.0 [11:02<00:40, 13.6s/exp, Success=100.0%, Failed=0, CSMF=0.621, COD=0.307]VA34 Experiments:  92%|█████████▏| 24.0/26.0 [11:04<00:20, 10.2s/exp, Success=100.0%, Failed=0, CSMF=0.621, COD=0.307]VA34 Experiments:  92%|█████████▏| 24.0/26.0 [11:04<00:20, 10.2s/exp, Success=100.0%, Failed=0, CSMF=0.607, COD=0.300]VA34 Experiments:  96%|█████████▌| 25.0/26.0 [11:10<00:08, 8.93s/exp, Success=100.0%, Failed=0, CSMF=0.607, COD=0.300]VA34 Experiments:  96%|█████████▌| 25.0/26.0 [11:10<00:08, 8.93s/exp, Success=100.0%, Failed=0, CSMF=0.619, COD=0.309]2025-07-31 14:57:54 - INFO - Processing batch 2/2
+14:57:54.852 | INFO    | model_comparison.orchestration.prefect_flows - Processing batch 2/2
+VA34 Experiments: 100%|██████████| 26.0/26.0 [12:22<00:00, 27.8s/exp, Success=100.0%, Failed=0, CSMF=0.619, COD=0.309]VA34 Experiments: 100%|██████████| 26.0/26.0 [12:22<00:00, 27.8s/exp, Success=100.0%, Failed=0, CSMF=0.618, COD=0.313]VA34 Experiments: 100%|██████████| 26.0/26.0 [12:22<00:00, 28.5s/exp, Success=100.0%, Failed=0, CSMF=0.618, COD=0.313]
+2025-07-31 14:59:06 - INFO - Completed 26/26 experiments in 0:12:22 (Success rate: 100.0%)
+14:59:06.584 | INFO    | model_comparison.monitoring.progress_tracker - Completed 26/26 experiments in 0:12:22 (Success rate: 100.0%)
+2025-07-31 14:59:06 - INFO - Saved results to results/xgboost_investigation/regularization_comparison/enhanced_20250731_144628/va34_comparison_results.csv
+14:59:06.600 | INFO    | model_comparison.orchestration.prefect_flows - Saved results to results/xgboost_investigation/regularization_comparison/enhanced_20250731_144628/va34_comparison_results.csv
+2025-07-31 14:59:06 - INFO - Performance summary: {'total_elapsed_seconds': 742.2170202732086, 'total_experiments': 26, 'avg_experiment_seconds': 354.9815444579491, 'min_experiment_seconds': 24.834877252578735, 'max_experiment_seconds': 668.7373471260071, 'throughput_per_second': 0.035030185632807846, 'worker_count': 25, 'worker_load_balance': {'min_experiments': 1, 'max_experiments': 2, 'avg_experiments': 1.04, 'std_experiments': 0.19595917942265426}}
+14:59:06.600 | INFO    | model_comparison.orchestration.prefect_flows - Performance summary: {'total_elapsed_seconds': 742.2170202732086, 'total_experiments': 26, 'avg_experiment_seconds': 354.9815444579491, 'min_experiment_seconds': 24.834877252578735, 'max_experiment_seconds': 668.7373471260071, 'throughput_per_second': 0.035030185632807846, 'worker_count': 25, 'worker_load_balance': {'min_experiments': 1, 'max_experiments': 2, 'avg_experiments': 1.04, 'std_experiments': 0.19595917942265426}}
+2025-07-31 14:59:06 - INFO - Generating visualizations...
+14:59:06.600 | INFO    | model_comparison.orchestration.prefect_flows - Generating visualizations...
+2025-07-31 14:59:08 - INFO - Experiment completed in 754.6s (26 experiments, 0.03 exp/s)
+14:59:08.869 | INFO    | model_comparison.orchestration.prefect_flows - Experiment completed in 754.6s (26 experiments, 0.03 exp/s)
+14:59:08.889 | INFO    | Flow run 'portable-kangaroo' - Finished in state Completed()
+2025-07-31 14:59:08 - INFO - 
+==================================================
+14:59:08.889 | INFO    | __main__ - 
+==================================================
+2025-07-31 14:59:08 - INFO - EXPERIMENT SUMMARY
+14:59:08.889 | INFO    | __main__ - EXPERIMENT SUMMARY
+2025-07-31 14:59:08 - INFO - ==================================================
+14:59:08.889 | INFO    | __main__ - ==================================================
+2025-07-31 14:59:08 - INFO - Total experiments: 26
+14:59:08.890 | INFO    | __main__ - Total experiments: 26
+2025-07-31 14:59:08 - INFO - Successful experiments: 26
+14:59:08.890 | INFO    | __main__ - Successful experiments: 26
+2025-07-31 14:59:08 - INFO - Failed experiments: 0
+14:59:08.890 | INFO    | __main__ - Failed experiments: 0
+2025-07-31 14:59:08 - INFO - 
+XGBOOST Performance:
+  Successful experiments: 13/13
+  Avg CSMF Accuracy: 0.587
+  Avg COD Accuracy: 0.313
+14:59:08.890 | INFO    | __main__ - 
+XGBOOST Performance:
+  Successful experiments: 13/13
+  Avg CSMF Accuracy: 0.587
+  Avg COD Accuracy: 0.313
+2025-07-31 14:59:08 - INFO - 
+INSILICO Performance:
+  Successful experiments: 13/13
+  Avg CSMF Accuracy: 0.587
+  Avg COD Accuracy: 0.279
+14:59:08.891 | INFO    | __main__ - 
+INSILICO Performance:
+  Successful experiments: 13/13
+  Avg CSMF Accuracy: 0.587
+  Avg COD Accuracy: 0.279
+2025-07-31 14:59:08 - INFO - 
+Results saved to: results/xgboost_investigation/regularization_comparison/enhanced_20250731_144628
+14:59:08.891 | INFO    | __main__ - 
+Results saved to: results/xgboost_investigation/regularization_comparison/enhanced_20250731_144628
+14:59:08.928 | INFO    | Flow run 'utopian-angelfish' - Beginning flow run 'utopian-angelfish' for flow 'Cleanup Ray Resources'
+2025-07-31 14:59:10 - INFO - Ray shutdown complete
+14:59:10.607 | INFO    | model_comparison.orchestration.prefect_flows - Ray shutdown complete
+14:59:10.631 | INFO    | Flow run 'utopian-angelfish' - Finished in state Completed()
+14:59:10.637 | INFO    | prefect - Stopping temporary server on http://127.0.0.1:8308
+
+>>> Experiment 1b: Conservative Configuration
+Using conservative search space with strong regularization
+2025-07-31 14:59:22 - INFO - Logging to: logs/model_comparison/site_comparison_20250731_145922.log
+14:59:22.283 | INFO    | model_comparison.experiments.site_comparison - Logging to: logs/model_comparison/site_comparison_20250731_145922.log
+2025-07-31 14:59:22 - INFO - Logging to: logs/orchestration/progress_tracker_20250731_145922.log
+14:59:22.313 | INFO    | model_comparison.monitoring.progress_tracker - Logging to: logs/orchestration/progress_tracker_20250731_145922.log
+2025-07-31 14:59:22 - INFO - Logging to: logs/orchestration/checkpoint_manager_20250731_145922.log
+14:59:22.319 | INFO    | model_comparison.orchestration.checkpoint_manager - Logging to: logs/orchestration/checkpoint_manager_20250731_145922.log
+2025-07-31 14:59:22 - INFO - Logging to: logs/orchestration/prefect_flows_20250731_145922.log
+14:59:22.325 | INFO    | model_comparison.orchestration.prefect_flows - Logging to: logs/orchestration/prefect_flows_20250731_145922.log
+2025-07-31 14:59:22 - INFO - Logging to: logs/orchestration/__main___20250731_145922.log
+14:59:22.332 | INFO    | __main__ - Logging to: logs/orchestration/__main___20250731_145922.log
+2025-07-31 14:59:22 - INFO - Starting distributed VA34 comparison
+14:59:22.334 | INFO    | __main__ - Starting distributed VA34 comparison
+2025-07-31 14:59:22 - INFO - Data path: va-data/data/phmrc/IHME_PHMRC_VA_DATA_ADULT_Y2013M09D11_0.csv
+14:59:22.334 | INFO    | __main__ - Data path: va-data/data/phmrc/IHME_PHMRC_VA_DATA_ADULT_Y2013M09D11_0.csv
+2025-07-31 14:59:22 - INFO - Sites: ['Mexico', 'AP', 'Pemba']
+14:59:22.334 | INFO    | __main__ - Sites: ['Mexico', 'AP', 'Pemba']
+2025-07-31 14:59:22 - INFO - Models: ['xgboost', 'insilico']
+14:59:22.334 | INFO    | __main__ - Models: ['xgboost', 'insilico']
+2025-07-31 14:59:22 - INFO - Workers: -1
+14:59:22.334 | INFO    | __main__ - Workers: -1
+2025-07-31 14:59:22 - INFO - Output directory: results/xgboost_investigation/regularization_comparison/conservative_20250731_144628
+14:59:22.334 | INFO    | __main__ - Output directory: results/xgboost_investigation/regularization_comparison/conservative_20250731_144628
+2025-07-31 14:59:22 - INFO - Tuning enabled: 25 trials × 2 models × 5 CV folds = 250 total model trainings per experiment
+14:59:22.334 | INFO    | __main__ - Tuning enabled: 25 trials × 2 models × 5 CV folds = 250 total model trainings per experiment
+2025-07-31 14:59:22 - INFO - Max concurrent tuning trials: 2
+14:59:22.335 | INFO    | __main__ - Max concurrent tuning trials: 2
+2025-07-31 14:59:22 - INFO - Ray dashboard will be available at: http://localhost:8266
+14:59:22.335 | INFO    | __main__ - Ray dashboard will be available at: http://localhost:8266
+2025-07-31 14:59:22 - INFO - Prefect dashboard available at: http://localhost:4200
+14:59:22.335 | INFO    | __main__ - Prefect dashboard available at: http://localhost:4200
+2025-07-31 14:59:22 - INFO - Start Prefect server with: prefect server start
+14:59:22.335 | INFO    | __main__ - Start Prefect server with: prefect server start
+2025-07-31 14:59:22 - INFO - Starting Prefect flow execution
+14:59:22.335 | INFO    | __main__ - Starting Prefect flow execution
+14:59:24.797 | INFO    | prefect - Starting temporary server on http://127.0.0.1:8551
+See https://docs.prefect.io/3.0/manage/self-host#self-host-a-prefect-server for more information on running a dedicated Prefect server.
+14:59:27.768 | INFO    | Flow run 'wooden-tarsier' - Beginning flow run 'wooden-tarsier' for flow 'VA34 Comparison Experiment'
+2025-07-31 14:59:27 - INFO - Starting VA34 comparison flow
+14:59:27.769 | INFO    | model_comparison.orchestration.prefect_flows - Starting VA34 comparison flow
+2025-07-31 14:59:30,150	INFO worker.py:1927 -- Started a local Ray instance.
+[2025-07-31 14:59:30,151 I 19886 32578200] logging.cc:302: Set ray log level from environment variable RAY_BACKEND_LOG_LEVEL to 1
+2025-07-31 14:59:30 - INFO - Ray initialized with dashboard at http://localhost:8266
+14:59:30.922 | INFO    | model_comparison.orchestration.prefect_flows - Ray initialized with dashboard at http://localhost:8266
+2025-07-31 14:59:38 - INFO - Loaded ML data with shape: (3308, 172)
+14:59:38.501 | INFO    | model_comparison.orchestration.prefect_flows - Loaded ML data with shape: (3308, 172)
+2025-07-31 14:59:38 - INFO - Loaded OpenVA data with shape: (3308, 172)
+14:59:38.502 | INFO    | model_comparison.orchestration.prefect_flows - Loaded OpenVA data with shape: (3308, 172)
+2025-07-31 14:59:38 - INFO - Generated 26 experiment configurations
+14:59:38.580 | INFO    | model_comparison.orchestration.prefect_flows - Generated 26 experiment configurations
+14:59:38.587 | INFO    | Task run 'generate_experiment_configs-507' - Finished in state Completed()
+2025-07-31 14:59:38 - INFO - No checkpoint found
+14:59:38.588 | INFO    | model_comparison.orchestration.checkpoint_manager - No checkpoint found
+2025-07-31 14:59:39 - INFO - Prepared data for 26/26 experiments
+14:59:39.870 | INFO    | model_comparison.orchestration.prefect_flows - Prepared data for 26/26 experiments
+14:59:39.874 | INFO    | Task run 'prepare_experiment_data-e72' - Finished in state Completed()
+VA34 Experiments:   0%|          | 0.00/26.0 [00:00<?, ?exp/s]VA34 Experiments:   0%|          | 0.00/26.0 [00:00<?, ?exp/s, Success=0.0%, Failed=0]2025-07-31 14:59:39 - INFO - Processing batch 1/2
+14:59:39.895 | INFO    | model_comparison.orchestration.prefect_flows - Processing batch 1/2
+VA34 Experiments:   4%|▍         | 1.00/26.0 [00:23<09:37, 23.1s/exp, Success=0.0%, Failed=0]VA34 Experiments:   4%|▍         | 1.00/26.0 [00:23<09:37, 23.1s/exp, Success=100.0%, Failed=0, CSMF=0.881, COD=0.533]VA34 Experiments:   8%|▊         | 2.00/26.0 [00:35<06:44, 16.8s/exp, Success=100.0%, Failed=0, CSMF=0.881, COD=0.533]VA34 Experiments:   8%|▊         | 2.00/26.0 [00:35<06:44, 16.8s/exp, Success=100.0%, Failed=0, CSMF=0.591, COD=0.350]VA34 Experiments:  12%|█▏        | 3.00/26.0 [00:40<04:26, 11.6s/exp, Success=100.0%, Failed=0, CSMF=0.591, COD=0.350]VA34 Experiments:  12%|█▏        | 3.00/26.0 [00:40<04:26, 11.6s/exp, Success=100.0%, Failed=0, CSMF=0.516, COD=0.311]VA34 Experiments:  15%|█▌        | 4.00/26.0 [01:29<09:36, 26.2s/exp, Success=100.0%, Failed=0, CSMF=0.516, COD=0.311]VA34 Experiments:  15%|█▌        | 4.00/26.0 [01:29<09:36, 26.2s/exp, Success=100.0%, Failed=0, CSMF=0.471, COD=0.270]VA34 Experiments:  19%|█▉        | 5.00/26.0 [01:30<06:01, 17.2s/exp, Success=100.0%, Failed=0, CSMF=0.471, COD=0.270]VA34 Experiments:  19%|█▉        | 5.00/26.0 [01:30<06:01, 17.2s/exp, Success=100.0%, Failed=0, CSMF=0.428, COD=0.234]VA34 Experiments:  23%|██▎       | 6.00/26.0 [02:12<08:33, 25.7s/exp, Success=100.0%, Failed=0, CSMF=0.428, COD=0.234]VA34 Experiments:  23%|██▎       | 6.00/26.0 [02:12<08:33, 25.7s/exp, Success=100.0%, Failed=0, CSMF=0.482, COD=0.240]VA34 Experiments:  27%|██▋       | 7.00/26.0 [02:13<05:32, 17.5s/exp, Success=100.0%, Failed=0, CSMF=0.482, COD=0.240]VA34 Experiments:  27%|██▋       | 7.00/26.0 [02:13<05:32, 17.5s/exp, Success=100.0%, Failed=0, CSMF=0.469, COD=0.235]VA34 Experiments:  31%|███       | 8.00/26.0 [02:18<04:03, 13.5s/exp, Success=100.0%, Failed=0, CSMF=0.469, COD=0.235]VA34 Experiments:  31%|███       | 8.00/26.0 [02:18<04:03, 13.5s/exp, Success=100.0%, Failed=0, CSMF=0.503, COD=0.250]VA34 Experiments:  35%|███▍      | 9.00/26.0 [02:20<02:50, 10.0s/exp, Success=100.0%, Failed=0, CSMF=0.503, COD=0.250]VA34 Experiments:  35%|███▍      | 9.00/26.0 [02:20<02:50, 10.0s/exp, Success=100.0%, Failed=0, CSMF=0.529, COD=0.253]VA34 Experiments:  38%|███▊      | 10.0/26.0 [02:22<02:00, 7.56s/exp, Success=100.0%, Failed=0, CSMF=0.529, COD=0.253]VA34 Experiments:  38%|███▊      | 10.0/26.0 [02:22<02:00, 7.56s/exp, Success=100.0%, Failed=0, CSMF=0.556, COD=0.270]2025-07-31 15:02:02 - INFO - 
+============================================================
+PROGRESS UPDATE: 10/26 experiments (38.5%)
+  • Success Rate: 100.0%
+  • Failed: 0
+  • Runtime: 0:02:22
+  • Speed: 0.07 exp/s
+  • ETA: 0:03:48 - Best: insilico (CSMF: 0.881)
+============================================================
+15:02:02.784 | INFO    | model_comparison.monitoring.progress_tracker - 
+============================================================
+PROGRESS UPDATE: 10/26 experiments (38.5%)
+  • Success Rate: 100.0%
+  • Failed: 0
+  • Runtime: 0:02:22
+  • Speed: 0.07 exp/s
+  • ETA: 0:03:48 - Best: insilico (CSMF: 0.881)
+============================================================
+VA34 Experiments:  42%|████▏     | 11.0/26.0 [02:32<02:03, 8.22s/exp, Success=100.0%, Failed=0, CSMF=0.556, COD=0.270]VA34 Experiments:  42%|████▏     | 11.0/26.0 [02:32<02:03, 8.22s/exp, Success=100.0%, Failed=0, CSMF=0.573, COD=0.274]VA34 Experiments:  46%|████▌     | 12.0/26.0 [02:33<01:21, 5.84s/exp, Success=100.0%, Failed=0, CSMF=0.573, COD=0.274]VA34 Experiments:  46%|████▌     | 12.0/26.0 [02:33<01:21, 5.84s/exp, Success=100.0%, Failed=0, CSMF=0.574, COD=0.273]VA34 Experiments:  50%|█████     | 13.0/26.0 [07:53<21:53, 101s/exp, Success=100.0%, Failed=0, CSMF=0.574, COD=0.273] VA34 Experiments:  50%|█████     | 13.0/26.0 [07:53<21:53, 101s/exp, Success=100.0%, Failed=0, CSMF=0.593, COD=0.286]VA34 Experiments:  54%|█████▍    | 14.0/26.0 [08:34<16:37, 83.1s/exp, Success=100.0%, Failed=0, CSMF=0.593, COD=0.286]VA34 Experiments:  54%|█████▍    | 14.0/26.0 [08:34<16:37, 83.1s/exp, Success=100.0%, Failed=0, CSMF=0.612, COD=0.297]VA34 Experiments:  58%|█████▊    | 15.0/26.0 [08:57<11:54, 65.0s/exp, Success=100.0%, Failed=0, CSMF=0.612, COD=0.297]VA34 Experiments:  58%|█████▊    | 15.0/26.0 [08:57<11:54, 65.0s/exp, Success=100.0%, Failed=0, CSMF=0.575, COD=0.278]VA34 Experiments:  62%|██████▏   | 16.0/26.0 [09:49<10:11, 61.1s/exp, Success=100.0%, Failed=0, CSMF=0.575, COD=0.278]VA34 Experiments:  62%|██████▏   | 16.0/26.0 [09:49<10:11, 61.1s/exp, Success=100.0%, Failed=0, CSMF=0.557, COD=0.274]VA34 Experiments:  65%|██████▌   | 17.0/26.0 [09:58<06:47, 45.3s/exp, Success=100.0%, Failed=0, CSMF=0.557, COD=0.274]VA34 Experiments:  65%|██████▌   | 17.0/26.0 [09:58<06:47, 45.3s/exp, Success=100.0%, Failed=0, CSMF=0.574, COD=0.295]VA34 Experiments:  69%|██████▉   | 18.0/26.0 [10:12<04:48, 36.0s/exp, Success=100.0%, Failed=0, CSMF=0.574, COD=0.295]VA34 Experiments:  69%|██████▉   | 18.0/26.0 [10:12<04:48, 36.0s/exp, Success=100.0%, Failed=0, CSMF=0.589, COD=0.302]VA34 Experiments:  73%|███████▎  | 19.0/26.0 [10:13<02:57, 25.4s/exp, Success=100.0%, Failed=0, CSMF=0.589, COD=0.302]VA34 Experiments:  73%|███████▎  | 19.0/26.0 [10:13<02:57, 25.4s/exp, Success=100.0%, Failed=0, CSMF=0.601, COD=0.307]VA34 Experiments:  77%|███████▋  | 20.0/26.0 [10:13<01:46, 17.8s/exp, Success=100.0%, Failed=0, CSMF=0.601, COD=0.307]VA34 Experiments:  77%|███████▋  | 20.0/26.0 [10:13<01:46, 17.8s/exp, Success=100.0%, Failed=0, CSMF=0.594, COD=0.303]2025-07-31 15:09:53 - INFO - 
+============================================================
+PROGRESS UPDATE: 20/26 experiments (76.9%)
+  • Success Rate: 100.0%
+  • Failed: 0
+  • Runtime: 0:10:13
+  • Speed: 0.03 exp/s
+  • ETA: 0:03:04 - Best: insilico (CSMF: 0.881)
+============================================================
+15:09:53.590 | INFO    | model_comparison.monitoring.progress_tracker - 
+============================================================
+PROGRESS UPDATE: 20/26 experiments (76.9%)
+  • Success Rate: 100.0%
+  • Failed: 0
+  • Runtime: 0:10:13
+  • Speed: 0.03 exp/s
+  • ETA: 0:03:04 - Best: insilico (CSMF: 0.881)
+============================================================
+VA34 Experiments:  81%|████████  | 21.0/26.0 [10:22<01:16, 15.2s/exp, Success=100.0%, Failed=0, CSMF=0.594, COD=0.303]VA34 Experiments:  81%|████████  | 21.0/26.0 [10:22<01:16, 15.2s/exp, Success=100.0%, Failed=0, CSMF=0.559, COD=0.278]VA34 Experiments:  85%|████████▍ | 22.0/26.0 [10:23<00:42, 10.7s/exp, Success=100.0%, Failed=0, CSMF=0.559, COD=0.278]VA34 Experiments:  85%|████████▍ | 22.0/26.0 [10:23<00:42, 10.7s/exp, Success=100.0%, Failed=0, CSMF=0.584, COD=0.288]VA34 Experiments:  88%|████████▊ | 23.0/26.0 [10:36<00:34, 11.5s/exp, Success=100.0%, Failed=0, CSMF=0.584, COD=0.288]VA34 Experiments:  88%|████████▊ | 23.0/26.0 [10:36<00:34, 11.5s/exp, Success=100.0%, Failed=0, CSMF=0.588, COD=0.289]VA34 Experiments:  92%|█████████▏| 24.0/26.0 [10:43<00:20, 10.3s/exp, Success=100.0%, Failed=0, CSMF=0.588, COD=0.289]VA34 Experiments:  92%|█████████▏| 24.0/26.0 [10:43<00:20, 10.3s/exp, Success=100.0%, Failed=0, CSMF=0.615, COD=0.306]VA34 Experiments:  96%|█████████▌| 25.0/26.0 [10:52<00:09, 9.83s/exp, Success=100.0%, Failed=0, CSMF=0.615, COD=0.306]VA34 Experiments:  96%|█████████▌| 25.0/26.0 [10:52<00:09, 9.83s/exp, Success=100.0%, Failed=0, CSMF=0.616, COD=0.306]2025-07-31 15:10:32 - INFO - Processing batch 2/2
+15:10:32.481 | INFO    | model_comparison.orchestration.prefect_flows - Processing batch 2/2
+VA34 Experiments: 100%|██████████| 26.0/26.0 [11:45<00:00, 22.7s/exp, Success=100.0%, Failed=0, CSMF=0.616, COD=0.306]VA34 Experiments: 100%|██████████| 26.0/26.0 [11:45<00:00, 22.7s/exp, Success=100.0%, Failed=0, CSMF=0.616, COD=0.310]VA34 Experiments: 100%|██████████| 26.0/26.0 [11:45<00:00, 27.1s/exp, Success=100.0%, Failed=0, CSMF=0.616, COD=0.310]
+2025-07-31 15:11:25 - INFO - Completed 26/26 experiments in 0:11:45 (Success rate: 100.0%)
+15:11:25.263 | INFO    | model_comparison.monitoring.progress_tracker - Completed 26/26 experiments in 0:11:45 (Success rate: 100.0%)
+2025-07-31 15:11:25 - INFO - Saved results to results/xgboost_investigation/regularization_comparison/conservative_20250731_144628/va34_comparison_results.csv
+15:11:25.272 | INFO    | model_comparison.orchestration.prefect_flows - Saved results to results/xgboost_investigation/regularization_comparison/conservative_20250731_144628/va34_comparison_results.csv
+2025-07-31 15:11:25 - INFO - Performance summary: {'total_elapsed_seconds': 705.3778040409088, 'total_experiments': 26, 'avg_experiment_seconds': 345.495322740995, 'min_experiment_seconds': 23.034192085266113, 'max_experiment_seconds': 650.7583158016205, 'throughput_per_second': 0.03685967980712378, 'worker_count': 25, 'worker_load_balance': {'min_experiments': 1, 'max_experiments': 2, 'avg_experiments': 1.04, 'std_experiments': 0.19595917942265426}}
+15:11:25.273 | INFO    | model_comparison.orchestration.prefect_flows - Performance summary: {'total_elapsed_seconds': 705.3778040409088, 'total_experiments': 26, 'avg_experiment_seconds': 345.495322740995, 'min_experiment_seconds': 23.034192085266113, 'max_experiment_seconds': 650.7583158016205, 'throughput_per_second': 0.03685967980712378, 'worker_count': 25, 'worker_load_balance': {'min_experiments': 1, 'max_experiments': 2, 'avg_experiments': 1.04, 'std_experiments': 0.19595917942265426}}
+2025-07-31 15:11:25 - INFO - Generating visualizations...
+15:11:25.273 | INFO    | model_comparison.orchestration.prefect_flows - Generating visualizations...
+2025-07-31 15:11:27 - INFO - Experiment completed in 719.5s (26 experiments, 0.04 exp/s)
+15:11:27.264 | INFO    | model_comparison.orchestration.prefect_flows - Experiment completed in 719.5s (26 experiments, 0.04 exp/s)
+15:11:27.287 | INFO    | Flow run 'wooden-tarsier' - Finished in state Completed()
+2025-07-31 15:11:27 - INFO - 
+==================================================
+15:11:27.287 | INFO    | __main__ - 
+==================================================
+2025-07-31 15:11:27 - INFO - EXPERIMENT SUMMARY
+15:11:27.287 | INFO    | __main__ - EXPERIMENT SUMMARY
+2025-07-31 15:11:27 - INFO - ==================================================
+15:11:27.288 | INFO    | __main__ - ==================================================
+2025-07-31 15:11:27 - INFO - Total experiments: 26
+15:11:27.288 | INFO    | __main__ - Total experiments: 26
+2025-07-31 15:11:27 - INFO - Successful experiments: 26
+15:11:27.288 | INFO    | __main__ - Successful experiments: 26
+2025-07-31 15:11:27 - INFO - Failed experiments: 0
+15:11:27.288 | INFO    | __main__ - Failed experiments: 0
+2025-07-31 15:11:27 - INFO - 
+XGBOOST Performance:
+  Successful experiments: 13/13
+  Avg CSMF Accuracy: 0.583
+  Avg COD Accuracy: 0.309
+15:11:27.288 | INFO    | __main__ - 
+XGBOOST Performance:
+  Successful experiments: 13/13
+  Avg CSMF Accuracy: 0.583
+  Avg COD Accuracy: 0.309
+2025-07-31 15:11:27 - INFO - 
+INSILICO Performance:
+  Successful experiments: 13/13
+  Avg CSMF Accuracy: 0.587
+  Avg COD Accuracy: 0.279
+15:11:27.289 | INFO    | __main__ - 
+INSILICO Performance:
+  Successful experiments: 13/13
+  Avg CSMF Accuracy: 0.587
+  Avg COD Accuracy: 0.279
+2025-07-31 15:11:27 - INFO - 
+Results saved to: results/xgboost_investigation/regularization_comparison/conservative_20250731_144628
+15:11:27.289 | INFO    | __main__ - 
+Results saved to: results/xgboost_investigation/regularization_comparison/conservative_20250731_144628
+15:11:27.337 | INFO    | Flow run 'smart-hedgehog' - Beginning flow run 'smart-hedgehog' for flow 'Cleanup Ray Resources'
+2025-07-31 15:11:28 - INFO - Ray shutdown complete
+15:11:28.813 | INFO    | model_comparison.orchestration.prefect_flows - Ray shutdown complete
+15:11:28.821 | INFO    | Flow run 'smart-hedgehog' - Finished in state Completed()
+15:11:28.825 | INFO    | prefect - Stopping temporary server on http://127.0.0.1:8551
+
+>>> Experiment 1c: Fixed Conservative Parameters (No Tuning)
+Using XGBoostEnhancedConfig.conservative() without tuning
+2025-07-31 15:11:39 - INFO - Logging to: logs/model_comparison/site_comparison_20250731_151139.log
+15:11:39.670 | INFO    | model_comparison.experiments.site_comparison - Logging to: logs/model_comparison/site_comparison_20250731_151139.log
+2025-07-31 15:11:39 - INFO - Logging to: logs/orchestration/progress_tracker_20250731_151139.log
+15:11:39.694 | INFO    | model_comparison.monitoring.progress_tracker - Logging to: logs/orchestration/progress_tracker_20250731_151139.log
+2025-07-31 15:11:39 - INFO - Logging to: logs/orchestration/checkpoint_manager_20250731_151139.log
+15:11:39.698 | INFO    | model_comparison.orchestration.checkpoint_manager - Logging to: logs/orchestration/checkpoint_manager_20250731_151139.log
+2025-07-31 15:11:39 - INFO - Logging to: logs/orchestration/prefect_flows_20250731_151139.log
+15:11:39.702 | INFO    | model_comparison.orchestration.prefect_flows - Logging to: logs/orchestration/prefect_flows_20250731_151139.log
+2025-07-31 15:11:39 - INFO - Logging to: logs/orchestration/__main___20250731_151139.log
+15:11:39.710 | INFO    | __main__ - Logging to: logs/orchestration/__main___20250731_151139.log
+2025-07-31 15:11:39 - INFO - Starting distributed VA34 comparison
+15:11:39.711 | INFO    | __main__ - Starting distributed VA34 comparison
+2025-07-31 15:11:39 - INFO - Data path: va-data/data/phmrc/IHME_PHMRC_VA_DATA_ADULT_Y2013M09D11_0.csv
+15:11:39.711 | INFO    | __main__ - Data path: va-data/data/phmrc/IHME_PHMRC_VA_DATA_ADULT_Y2013M09D11_0.csv
+2025-07-31 15:11:39 - INFO - Sites: ['Mexico', 'AP', 'Pemba']
+15:11:39.711 | INFO    | __main__ - Sites: ['Mexico', 'AP', 'Pemba']
+2025-07-31 15:11:39 - INFO - Models: ['xgboost', 'insilico']
+15:11:39.711 | INFO    | __main__ - Models: ['xgboost', 'insilico']
+2025-07-31 15:11:39 - INFO - Workers: -1
+15:11:39.711 | INFO    | __main__ - Workers: -1
+2025-07-31 15:11:39 - INFO - Output directory: results/xgboost_investigation/regularization_comparison/fixed_conservative_20250731_144628
+15:11:39.711 | INFO    | __main__ - Output directory: results/xgboost_investigation/regularization_comparison/fixed_conservative_20250731_144628
+2025-07-31 15:11:39 - INFO - Ray dashboard will be available at: http://localhost:8267
+15:11:39.711 | INFO    | __main__ - Ray dashboard will be available at: http://localhost:8267
+2025-07-31 15:11:39 - INFO - Prefect dashboard available at: http://localhost:4200
+15:11:39.711 | INFO    | __main__ - Prefect dashboard available at: http://localhost:4200
+2025-07-31 15:11:39 - INFO - Start Prefect server with: prefect server start
+15:11:39.712 | INFO    | __main__ - Start Prefect server with: prefect server start
+2025-07-31 15:11:39 - INFO - Starting Prefect flow execution
+15:11:39.712 | INFO    | __main__ - Starting Prefect flow execution
+15:11:42.361 | INFO    | prefect - Starting temporary server on http://127.0.0.1:8555
+See https://docs.prefect.io/3.0/manage/self-host#self-host-a-prefect-server for more information on running a dedicated Prefect server.
+15:11:45.550 | INFO    | Flow run 'inventive-skink' - Beginning flow run 'inventive-skink' for flow 'VA34 Comparison Experiment'
+2025-07-31 15:11:45 - INFO - Starting VA34 comparison flow
+15:11:45.551 | INFO    | model_comparison.orchestration.prefect_flows - Starting VA34 comparison flow
+2025-07-31 15:11:47,704	INFO worker.py:1927 -- Started a local Ray instance.
+[2025-07-31 15:11:47,709 I 26134 32654190] logging.cc:302: Set ray log level from environment variable RAY_BACKEND_LOG_LEVEL to 1
+2025-07-31 15:11:48 - INFO - Ray initialized with dashboard at http://localhost:8267
+15:11:48.614 | INFO    | model_comparison.orchestration.prefect_flows - Ray initialized with dashboard at http://localhost:8267
+2025-07-31 15:11:56 - INFO - Loaded ML data with shape: (3308, 172)
+15:11:56.038 | INFO    | model_comparison.orchestration.prefect_flows - Loaded ML data with shape: (3308, 172)
+2025-07-31 15:11:56 - INFO - Loaded OpenVA data with shape: (3308, 172)
+15:11:56.039 | INFO    | model_comparison.orchestration.prefect_flows - Loaded OpenVA data with shape: (3308, 172)
+2025-07-31 15:11:56 - INFO - Generated 26 experiment configurations
+15:11:56.120 | INFO    | model_comparison.orchestration.prefect_flows - Generated 26 experiment configurations
+15:11:56.126 | INFO    | Task run 'generate_experiment_configs-82e' - Finished in state Completed()
+2025-07-31 15:11:56 - INFO - No checkpoint found
+15:11:56.126 | INFO    | model_comparison.orchestration.checkpoint_manager - No checkpoint found
+2025-07-31 15:11:57 - INFO - Prepared data for 26/26 experiments
+15:11:57.537 | INFO    | model_comparison.orchestration.prefect_flows - Prepared data for 26/26 experiments
+15:11:57.540 | INFO    | Task run 'prepare_experiment_data-d8c' - Finished in state Completed()
+VA34 Experiments:   0%|          | 0.00/26.0 [00:00<?, ?exp/s]VA34 Experiments:   0%|          | 0.00/26.0 [00:00<?, ?exp/s, Success=0.0%, Failed=0]2025-07-31 15:11:57 - INFO - Processing batch 1/2
+15:11:57.562 | INFO    | model_comparison.orchestration.prefect_flows - Processing batch 1/2
+VA34 Experiments:   4%|▍         | 1.00/26.0 [00:00<00:06, 3.78exp/s, Success=0.0%, Failed=0]VA34 Experiments:   4%|▍         | 1.00/26.0 [00:00<00:06, 3.78exp/s, Success=100.0%, Failed=0, CSMF=0.915, COD=0.617]VA34 Experiments:   8%|▊         | 2.00/26.0 [00:00<00:11, 2.15exp/s, Success=100.0%, Failed=0, CSMF=0.915, COD=0.617]VA34 Experiments:   8%|▊         | 2.00/26.0 [00:00<00:11, 2.15exp/s, Success=100.0%, Failed=0, CSMF=0.887, COD=0.529]VA34 Experiments:  12%|█▏        | 3.00/26.0 [00:00<00:10, 2.15exp/s, Success=100.0%, Failed=0, CSMF=0.884, COD=0.510]VA34 Experiments:  15%|█▌        | 4.00/26.0 [00:01<00:04, 4.57exp/s, Success=100.0%, Failed=0, CSMF=0.884, COD=0.510]VA34 Experiments:  15%|█▌        | 4.00/26.0 [00:01<00:04, 4.57exp/s, Success=100.0%, Failed=0, CSMF=0.777, COD=0.434]VA34 Experiments:  19%|█▉        | 5.00/26.0 [00:01<00:05, 4.19exp/s, Success=100.0%, Failed=0, CSMF=0.777, COD=0.434]VA34 Experiments:  19%|█▉        | 5.00/26.0 [00:01<00:05, 4.19exp/s, Success=100.0%, Failed=0, CSMF=0.792, COD=0.418]VA34 Experiments:  23%|██▎       | 6.00/26.0 [00:01<00:06, 3.30exp/s, Success=100.0%, Failed=0, CSMF=0.792, COD=0.418]VA34 Experiments:  23%|██▎       | 6.00/26.0 [00:01<00:06, 3.30exp/s, Success=100.0%, Failed=0, CSMF=0.798, COD=0.408]VA34 Experiments:  27%|██▋       | 7.00/26.0 [00:03<00:12, 1.55exp/s, Success=100.0%, Failed=0, CSMF=0.798, COD=0.408]VA34 Experiments:  27%|██▋       | 7.00/26.0 [00:03<00:12, 1.55exp/s, Success=100.0%, Failed=0, CSMF=0.733, COD=0.364]VA34 Experiments:  31%|███       | 8.00/26.0 [00:03<00:11, 1.59exp/s, Success=100.0%, Failed=0, CSMF=0.733, COD=0.364]VA34 Experiments:  31%|███       | 8.00/26.0 [00:03<00:11, 1.59exp/s, Success=100.0%, Failed=0, CSMF=0.698, COD=0.362]VA34 Experiments:  35%|███▍      | 9.00/26.0 [00:03<00:10, 1.59exp/s, Success=100.0%, Failed=0, CSMF=0.670, COD=0.355]VA34 Experiments:  38%|███▊      | 10.0/26.0 [00:03<00:06, 2.64exp/s, Success=100.0%, Failed=0, CSMF=0.670, COD=0.355]VA34 Experiments:  38%|███▊      | 10.0/26.0 [00:03<00:06, 2.64exp/s, Success=100.0%, Failed=0, CSMF=0.679, COD=0.354]2025-07-31 15:12:01 - INFO - 
+============================================================
+PROGRESS UPDATE: 10/26 experiments (38.5%)
+  • Success Rate: 100.0%
+  • Failed: 0
+  • Runtime: 0:00:03
+  • Speed: 2.52 exp/s
+  • ETA: 0:00:06 - Best: xgboost (CSMF: 0.915)
+============================================================
+15:12:01.509 | INFO    | model_comparison.monitoring.progress_tracker - 
+============================================================
+PROGRESS UPDATE: 10/26 experiments (38.5%)
+  • Success Rate: 100.0%
+  • Failed: 0
+  • Runtime: 0:00:03
+  • Speed: 2.52 exp/s
+  • ETA: 0:00:06 - Best: xgboost (CSMF: 0.915)
+============================================================
+VA34 Experiments:  42%|████▏     | 11.0/26.0 [00:03<00:05, 2.64exp/s, Success=100.0%, Failed=0, CSMF=0.673, COD=0.342]VA34 Experiments:  46%|████▌     | 12.0/26.0 [00:04<00:05, 2.59exp/s, Success=100.0%, Failed=0, CSMF=0.673, COD=0.342]VA34 Experiments:  46%|████▌     | 12.0/26.0 [00:04<00:05, 2.59exp/s, Success=100.0%, Failed=0, CSMF=0.688, COD=0.351]VA34 Experiments:  50%|█████     | 13.0/26.0 [00:17<00:41, 3.18s/exp, Success=100.0%, Failed=0, CSMF=0.688, COD=0.351]VA34 Experiments:  50%|█████     | 13.0/26.0 [00:17<00:41, 3.18s/exp, Success=100.0%, Failed=0, CSMF=0.699, COD=0.354]VA34 Experiments:  54%|█████▍    | 14.0/26.0 [00:22<00:43, 3.62s/exp, Success=100.0%, Failed=0, CSMF=0.699, COD=0.354]VA34 Experiments:  54%|█████▍    | 14.0/26.0 [00:22<00:43, 3.62s/exp, Success=100.0%, Failed=0, CSMF=0.712, COD=0.367]VA34 Experiments:  58%|█████▊    | 15.0/26.0 [00:31<00:54, 4.91s/exp, Success=100.0%, Failed=0, CSMF=0.712, COD=0.367]VA34 Experiments:  58%|█████▊    | 15.0/26.0 [00:31<00:54, 4.91s/exp, Success=100.0%, Failed=0, CSMF=0.685, COD=0.354]VA34 Experiments:  62%|██████▏   | 16.0/26.0 [00:35<00:45, 4.57s/exp, Success=100.0%, Failed=0, CSMF=0.685, COD=0.354]VA34 Experiments:  62%|██████▏   | 16.0/26.0 [00:35<00:45, 4.57s/exp, Success=100.0%, Failed=0, CSMF=0.665, COD=0.346]VA34 Experiments:  65%|██████▌   | 17.0/26.0 [00:55<01:19, 8.83s/exp, Success=100.0%, Failed=0, CSMF=0.665, COD=0.346]VA34 Experiments:  65%|██████▌   | 17.0/26.0 [00:55<01:19, 8.83s/exp, Success=100.0%, Failed=0, CSMF=0.646, COD=0.334]VA34 Experiments:  69%|██████▉   | 18.0/26.0 [00:56<00:54, 6.78s/exp, Success=100.0%, Failed=0, CSMF=0.646, COD=0.334]VA34 Experiments:  69%|██████▉   | 18.0/26.0 [00:56<00:54, 6.78s/exp, Success=100.0%, Failed=0, CSMF=0.624, COD=0.321]VA34 Experiments:  73%|███████▎  | 19.0/26.0 [01:11<01:03, 9.13s/exp, Success=100.0%, Failed=0, CSMF=0.624, COD=0.321]VA34 Experiments:  73%|███████▎  | 19.0/26.0 [01:11<01:03, 9.13s/exp, Success=100.0%, Failed=0, CSMF=0.631, COD=0.318]VA34 Experiments:  77%|███████▋  | 20.0/26.0 [01:14<00:44, 7.34s/exp, Success=100.0%, Failed=0, CSMF=0.631, COD=0.318]VA34 Experiments:  77%|███████▋  | 20.0/26.0 [01:14<00:44, 7.34s/exp, Success=100.0%, Failed=0, CSMF=0.619, COD=0.312]2025-07-31 15:13:12 - INFO - 
+============================================================
+PROGRESS UPDATE: 20/26 experiments (76.9%)
+  • Success Rate: 100.0%
+  • Failed: 0
+  • Runtime: 0:01:14
+  • Speed: 0.27 exp/s
+  • ETA: 0:00:22 - Best: xgboost (CSMF: 0.915)
+============================================================
+15:13:12.102 | INFO    | model_comparison.monitoring.progress_tracker - 
+============================================================
+PROGRESS UPDATE: 20/26 experiments (76.9%)
+  • Success Rate: 100.0%
+  • Failed: 0
+  • Runtime: 0:01:14
+  • Speed: 0.27 exp/s
+  • ETA: 0:00:22 - Best: xgboost (CSMF: 0.915)
+============================================================
+VA34 Experiments:  81%|████████  | 21.0/26.0 [01:15<00:27, 5.48s/exp, Success=100.0%, Failed=0, CSMF=0.619, COD=0.312]VA34 Experiments:  81%|████████  | 21.0/26.0 [01:15<00:27, 5.48s/exp, Success=100.0%, Failed=0, CSMF=0.610, COD=0.295]VA34 Experiments:  85%|████████▍ | 22.0/26.0 [01:15<00:15, 3.97s/exp, Success=100.0%, Failed=0, CSMF=0.610, COD=0.295]VA34 Experiments:  85%|████████▍ | 22.0/26.0 [01:15<00:15, 3.97s/exp, Success=100.0%, Failed=0, CSMF=0.607, COD=0.295]VA34 Experiments:  88%|████████▊ | 23.0/26.0 [01:16<00:09, 3.04s/exp, Success=100.0%, Failed=0, CSMF=0.607, COD=0.295]VA34 Experiments:  88%|████████▊ | 23.0/26.0 [01:16<00:09, 3.04s/exp, Success=100.0%, Failed=0, CSMF=0.600, COD=0.287]VA34 Experiments:  92%|█████████▏| 24.0/26.0 [01:17<00:04, 2.30s/exp, Success=100.0%, Failed=0, CSMF=0.600, COD=0.287]VA34 Experiments:  92%|█████████▏| 24.0/26.0 [01:17<00:04, 2.30s/exp, Success=100.0%, Failed=0, CSMF=0.614, COD=0.294]VA34 Experiments:  96%|█████████▌| 25.0/26.0 [01:20<00:02, 2.51s/exp, Success=100.0%, Failed=0, CSMF=0.614, COD=0.294]VA34 Experiments:  96%|█████████▌| 25.0/26.0 [01:20<00:02, 2.51s/exp, Success=100.0%, Failed=0, CSMF=0.601, COD=0.289]2025-07-31 15:13:17 - INFO - Processing batch 2/2
+15:13:17.877 | INFO    | model_comparison.orchestration.prefect_flows - Processing batch 2/2
+VA34 Experiments: 100%|██████████| 26.0/26.0 [02:11<00:00, 16.9s/exp, Success=100.0%, Failed=0, CSMF=0.601, COD=0.289]VA34 Experiments: 100%|██████████| 26.0/26.0 [02:11<00:00, 16.9s/exp, Success=100.0%, Failed=0, CSMF=0.596, COD=0.289]VA34 Experiments: 100%|██████████| 26.0/26.0 [02:11<00:00, 5.04s/exp, Success=100.0%, Failed=0, CSMF=0.596, COD=0.289]
+2025-07-31 15:14:08 - INFO - Completed 26/26 experiments in 0:02:11 (Success rate: 100.0%)
+15:14:08.661 | INFO    | model_comparison.monitoring.progress_tracker - Completed 26/26 experiments in 0:02:11 (Success rate: 100.0%)
+2025-07-31 15:14:08 - INFO - Saved results to results/xgboost_investigation/regularization_comparison/fixed_conservative_20250731_144628/va34_comparison_results.csv
+15:14:08.671 | INFO    | model_comparison.orchestration.prefect_flows - Saved results to results/xgboost_investigation/regularization_comparison/fixed_conservative_20250731_144628/va34_comparison_results.csv
+2025-07-31 15:14:08 - INFO - Performance summary: {'total_elapsed_seconds': 131.1090009212494, 'total_experiments': 26, 'avg_experiment_seconds': 29.621099756314205, 'min_experiment_seconds': 0.13735699653625488, 'max_experiment_seconds': 77.3754723072052, 'throughput_per_second': 0.1983082764517205, 'worker_count': 16, 'worker_load_balance': {'min_experiments': 1, 'max_experiments': 5, 'avg_experiments': 1.625, 'std_experiments': 0.9921567416492215}}
+15:14:08.671 | INFO    | model_comparison.orchestration.prefect_flows - Performance summary: {'total_elapsed_seconds': 131.1090009212494, 'total_experiments': 26, 'avg_experiment_seconds': 29.621099756314205, 'min_experiment_seconds': 0.13735699653625488, 'max_experiment_seconds': 77.3754723072052, 'throughput_per_second': 0.1983082764517205, 'worker_count': 16, 'worker_load_balance': {'min_experiments': 1, 'max_experiments': 5, 'avg_experiments': 1.625, 'std_experiments': 0.9921567416492215}}
+2025-07-31 15:14:08 - INFO - Generating visualizations...
+15:14:08.671 | INFO    | model_comparison.orchestration.prefect_flows - Generating visualizations...
+2025-07-31 15:14:10 - INFO - Experiment completed in 144.6s (26 experiments, 0.18 exp/s)
+15:14:10.152 | INFO    | model_comparison.orchestration.prefect_flows - Experiment completed in 144.6s (26 experiments, 0.18 exp/s)
+15:14:10.175 | INFO    | Flow run 'inventive-skink' - Finished in state Completed()
+2025-07-31 15:14:10 - INFO - 
+==================================================
+15:14:10.176 | INFO    | __main__ - 
+==================================================
+2025-07-31 15:14:10 - INFO - EXPERIMENT SUMMARY
+15:14:10.176 | INFO    | __main__ - EXPERIMENT SUMMARY
+2025-07-31 15:14:10 - INFO - ==================================================
+15:14:10.176 | INFO    | __main__ - ==================================================
+2025-07-31 15:14:10 - INFO - Total experiments: 26
+15:14:10.176 | INFO    | __main__ - Total experiments: 26
+2025-07-31 15:14:10 - INFO - Successful experiments: 26
+15:14:10.177 | INFO    | __main__ - Successful experiments: 26
+2025-07-31 15:14:10 - INFO - Failed experiments: 0
+15:14:10.177 | INFO    | __main__ - Failed experiments: 0
+2025-07-31 15:14:10 - INFO - 
+XGBOOST Performance:
+  Successful experiments: 13/13
+  Avg CSMF Accuracy: 0.699
+  Avg COD Accuracy: 0.354
+15:14:10.177 | INFO    | __main__ - 
+XGBOOST Performance:
+  Successful experiments: 13/13
+  Avg CSMF Accuracy: 0.699
+  Avg COD Accuracy: 0.354
+2025-07-31 15:14:10 - INFO - 
+INSILICO Performance:
+  Successful experiments: 13/13
+  Avg CSMF Accuracy: 0.587
+  Avg COD Accuracy: 0.279
+15:14:10.178 | INFO    | __main__ - 
+INSILICO Performance:
+  Successful experiments: 13/13
+  Avg CSMF Accuracy: 0.587
+  Avg COD Accuracy: 0.279
+2025-07-31 15:14:10 - INFO - 
+Results saved to: results/xgboost_investigation/regularization_comparison/fixed_conservative_20250731_144628
+15:14:10.178 | INFO    | __main__ - 
+Results saved to: results/xgboost_investigation/regularization_comparison/fixed_conservative_20250731_144628
+15:14:10.217 | INFO    | Flow run 'kind-hippo' - Beginning flow run 'kind-hippo' for flow 'Cleanup Ray Resources'
+2025-07-31 15:14:11 - INFO - Ray shutdown complete
+15:14:11.650 | INFO    | model_comparison.orchestration.prefect_flows - Ray shutdown complete
+15:14:11.674 | INFO    | Flow run 'kind-hippo' - Finished in state Completed()
+15:14:11.681 | INFO    | prefect - Stopping temporary server on http://127.0.0.1:8555
+
+>>> Generating Comparison Report
+Looking for results in: results/xgboost_investigation/regularization_comparison
+Found results for enhanced: results/xgboost_investigation/regularization_comparison/enhanced_20250731_144628/va34_comparison_results.csv
+Found results for conservative: results/xgboost_investigation/regularization_comparison/conservative_20250731_144628/va34_comparison_results.csv
+Found results for fixed_conservative: results/xgboost_investigation/regularization_comparison/fixed_conservative_20250731_144628/va34_comparison_results.csv
+
+=== Regularization Strategy Comparison ===
+
+ENHANCED Configuration:
+  In-domain CSMF: 0.8540
+  Out-domain CSMF: 0.2907
+  Performance gap: 66.0%
+  Execution time: 612.8s
+
+CONSERVATIVE Configuration:
+  In-domain CSMF: 0.8551
+  Out-domain CSMF: 0.2867
+  Performance gap: 66.5%
+  Execution time: 592.1s
+
+FIXED_CONSERVATIVE Configuration:
+  In-domain CSMF: 0.8844
+  Out-domain CSMF: 0.5112
+  Performance gap: 42.2%
+  Execution time: 0.6s
+
+
+Combined results saved to: results/xgboost_investigation/regularization_comparison/regularization_comparison_combined.csv
+
+Experiment completed at Thu Jul 31 15:14:14 EDT 2025
+Results saved to: results/xgboost_investigation/regularization_comparison
+
+====================================
+Experiment 2: Cross-Domain Tuning
+====================================
+===========================================
+Cross-Domain Tuning Experiment
+===========================================
+Starting experiments at Thu Jul 31 15:14:15 EDT 2025
+Output directory: results/xgboost_investigation/cross_domain_tuning
+Sites: Mexico AP UP Pemba Bohol Dar
+
+>>> Experiment 2a: In-Domain Tuning (Standard Approach)
+Optimizing for in-domain CSMF accuracy
+2025-07-31 15:14:18 - INFO - Logging to: logs/model_comparison/site_comparison_20250731_151418.log
+15:14:18.044 | INFO    | model_comparison.experiments.site_comparison - Logging to: logs/model_comparison/site_comparison_20250731_151418.log
+2025-07-31 15:14:18 - INFO - Logging to: logs/orchestration/progress_tracker_20250731_151418.log
+15:14:18.050 | INFO    | model_comparison.monitoring.progress_tracker - Logging to: logs/orchestration/progress_tracker_20250731_151418.log
+2025-07-31 15:14:18 - INFO - Logging to: logs/orchestration/checkpoint_manager_20250731_151418.log
+15:14:18.051 | INFO    | model_comparison.orchestration.checkpoint_manager - Logging to: logs/orchestration/checkpoint_manager_20250731_151418.log
+2025-07-31 15:14:18 - INFO - Logging to: logs/orchestration/prefect_flows_20250731_151418.log
+15:14:18.053 | INFO    | model_comparison.orchestration.prefect_flows - Logging to: logs/orchestration/prefect_flows_20250731_151418.log
+2025-07-31 15:14:18 - INFO - Logging to: logs/orchestration/__main___20250731_151418.log
+15:14:18.060 | INFO    | __main__ - Logging to: logs/orchestration/__main___20250731_151418.log
+2025-07-31 15:14:18 - INFO - Starting distributed VA34 comparison
+15:14:18.061 | INFO    | __main__ - Starting distributed VA34 comparison
+2025-07-31 15:14:18 - INFO - Data path: va-data/data/phmrc/IHME_PHMRC_VA_DATA_ADULT_Y2013M09D11_0.csv
+15:14:18.061 | INFO    | __main__ - Data path: va-data/data/phmrc/IHME_PHMRC_VA_DATA_ADULT_Y2013M09D11_0.csv
+2025-07-31 15:14:18 - INFO - Sites: ['Mexico', 'AP', 'UP', 'Pemba', 'Bohol', 'Dar']
+15:14:18.061 | INFO    | __main__ - Sites: ['Mexico', 'AP', 'UP', 'Pemba', 'Bohol', 'Dar']
+2025-07-31 15:14:18 - INFO - Models: ['xgboost']
+15:14:18.062 | INFO    | __main__ - Models: ['xgboost']
+2025-07-31 15:14:18 - INFO - Workers: -1
+15:14:18.062 | INFO    | __main__ - Workers: -1
+2025-07-31 15:14:18 - INFO - Output directory: results/xgboost_investigation/cross_domain_tuning/in_domain_tuning_20250731_151415
+15:14:18.062 | INFO    | __main__ - Output directory: results/xgboost_investigation/cross_domain_tuning/in_domain_tuning_20250731_151415
+2025-07-31 15:14:18 - INFO - Tuning enabled: 15 trials × 1 models × 5 CV folds = 75 total model trainings per experiment
+15:14:18.062 | INFO    | __main__ - Tuning enabled: 15 trials × 1 models × 5 CV folds = 75 total model trainings per experiment
+2025-07-31 15:14:18 - INFO - Max concurrent tuning trials: 2
+15:14:18.062 | INFO    | __main__ - Max concurrent tuning trials: 2
+2025-07-31 15:14:18 - INFO - Ray dashboard will be available at: http://localhost:8265
+15:14:18.062 | INFO    | __main__ - Ray dashboard will be available at: http://localhost:8265
+2025-07-31 15:14:18 - INFO - Prefect dashboard available at: http://localhost:4200
+15:14:18.062 | INFO    | __main__ - Prefect dashboard available at: http://localhost:4200
+2025-07-31 15:14:18 - INFO - Start Prefect server with: prefect server start
+15:14:18.062 | INFO    | __main__ - Start Prefect server with: prefect server start
+2025-07-31 15:14:18 - INFO - Starting Prefect flow execution
+15:14:18.062 | INFO    | __main__ - Starting Prefect flow execution
+15:14:18.851 | INFO    | prefect - Starting temporary server on http://127.0.0.1:8938
+See https://docs.prefect.io/3.0/manage/self-host#self-host-a-prefect-server for more information on running a dedicated Prefect server.
+15:14:20.818 | INFO    | Flow run 'pristine-starfish' - Beginning flow run 'pristine-starfish' for flow 'VA34 Comparison Experiment'
+2025-07-31 15:14:20 - INFO - Starting VA34 comparison flow
+15:14:20.819 | INFO    | model_comparison.orchestration.prefect_flows - Starting VA34 comparison flow
+2025-07-31 15:14:22,748	INFO worker.py:1927 -- Started a local Ray instance.
+[2025-07-31 15:14:22,752 I 27366 32665703] logging.cc:302: Set ray log level from environment variable RAY_BACKEND_LOG_LEVEL to 1
+2025-07-31 15:14:23 - INFO - Ray initialized with dashboard at http://localhost:8265
+15:14:23.535 | INFO    | model_comparison.orchestration.prefect_flows - Ray initialized with dashboard at http://localhost:8265
+2025-07-31 15:14:30 - INFO - Loaded ML data with shape: (7582, 172)
+15:14:30.461 | INFO    | model_comparison.orchestration.prefect_flows - Loaded ML data with shape: (7582, 172)
+2025-07-31 15:14:30 - INFO - Loaded OpenVA data with shape: (7582, 172)
+15:14:30.461 | INFO    | model_comparison.orchestration.prefect_flows - Loaded OpenVA data with shape: (7582, 172)
+2025-07-31 15:14:30 - INFO - Generated 40 experiment configurations
+15:14:30.523 | INFO    | model_comparison.orchestration.prefect_flows - Generated 40 experiment configurations
+15:14:30.526 | INFO    | Task run 'generate_experiment_configs-3ca' - Finished in state Completed()
+2025-07-31 15:14:30 - INFO - No checkpoint found
+15:14:30.526 | INFO    | model_comparison.orchestration.checkpoint_manager - No checkpoint found
+2025-07-31 15:14:32 - INFO - Prepared data for 40/40 experiments
+15:14:32.114 | INFO    | model_comparison.orchestration.prefect_flows - Prepared data for 40/40 experiments
+15:14:32.118 | INFO    | Task run 'prepare_experiment_data-518' - Finished in state Completed()
+VA34 Experiments:   0%|          | 0.00/40.0 [00:00<?, ?exp/s]VA34 Experiments:   0%|          | 0.00/40.0 [00:00<?, ?exp/s, Success=0.0%, Failed=0]2025-07-31 15:14:32 - INFO - Processing batch 1/2
+15:14:32.138 | INFO    | model_comparison.orchestration.prefect_flows - Processing batch 1/2
+VA34 Experiments:   2%|▎         | 1.00/40.0 [03:45<2:26:19, 225s/exp, Success=0.0%, Failed=0]VA34 Experiments:   2%|▎         | 1.00/40.0 [03:45<2:26:19, 225s/exp, Success=100.0%, Failed=0, CSMF=0.857, COD=0.512]VA34 Experiments:   5%|▌         | 2.00/40.0 [04:37<1:18:15, 124s/exp, Success=100.0%, Failed=0, CSMF=0.857, COD=0.512]VA34 Experiments:   5%|▌         | 2.00/40.0 [04:37<1:18:15, 124s/exp, Success=100.0%, Failed=0, CSMF=0.634, COD=0.386]VA34 Experiments:   8%|▊         | 3.00/40.0 [04:57<47:00, 76.2s/exp, Success=100.0%, Failed=0, CSMF=0.634, COD=0.386] VA34 Experiments:   8%|▊         | 3.00/40.0 [04:57<47:00, 76.2s/exp, Success=100.0%, Failed=0, CSMF=0.497, COD=0.307]VA34 Experiments:  10%|█         | 4.00/40.0 [05:45<39:01, 65.0s/exp, Success=100.0%, Failed=0, CSMF=0.497, COD=0.307]VA34 Experiments:  10%|█         | 4.00/40.0 [05:45<39:01, 65.0s/exp, Success=100.0%, Failed=0, CSMF=0.585, COD=0.333]VA34 Experiments:  12%|█▎        | 5.00/40.0 [06:01<27:34, 47.3s/exp, Success=100.0%, Failed=0, CSMF=0.585, COD=0.333]VA34 Experiments:  12%|█▎        | 5.00/40.0 [06:01<27:34, 47.3s/exp, Success=100.0%, Failed=0, CSMF=0.568, COD=0.316]VA34 Experiments:  15%|█▌        | 6.00/40.0 [06:05<18:32, 32.7s/exp, Success=100.0%, Failed=0, CSMF=0.568, COD=0.316]VA34 Experiments:  15%|█▌        | 6.00/40.0 [06:05<18:32, 32.7s/exp, Success=100.0%, Failed=0, CSMF=0.551, COD=0.313]VA34 Experiments:  18%|█▊        | 7.00/40.0 [06:05<17:59, 32.7s/exp, Success=100.0%, Failed=0, CSMF=0.478, COD=0.270]VA34 Experiments:  20%|██        | 8.00/40.0 [06:10<09:31, 17.9s/exp, Success=100.0%, Failed=0, CSMF=0.478, COD=0.270]VA34 Experiments:  20%|██        | 8.00/40.0 [06:10<09:31, 17.9s/exp, Success=100.0%, Failed=0, CSMF=0.441, COD=0.240]VA34 Experiments:  22%|██▎       | 9.00/40.0 [06:36<10:14, 19.8s/exp, Success=100.0%, Failed=0, CSMF=0.441, COD=0.240]VA34 Experiments:  22%|██▎       | 9.00/40.0 [06:36<10:14, 19.8s/exp, Success=100.0%, Failed=0, CSMF=0.433, COD=0.243]VA34 Experiments:  25%|██▌       | 10.0/40.0 [06:50<09:14, 18.5s/exp, Success=100.0%, Failed=0, CSMF=0.433, COD=0.243]VA34 Experiments:  25%|██▌       | 10.0/40.0 [06:50<09:14, 18.5s/exp, Success=100.0%, Failed=0, CSMF=0.429, COD=0.240]2025-07-31 15:21:23 - INFO - 
+============================================================
+PROGRESS UPDATE: 10/40 experiments (25.0%)
+  • Success Rate: 100.0%
+  • Failed: 0
+  • Runtime: 0:06:50
+  • Speed: 0.02 exp/s
+  • ETA: 0:20:32 - Best: xgboost (CSMF: 0.857)
+============================================================
+15:21:23.102 | INFO    | model_comparison.monitoring.progress_tracker - 
+============================================================
+PROGRESS UPDATE: 10/40 experiments (25.0%)
+  • Success Rate: 100.0%
+  • Failed: 0
+  • Runtime: 0:06:50
+  • Speed: 0.02 exp/s
+  • ETA: 0:20:32 - Best: xgboost (CSMF: 0.857)
+============================================================
+VA34 Experiments:  28%|██▊       | 11.0/40.0 [06:56<07:11, 14.9s/exp, Success=100.0%, Failed=0, CSMF=0.429, COD=0.240]VA34 Experiments:  28%|██▊       | 11.0/40.0 [06:56<07:11, 14.9s/exp, Success=100.0%, Failed=0, CSMF=0.467, COD=0.280]VA34 Experiments:  30%|███       | 12.0/40.0 [06:57<05:02, 10.8s/exp, Success=100.0%, Failed=0, CSMF=0.467, COD=0.280]VA34 Experiments:  30%|███       | 12.0/40.0 [06:57<05:02, 10.8s/exp, Success=100.0%, Failed=0, CSMF=0.461, COD=0.273]VA34 Experiments:  32%|███▎      | 13.0/40.0 [06:58<03:40, 8.18s/exp, Success=100.0%, Failed=0, CSMF=0.461, COD=0.273]VA34 Experiments:  32%|███▎      | 13.0/40.0 [06:58<03:40, 8.18s/exp, Success=100.0%, Failed=0, CSMF=0.440, COD=0.256]VA34 Experiments:  35%|███▌      | 14.0/40.0 [07:25<05:54, 13.6s/exp, Success=100.0%, Failed=0, CSMF=0.440, COD=0.256]VA34 Experiments:  35%|███▌      | 14.0/40.0 [07:25<05:54, 13.6s/exp, Success=100.0%, Failed=0, CSMF=0.464, COD=0.267]VA34 Experiments:  38%|███▊      | 15.0/40.0 [07:28<04:19, 10.4s/exp, Success=100.0%, Failed=0, CSMF=0.464, COD=0.267]VA34 Experiments:  38%|███▊      | 15.0/40.0 [07:28<04:19, 10.4s/exp, Success=100.0%, Failed=0, CSMF=0.435, COD=0.250]VA34 Experiments:  40%|████      | 16.0/40.0 [07:28<02:56, 7.36s/exp, Success=100.0%, Failed=0, CSMF=0.435, COD=0.250]VA34 Experiments:  40%|████      | 16.0/40.0 [07:28<02:56, 7.36s/exp, Success=100.0%, Failed=0, CSMF=0.434, COD=0.249]VA34 Experiments:  42%|████▎     | 17.0/40.0 [07:30<02:13, 5.81s/exp, Success=100.0%, Failed=0, CSMF=0.434, COD=0.249]VA34 Experiments:  42%|████▎     | 17.0/40.0 [07:30<02:13, 5.81s/exp, Success=100.0%, Failed=0, CSMF=0.420, COD=0.241]VA34 Experiments:  45%|████▌     | 18.0/40.0 [07:53<03:58, 10.9s/exp, Success=100.0%, Failed=0, CSMF=0.420, COD=0.241]VA34 Experiments:  45%|████▌     | 18.0/40.0 [07:53<03:58, 10.9s/exp, Success=100.0%, Failed=0, CSMF=0.399, COD=0.228]VA34 Experiments:  48%|████▊     | 19.0/40.0 [07:53<03:47, 10.9s/exp, Success=100.0%, Failed=0, CSMF=0.406, COD=0.228]VA34 Experiments:  50%|█████     | 20.0/40.0 [08:00<02:31, 7.55s/exp, Success=100.0%, Failed=0, CSMF=0.406, COD=0.228]VA34 Experiments:  50%|█████     | 20.0/40.0 [08:00<02:31, 7.55s/exp, Success=100.0%, Failed=0, CSMF=0.388, COD=0.219]2025-07-31 15:22:32 - INFO - 
+============================================================
+PROGRESS UPDATE: 20/40 experiments (50.0%)
+  • Success Rate: 100.0%
+  • Failed: 0
+  • Runtime: 0:08:00
+  • Speed: 0.04 exp/s
+  • ETA: 0:08:00 - Best: xgboost (CSMF: 0.857)
+============================================================
+15:22:32.872 | INFO    | model_comparison.monitoring.progress_tracker - 
+============================================================
+PROGRESS UPDATE: 20/40 experiments (50.0%)
+  • Success Rate: 100.0%
+  • Failed: 0
+  • Runtime: 0:08:00
+  • Speed: 0.04 exp/s
+  • ETA: 0:08:00 - Best: xgboost (CSMF: 0.857)
+============================================================
+VA34 Experiments:  52%|█████▎    | 21.0/40.0 [08:24<03:41, 11.6s/exp, Success=100.0%, Failed=0, CSMF=0.388, COD=0.219]VA34 Experiments:  52%|█████▎    | 21.0/40.0 [08:24<03:41, 11.6s/exp, Success=100.0%, Failed=0, CSMF=0.388, COD=0.215]VA34 Experiments:  55%|█████▌    | 22.0/40.0 [08:32<03:08, 10.5s/exp, Success=100.0%, Failed=0, CSMF=0.388, COD=0.215]VA34 Experiments:  55%|█████▌    | 22.0/40.0 [08:32<03:08, 10.5s/exp, Success=100.0%, Failed=0, CSMF=0.381, COD=0.207]VA34 Experiments:  57%|█████▊    | 23.0/40.0 [08:35<02:27, 8.71s/exp, Success=100.0%, Failed=0, CSMF=0.381, COD=0.207]VA34 Experiments:  57%|█████▊    | 23.0/40.0 [08:35<02:27, 8.71s/exp, Success=100.0%, Failed=0, CSMF=0.375, COD=0.201]VA34 Experiments:  60%|██████    | 24.0/40.0 [08:36<01:44, 6.53s/exp, Success=100.0%, Failed=0, CSMF=0.375, COD=0.201]VA34 Experiments:  60%|██████    | 24.0/40.0 [08:36<01:44, 6.53s/exp, Success=100.0%, Failed=0, CSMF=0.354, COD=0.191]VA34 Experiments:  62%|██████▎   | 25.0/40.0 [08:46<01:50, 7.40s/exp, Success=100.0%, Failed=0, CSMF=0.354, COD=0.191]VA34 Experiments:  62%|██████▎   | 25.0/40.0 [08:46<01:50, 7.40s/exp, Success=100.0%, Failed=0, CSMF=0.338, COD=0.183]VA34 Experiments:  65%|██████▌   | 26.0/40.0 [08:47<01:16, 5.47s/exp, Success=100.0%, Failed=0, CSMF=0.338, COD=0.183]VA34 Experiments:  65%|██████▌   | 26.0/40.0 [08:47<01:16, 5.47s/exp, Success=100.0%, Failed=0, CSMF=0.322, COD=0.172]VA34 Experiments:  68%|██████▊   | 27.0/40.0 [08:47<00:51, 4.00s/exp, Success=100.0%, Failed=0, CSMF=0.322, COD=0.172]VA34 Experiments:  68%|██████▊   | 27.0/40.0 [08:47<00:51, 4.00s/exp, Success=100.0%, Failed=0, CSMF=0.363, COD=0.196]VA34 Experiments:  70%|███████   | 28.0/40.0 [09:00<01:20, 6.73s/exp, Success=100.0%, Failed=0, CSMF=0.363, COD=0.196]VA34 Experiments:  70%|███████   | 28.0/40.0 [09:00<01:20, 6.73s/exp, Success=100.0%, Failed=0, CSMF=0.356, COD=0.195]VA34 Experiments:  72%|███████▎  | 29.0/40.0 [09:07<01:13, 6.70s/exp, Success=100.0%, Failed=0, CSMF=0.356, COD=0.195]VA34 Experiments:  72%|███████▎  | 29.0/40.0 [09:07<01:13, 6.70s/exp, Success=100.0%, Failed=0, CSMF=0.339, COD=0.183]VA34 Experiments:  75%|███████▌  | 30.0/40.0 [09:19<01:22, 8.26s/exp, Success=100.0%, Failed=0, CSMF=0.339, COD=0.183]VA34 Experiments:  75%|███████▌  | 30.0/40.0 [09:19<01:22, 8.26s/exp, Success=100.0%, Failed=0, CSMF=0.331, COD=0.179]2025-07-31 15:23:51 - INFO - 
+============================================================
+PROGRESS UPDATE: 30/40 experiments (75.0%)
+  • Success Rate: 100.0%
+  • Failed: 0
+  • Runtime: 0:09:19
+  • Speed: 0.05 exp/s
+  • ETA: 0:03:06 - Best: xgboost (CSMF: 0.867)
+============================================================
+15:23:51.610 | INFO    | model_comparison.monitoring.progress_tracker - 
+============================================================
+PROGRESS UPDATE: 30/40 experiments (75.0%)
+  • Success Rate: 100.0%
+  • Failed: 0
+  • Runtime: 0:09:19
+  • Speed: 0.05 exp/s
+  • ETA: 0:03:06 - Best: xgboost (CSMF: 0.867)
+============================================================
+2025-07-31 15:23:51 - INFO - Processing batch 2/2
+15:23:51.610 | INFO    | model_comparison.orchestration.prefect_flows - Processing batch 2/2
+VA34 Experiments:  78%|███████▊  | 31.0/40.0 [12:52<10:23, 69.3s/exp, Success=100.0%, Failed=0, CSMF=0.331, COD=0.179]VA34 Experiments:  78%|███████▊  | 31.0/40.0 [12:52<10:23, 69.3s/exp, Success=100.0%, Failed=0, CSMF=0.294, COD=0.145]VA34 Experiments:  80%|████████  | 32.0/40.0 [12:53<06:30, 48.8s/exp, Success=100.0%, Failed=0, CSMF=0.294, COD=0.145]VA34 Experiments:  80%|████████  | 32.0/40.0 [12:53<06:30, 48.8s/exp, Success=100.0%, Failed=0, CSMF=0.314, COD=0.155]VA34 Experiments:  82%|████████▎ | 33.0/40.0 [12:57<04:09, 35.6s/exp, Success=100.0%, Failed=0, CSMF=0.314, COD=0.155]VA34 Experiments:  82%|████████▎ | 33.0/40.0 [12:57<04:09, 35.6s/exp, Success=100.0%, Failed=0, CSMF=0.312, COD=0.154]VA34 Experiments:  85%|████████▌ | 34.0/40.0 [13:06<02:44, 27.4s/exp, Success=100.0%, Failed=0, CSMF=0.312, COD=0.154]VA34 Experiments:  85%|████████▌ | 34.0/40.0 [13:06<02:44, 27.4s/exp, Success=100.0%, Failed=0, CSMF=0.279, COD=0.136]VA34 Experiments:  88%|████████▊ | 35.0/40.0 [13:09<01:40, 20.1s/exp, Success=100.0%, Failed=0, CSMF=0.279, COD=0.136]VA34 Experiments:  88%|████████▊ | 35.0/40.0 [13:09<01:40, 20.1s/exp, Success=100.0%, Failed=0, CSMF=0.318, COD=0.156]VA34 Experiments:  90%|█████████ | 36.0/40.0 [13:11<00:58, 14.7s/exp, Success=100.0%, Failed=0, CSMF=0.318, COD=0.156]VA34 Experiments:  90%|█████████ | 36.0/40.0 [13:11<00:58, 14.7s/exp, Success=100.0%, Failed=0, CSMF=0.340, COD=0.167]VA34 Experiments:  92%|█████████▎| 37.0/40.0 [13:12<00:31, 10.7s/exp, Success=100.0%, Failed=0, CSMF=0.340, COD=0.167]VA34 Experiments:  92%|█████████▎| 37.0/40.0 [13:12<00:31, 10.7s/exp, Success=100.0%, Failed=0, CSMF=0.350, COD=0.168]VA34 Experiments:  95%|█████████▌| 38.0/40.0 [13:19<00:18, 9.48s/exp, Success=100.0%, Failed=0, CSMF=0.350, COD=0.168]VA34 Experiments:  95%|█████████▌| 38.0/40.0 [13:19<00:18, 9.48s/exp, Success=100.0%, Failed=0, CSMF=0.391, COD=0.186]VA34 Experiments:  98%|█████████▊| 39.0/40.0 [13:23<00:08, 8.03s/exp, Success=100.0%, Failed=0, CSMF=0.391, COD=0.186]VA34 Experiments:  98%|█████████▊| 39.0/40.0 [13:23<00:08, 8.03s/exp, Success=100.0%, Failed=0, CSMF=0.386, COD=0.185]VA34 Experiments: 100%|██████████| 40.0/40.0 [13:54<00:00, 14.9s/exp, Success=100.0%, Failed=0, CSMF=0.386, COD=0.185]VA34 Experiments: 100%|██████████| 40.0/40.0 [13:54<00:00, 14.9s/exp, Success=100.0%, Failed=0, CSMF=0.389, COD=0.183]2025-07-31 15:28:26 - INFO - 
+============================================================
+PROGRESS UPDATE: 40/40 experiments (100.0%)
+  • Success Rate: 100.0%
+  • Failed: 0
+  • Runtime: 0:13:54
+  • Speed: 0.05 exp/s
+  • ETA: 0:00:00 - Best: xgboost (CSMF: 0.867)
+============================================================
+15:28:26.791 | INFO    | model_comparison.monitoring.progress_tracker - 
+============================================================
+PROGRESS UPDATE: 40/40 experiments (100.0%)
+  • Success Rate: 100.0%
+  • Failed: 0
+  • Runtime: 0:13:54
+  • Speed: 0.05 exp/s
+  • ETA: 0:00:00 - Best: xgboost (CSMF: 0.867)
+============================================================
+VA34 Experiments: 100%|██████████| 40.0/40.0 [13:54<00:00, 20.9s/exp, Success=100.0%, Failed=0, CSMF=0.389, COD=0.183]
+2025-07-31 15:28:26 - INFO - Completed 40/40 experiments in 0:13:54 (Success rate: 100.0%)
+15:28:26.791 | INFO    | model_comparison.monitoring.progress_tracker - Completed 40/40 experiments in 0:13:54 (Success rate: 100.0%)
+2025-07-31 15:28:26 - INFO - Saved results to results/xgboost_investigation/cross_domain_tuning/in_domain_tuning_20250731_151415/va34_comparison_results.csv
+15:28:26.798 | INFO    | model_comparison.orchestration.prefect_flows - Saved results to results/xgboost_investigation/cross_domain_tuning/in_domain_tuning_20250731_151415/va34_comparison_results.csv
+2025-07-31 15:28:26 - INFO - Performance summary: {'total_elapsed_seconds': 834.6606118679047, 'total_experiments': 40, 'avg_experiment_seconds': 364.5716852366924, 'min_experiment_seconds': 212.99155282974243, 'max_experiment_seconds': 527.6085648536682, 'throughput_per_second': 0.047923670329288875, 'worker_count': 31, 'worker_load_balance': {'min_experiments': 1, 'max_experiments': 2, 'avg_experiments': 1.2903225806451613, 'std_experiments': 0.4539112025635577}}
+15:28:26.799 | INFO    | model_comparison.orchestration.prefect_flows - Performance summary: {'total_elapsed_seconds': 834.6606118679047, 'total_experiments': 40, 'avg_experiment_seconds': 364.5716852366924, 'min_experiment_seconds': 212.99155282974243, 'max_experiment_seconds': 527.6085648536682, 'throughput_per_second': 0.047923670329288875, 'worker_count': 31, 'worker_load_balance': {'min_experiments': 1, 'max_experiments': 2, 'avg_experiments': 1.2903225806451613, 'std_experiments': 0.4539112025635577}}
+2025-07-31 15:28:26 - INFO - Generating visualizations...
+15:28:26.799 | INFO    | model_comparison.orchestration.prefect_flows - Generating visualizations...
+/Users/ericliu/projects5/context-engineering-intro/.venv/lib/python3.12/site-packages/matplotlib/cbook.py:1719: FutureWarning: Calling float on a single element Series is deprecated and will raise a TypeError in the future. Use float(ser.iloc[0]) instead
+  return math.isfinite(val)
+2025-07-31 15:28:32 - INFO - Experiment completed in 851.3s (40 experiments, 0.05 exp/s)
+15:28:32.151 | INFO    | model_comparison.orchestration.prefect_flows - Experiment completed in 851.3s (40 experiments, 0.05 exp/s)
+15:28:32.174 | INFO    | Flow run 'pristine-starfish' - Finished in state Completed()
+2025-07-31 15:28:32 - INFO - 
+==================================================
+15:28:32.175 | INFO    | __main__ - 
+==================================================
+2025-07-31 15:28:32 - INFO - EXPERIMENT SUMMARY
+15:28:32.175 | INFO    | __main__ - EXPERIMENT SUMMARY
+2025-07-31 15:28:32 - INFO - ==================================================
+15:28:32.175 | INFO    | __main__ - ==================================================
+2025-07-31 15:28:32 - INFO - Total experiments: 40
+15:28:32.176 | INFO    | __main__ - Total experiments: 40
+2025-07-31 15:28:32 - INFO - Successful experiments: 40
+15:28:32.176 | INFO    | __main__ - Successful experiments: 40
+2025-07-31 15:28:32 - INFO - Failed experiments: 0
+15:28:32.176 | INFO    | __main__ - Failed experiments: 0
+2025-07-31 15:28:32 - INFO - 
+XGBOOST Performance:
+  Successful experiments: 40/40
+  Avg CSMF Accuracy: 0.388
+  Avg COD Accuracy: 0.201
+15:28:32.176 | INFO    | __main__ - 
+XGBOOST Performance:
+  Successful experiments: 40/40
+  Avg CSMF Accuracy: 0.388
+  Avg COD Accuracy: 0.201
+2025-07-31 15:28:32 - INFO - 
+Results saved to: results/xgboost_investigation/cross_domain_tuning/in_domain_tuning_20250731_151415
+15:28:32.177 | INFO    | __main__ - 
+Results saved to: results/xgboost_investigation/cross_domain_tuning/in_domain_tuning_20250731_151415
+15:28:32.215 | INFO    | Flow run 'married-okapi' - Beginning flow run 'married-okapi' for flow 'Cleanup Ray Resources'
+2025-07-31 15:28:33 - INFO - Ray shutdown complete
+15:28:33.723 | INFO    | model_comparison.orchestration.prefect_flows - Ray shutdown complete
+15:28:33.784 | INFO    | Flow run 'married-okapi' - Finished in state Completed()
+[33m(raylet)[0m WARNING: 64 PYTHON worker processes have been started on node: 311a5010e52887339b2fdec6ead0d8249b3508210e90640f7936251e with address: 127.0.0.1. This could be a result of using a large number of actors, or due to tasks blocked in ray.get() calls (see https://github.com/ray-project/ray/issues/3644 for some discussion of workarounds).
+[33m(raylet)[0m WARNING: 80 PYTHON worker processes have been started on node: 311a5010e52887339b2fdec6ead0d8249b3508210e90640f7936251e with address: 127.0.0.1. This could be a result of using a large number of actors, or due to tasks blocked in ray.get() calls (see https://github.com/ray-project/ray/issues/3644 for some discussion of workarounds).
+15:28:33.798 | INFO    | prefect - Stopping temporary server on http://127.0.0.1:8938
+
+>>> Experiment 2b: Cross-Domain Tuning
+Optimizing for out-of-domain performance using leave-one-site-out CV
+2025-07-31 15:28:48 - INFO - Logging to: logs/hyperparameter_tuning/ray_tuner_20250731_152848.log
+Traceback (most recent call last):
+  File "/Users/ericliu/projects5/context-engineering-intro/model_comparison/experiments/xgboost_investigation/run_cross_domain_tuning.py", line 26, in <module>
+    from data.va_data_handler import VADataHandler
+ModuleNotFoundError: No module named 'data.va_data_handler'
+
+>>> Experiment 2c: Multi-Objective Tuning Simulation
+Training separate models for each objective and comparing
+2025-07-31 15:28:53 - INFO - Logging to: logs/model_comparison/site_comparison_20250731_152853.log
+15:28:53.904 | INFO    | model_comparison.experiments.site_comparison - Logging to: logs/model_comparison/site_comparison_20250731_152853.log
+2025-07-31 15:28:53 - INFO - Logging to: logs/orchestration/progress_tracker_20250731_152853.log
+15:28:53.916 | INFO    | model_comparison.monitoring.progress_tracker - Logging to: logs/orchestration/progress_tracker_20250731_152853.log
+2025-07-31 15:28:53 - INFO - Logging to: logs/orchestration/checkpoint_manager_20250731_152853.log
+15:28:53.920 | INFO    | model_comparison.orchestration.checkpoint_manager - Logging to: logs/orchestration/checkpoint_manager_20250731_152853.log
+2025-07-31 15:28:53 - INFO - Logging to: logs/orchestration/prefect_flows_20250731_152853.log
+15:28:53.926 | INFO    | model_comparison.orchestration.prefect_flows - Logging to: logs/orchestration/prefect_flows_20250731_152853.log
+2025-07-31 15:28:53 - INFO - Logging to: logs/orchestration/__main___20250731_152853.log
+15:28:53.933 | INFO    | __main__ - Logging to: logs/orchestration/__main___20250731_152853.log
+usage: run_distributed_comparison.py [-h] --data-path DATA_PATH --sites SITES
+                                     [SITES ...]
+                                     [--models {xgboost,insilico,random_forest,logistic_regression,categorical_nb,ensemble} [{xgboost,insilico,random_forest,logistic_regression,categorical_nb,ensemble} ...]]
+                                     [--training-sizes TRAINING_SIZES [TRAINING_SIZES ...]]
+                                     [--n-bootstrap N_BOOTSTRAP]
+                                     [--n-workers N_WORKERS]
+                                     [--memory-per-worker MEMORY_PER_WORKER]
+                                     [--batch-size BATCH_SIZE]
+                                     [--checkpoint-interval CHECKPOINT_INTERVAL]
+                                     [--no-ray-dashboard]
+                                     [--ray-dashboard-port RAY_DASHBOARD_PORT]
+                                     [--no-prefect-dashboard]
+                                     [--output-dir OUTPUT_DIR] [--no-plots]
+                                     [--enable-tuning]
+                                     [--tuning-trials TUNING_TRIALS]
+                                     [--tuning-algorithm {grid,random,bayesian}]
+                                     [--tuning-metric {csmf_accuracy,cod_accuracy}]
+                                     [--tuning-cv-folds TUNING_CV_FOLDS]
+                                     [--tuning-cpus-per-trial TUNING_CPUS_PER_TRIAL]
+                                     [--tuning-max-concurrent-trials TUNING_MAX_CONCURRENT_TRIALS]
+                                     [--track-component-times]
+                                     [--use-conservative-xgboost]
+                                     [--use-adaptive-xgboost]
+                                     [--use-cross-domain-cv]
+                                     [--random-seed RANDOM_SEED] [--resume]
+                                     [--clear-checkpoints]
+run_distributed_comparison.py: error: unrecognized arguments: --test-sites AP UP Pemba Bohol Dar
+
+>>> Generating Cross-Domain Tuning Report
+
+=== Cross-Domain Tuning Strategy Comparison ===
+
+In-Domain Optimization:
+  In-domain CSMF: 0.8438
+  Out-domain CSMF: 0.2387
+  Performance gap: 71.7%
+  Tuning time: 359.8s
+
+  Top performing transfers:
+    UP → AP: CSMF=0.5304, COD=0.2424
+    UP → Pemba: CSMF=0.5000, COD=0.2500
+    Mexico → Pemba: CSMF=0.4667, COD=0.3000
+    Mexico → AP: CSMF=0.4377, COD=0.1953
+    Dar → Bohol: CSMF=0.4343, COD=0.2112
+
+
+Comparison saved to: results/xgboost_investigation/cross_domain_tuning/tuning_strategy_comparison.csv
+
+>>> RECOMMENDATION: In-Domain Optimization shows the best generalization
+    with only 71.7% performance gap between domains
+
+Experiment completed at Thu Jul 31 15:28:55 EDT 2025
+Results saved to: results/xgboost_investigation/cross_domain_tuning
+
+======================================
+Experiment 3: Model Complexity Analysis
+======================================
+Analyzing models from: results/xgboost_investigation/regularization_comparison/enhanced_20250731_144628
+
+Overfitting Analysis:
+   model  in_domain_csmf  out_domain_csmf  overfitting_score  performance_gap
+insilico        0.806546         0.372086           0.538668        53.866756
+ xgboost        0.854016         0.290748           0.659553        65.955259
+No XGBoost models found in results/xgboost_investigation/regularization_comparison/enhanced_20250731_144628/models
+
+Analysis complete. Results saved to: results/xgboost_investigation/final_report_20250731_144628/complexity_analysis
+
+======================================
+Experiment 4: Optimized Subsampling
+======================================
+===========================================
+XGBoost Optimized Subsampling Experiment
+===========================================
+Starting experiments at Thu Jul 31 15:28:57 EDT 2025
+Output directory: results/xgboost_investigation/optimized_subsampling
+Sites: Mexico AP Pemba
+
+>>> Experiment 4a: Baseline Enhanced Configuration
+Using current enhanced configuration for baseline comparison
+2025-07-31 15:29:00 - INFO - Logging to: logs/model_comparison/site_comparison_20250731_152900.log
+15:29:00.485 | INFO    | model_comparison.experiments.site_comparison - Logging to: logs/model_comparison/site_comparison_20250731_152900.log
+2025-07-31 15:29:00 - INFO - Logging to: logs/orchestration/progress_tracker_20250731_152900.log
+15:29:00.490 | INFO    | model_comparison.monitoring.progress_tracker - Logging to: logs/orchestration/progress_tracker_20250731_152900.log
+2025-07-31 15:29:00 - INFO - Logging to: logs/orchestration/checkpoint_manager_20250731_152900.log
+15:29:00.491 | INFO    | model_comparison.orchestration.checkpoint_manager - Logging to: logs/orchestration/checkpoint_manager_20250731_152900.log
+2025-07-31 15:29:00 - INFO - Logging to: logs/orchestration/prefect_flows_20250731_152900.log
+15:29:00.492 | INFO    | model_comparison.orchestration.prefect_flows - Logging to: logs/orchestration/prefect_flows_20250731_152900.log
+2025-07-31 15:29:00 - INFO - Logging to: logs/orchestration/__main___20250731_152900.log
+15:29:00.499 | INFO    | __main__ - Logging to: logs/orchestration/__main___20250731_152900.log
+2025-07-31 15:29:00 - INFO - Starting distributed VA34 comparison
+15:29:00.500 | INFO    | __main__ - Starting distributed VA34 comparison
+2025-07-31 15:29:00 - INFO - Data path: va-data/data/phmrc/IHME_PHMRC_VA_DATA_ADULT_Y2013M09D11_0.csv
+15:29:00.500 | INFO    | __main__ - Data path: va-data/data/phmrc/IHME_PHMRC_VA_DATA_ADULT_Y2013M09D11_0.csv
+2025-07-31 15:29:00 - INFO - Sites: ['Mexico', 'AP', 'Pemba']
+15:29:00.500 | INFO    | __main__ - Sites: ['Mexico', 'AP', 'Pemba']
+2025-07-31 15:29:00 - INFO - Models: ['xgboost', 'insilico']
+15:29:00.500 | INFO    | __main__ - Models: ['xgboost', 'insilico']
+2025-07-31 15:29:00 - INFO - Workers: -1
+15:29:00.500 | INFO    | __main__ - Workers: -1
+2025-07-31 15:29:00 - INFO - Output directory: results/xgboost_investigation/optimized_subsampling/baseline_enhanced_20250731_152857
+15:29:00.500 | INFO    | __main__ - Output directory: results/xgboost_investigation/optimized_subsampling/baseline_enhanced_20250731_152857
+2025-07-31 15:29:00 - INFO - Ray dashboard will be available at: http://localhost:8265
+15:29:00.501 | INFO    | __main__ - Ray dashboard will be available at: http://localhost:8265
+2025-07-31 15:29:00 - INFO - Prefect dashboard available at: http://localhost:4200
+15:29:00.501 | INFO    | __main__ - Prefect dashboard available at: http://localhost:4200
+2025-07-31 15:29:00 - INFO - Start Prefect server with: prefect server start
+15:29:00.501 | INFO    | __main__ - Start Prefect server with: prefect server start
+2025-07-31 15:29:00 - INFO - Starting Prefect flow execution
+15:29:00.501 | INFO    | __main__ - Starting Prefect flow execution
+15:29:02.704 | INFO    | prefect - Starting temporary server on http://127.0.0.1:8424
+See https://docs.prefect.io/3.0/manage/self-host#self-host-a-prefect-server for more information on running a dedicated Prefect server.
+15:29:10.293 | INFO    | Flow run 'tuscan-capybara' - Beginning flow run 'tuscan-capybara' for flow 'VA34 Comparison Experiment'
+2025-07-31 15:29:10 - INFO - Starting VA34 comparison flow
+15:29:10.294 | INFO    | model_comparison.orchestration.prefect_flows - Starting VA34 comparison flow
+2025-07-31 15:29:13,855	INFO worker.py:1927 -- Started a local Ray instance.
+[2025-07-31 15:29:13,857 I 34473 32771020] logging.cc:302: Set ray log level from environment variable RAY_BACKEND_LOG_LEVEL to 1
+2025-07-31 15:29:14 - INFO - Ray initialized with dashboard at http://localhost:8265
+15:29:14.798 | INFO    | model_comparison.orchestration.prefect_flows - Ray initialized with dashboard at http://localhost:8265
+2025-07-31 15:29:24 - INFO - Loaded ML data with shape: (3308, 172)
+15:29:24.422 | INFO    | model_comparison.orchestration.prefect_flows - Loaded ML data with shape: (3308, 172)
+2025-07-31 15:29:24 - INFO - Loaded OpenVA data with shape: (3308, 172)
+15:29:24.423 | INFO    | model_comparison.orchestration.prefect_flows - Loaded OpenVA data with shape: (3308, 172)
+2025-07-31 15:29:24 - INFO - Generated 26 experiment configurations
+15:29:24.625 | INFO    | model_comparison.orchestration.prefect_flows - Generated 26 experiment configurations
+15:29:24.655 | INFO    | Task run 'generate_experiment_configs-8e0' - Finished in state Completed()
+2025-07-31 15:29:24 - INFO - No checkpoint found
+15:29:24.656 | INFO    | model_comparison.orchestration.checkpoint_manager - No checkpoint found
+2025-07-31 15:29:26 - INFO - Prepared data for 26/26 experiments
+15:29:26.073 | INFO    | model_comparison.orchestration.prefect_flows - Prepared data for 26/26 experiments
+15:29:26.076 | INFO    | Task run 'prepare_experiment_data-d7b' - Finished in state Completed()
+VA34 Experiments:   0%|          | 0.00/26.0 [00:00<?, ?exp/s]VA34 Experiments:   0%|          | 0.00/26.0 [00:00<?, ?exp/s, Success=0.0%, Failed=0]2025-07-31 15:29:26 - INFO - Processing batch 1/2
+15:29:26.099 | INFO    | model_comparison.orchestration.prefect_flows - Processing batch 1/2
+VA34 Experiments:   4%|▍         | 1.00/26.0 [00:00<00:05, 4.98exp/s, Success=0.0%, Failed=0]VA34 Experiments:   4%|▍         | 1.00/26.0 [00:00<00:05, 4.98exp/s, Success=100.0%, Failed=0, CSMF=0.915, COD=0.617]VA34 Experiments:   8%|▊         | 2.00/26.0 [00:00<00:11, 2.12exp/s, Success=100.0%, Failed=0, CSMF=0.915, COD=0.617]VA34 Experiments:   8%|▊         | 2.00/26.0 [00:00<00:11, 2.12exp/s, Success=100.0%, Failed=0, CSMF=0.887, COD=0.529]VA34 Experiments:  12%|█▏        | 3.00/26.0 [00:00<00:10, 2.12exp/s, Success=100.0%, Failed=0, CSMF=0.884, COD=0.510]VA34 Experiments:  15%|█▌        | 4.00/26.0 [00:01<00:04, 4.42exp/s, Success=100.0%, Failed=0, CSMF=0.884, COD=0.510]VA34 Experiments:  15%|█▌        | 4.00/26.0 [00:01<00:04, 4.42exp/s, Success=100.0%, Failed=0, CSMF=0.777, COD=0.434]VA34 Experiments:  19%|█▉        | 5.00/26.0 [00:01<00:04, 4.21exp/s, Success=100.0%, Failed=0, CSMF=0.777, COD=0.434]VA34 Experiments:  19%|█▉        | 5.00/26.0 [00:01<00:04, 4.21exp/s, Success=100.0%, Failed=0, CSMF=0.792, COD=0.418]VA34 Experiments:  23%|██▎       | 6.00/26.0 [00:01<00:06, 3.29exp/s, Success=100.0%, Failed=0, CSMF=0.792, COD=0.418]VA34 Experiments:  23%|██▎       | 6.00/26.0 [00:01<00:06, 3.29exp/s, Success=100.0%, Failed=0, CSMF=0.798, COD=0.408]VA34 Experiments:  27%|██▋       | 7.00/26.0 [00:01<00:05, 3.51exp/s, Success=100.0%, Failed=0, CSMF=0.798, COD=0.408]VA34 Experiments:  27%|██▋       | 7.00/26.0 [00:01<00:05, 3.51exp/s, Success=100.0%, Failed=0, CSMF=0.733, COD=0.364]VA34 Experiments:  31%|███       | 8.00/26.0 [00:02<00:05, 3.11exp/s, Success=100.0%, Failed=0, CSMF=0.733, COD=0.364]VA34 Experiments:  31%|███       | 8.00/26.0 [00:02<00:05, 3.11exp/s, Success=100.0%, Failed=0, CSMF=0.746, COD=0.368]VA34 Experiments:  35%|███▍      | 9.00/26.0 [00:02<00:04, 3.48exp/s, Success=100.0%, Failed=0, CSMF=0.746, COD=0.368]VA34 Experiments:  35%|███▍      | 9.00/26.0 [00:02<00:04, 3.48exp/s, Success=100.0%, Failed=0, CSMF=0.713, COD=0.366]VA34 Experiments:  38%|███▊      | 10.0/26.0 [00:02<00:04, 3.48exp/s, Success=100.0%, Failed=0, CSMF=0.718, COD=0.364]2025-07-31 15:29:28 - INFO - 
+============================================================
+PROGRESS UPDATE: 10/26 experiments (38.5%)
+  • Success Rate: 100.0%
+  • Failed: 0
+  • Runtime: 0:00:02
+  • Speed: 3.80 exp/s
+  • ETA: 0:00:04 - Best: xgboost (CSMF: 0.915)
+============================================================
+15:29:28.711 | INFO    | model_comparison.monitoring.progress_tracker - 
+============================================================
+PROGRESS UPDATE: 10/26 experiments (38.5%)
+  • Success Rate: 100.0%
+  • Failed: 0
+  • Runtime: 0:00:02
+  • Speed: 3.80 exp/s
+  • ETA: 0:00:04 - Best: xgboost (CSMF: 0.915)
+============================================================
+VA34 Experiments:  42%|████▏     | 11.0/26.0 [00:02<00:04, 3.48exp/s, Success=100.0%, Failed=0, CSMF=0.693, COD=0.358]VA34 Experiments:  46%|████▌     | 12.0/26.0 [00:02<00:04, 3.48exp/s, Success=100.0%, Failed=0, CSMF=0.686, COD=0.347]VA34 Experiments:  50%|█████     | 13.0/26.0 [00:03<00:02, 4.86exp/s, Success=100.0%, Failed=0, CSMF=0.686, COD=0.347]VA34 Experiments:  50%|█████     | 13.0/26.0 [00:03<00:02, 4.86exp/s, Success=100.0%, Failed=0, CSMF=0.699, COD=0.354]VA34 Experiments:  54%|█████▍    | 14.0/26.0 [00:26<00:53, 4.42s/exp, Success=100.0%, Failed=0, CSMF=0.699, COD=0.354]VA34 Experiments:  54%|█████▍    | 14.0/26.0 [00:26<00:53, 4.42s/exp, Success=100.0%, Failed=0, CSMF=0.712, COD=0.367]VA34 Experiments:  58%|█████▊    | 15.0/26.0 [00:34<00:56, 5.13s/exp, Success=100.0%, Failed=0, CSMF=0.712, COD=0.367]VA34 Experiments:  58%|█████▊    | 15.0/26.0 [00:34<00:56, 5.13s/exp, Success=100.0%, Failed=0, CSMF=0.685, COD=0.354]VA34 Experiments:  62%|██████▏   | 16.0/26.0 [00:36<00:45, 4.59s/exp, Success=100.0%, Failed=0, CSMF=0.685, COD=0.354]VA34 Experiments:  62%|██████▏   | 16.0/26.0 [00:36<00:45, 4.59s/exp, Success=100.0%, Failed=0, CSMF=0.665, COD=0.346]VA34 Experiments:  65%|██████▌   | 17.0/26.0 [01:01<01:25, 9.55s/exp, Success=100.0%, Failed=0, CSMF=0.665, COD=0.346]VA34 Experiments:  65%|██████▌   | 17.0/26.0 [01:01<01:25, 9.55s/exp, Success=100.0%, Failed=0, CSMF=0.646, COD=0.334]VA34 Experiments:  69%|██████▉   | 18.0/26.0 [01:02<00:58, 7.27s/exp, Success=100.0%, Failed=0, CSMF=0.646, COD=0.334]VA34 Experiments:  69%|██████▉   | 18.0/26.0 [01:02<00:58, 7.27s/exp, Success=100.0%, Failed=0, CSMF=0.624, COD=0.321]VA34 Experiments:  73%|███████▎  | 19.0/26.0 [01:18<01:07, 9.71s/exp, Success=100.0%, Failed=0, CSMF=0.624, COD=0.321]VA34 Experiments:  73%|███████▎  | 19.0/26.0 [01:18<01:07, 9.71s/exp, Success=100.0%, Failed=0, CSMF=0.612, COD=0.315]VA34 Experiments:  77%|███████▋  | 20.0/26.0 [01:21<00:47, 7.88s/exp, Success=100.0%, Failed=0, CSMF=0.612, COD=0.315]VA34 Experiments:  77%|███████▋  | 20.0/26.0 [01:21<00:47, 7.88s/exp, Success=100.0%, Failed=0, CSMF=0.618, COD=0.313]2025-07-31 15:30:47 - INFO - 
+============================================================
+PROGRESS UPDATE: 20/26 experiments (76.9%)
+  • Success Rate: 100.0%
+  • Failed: 0
+  • Runtime: 0:01:21
+  • Speed: 0.24 exp/s
+  • ETA: 0:00:24 - Best: xgboost (CSMF: 0.915)
+============================================================
+15:30:47.874 | INFO    | model_comparison.monitoring.progress_tracker - 
+============================================================
+PROGRESS UPDATE: 20/26 experiments (76.9%)
+  • Success Rate: 100.0%
+  • Failed: 0
+  • Runtime: 0:01:21
+  • Speed: 0.24 exp/s
+  • ETA: 0:00:24 - Best: xgboost (CSMF: 0.915)
+============================================================
+VA34 Experiments:  81%|████████  | 21.0/26.0 [01:23<00:29, 5.98s/exp, Success=100.0%, Failed=0, CSMF=0.618, COD=0.313]VA34 Experiments:  81%|████████  | 21.0/26.0 [01:23<00:29, 5.98s/exp, Success=100.0%, Failed=0, CSMF=0.610, COD=0.295]VA34 Experiments:  85%|████████▍ | 22.0/26.0 [01:23<00:17, 4.30s/exp, Success=100.0%, Failed=0, CSMF=0.610, COD=0.295]VA34 Experiments:  85%|████████▍ | 22.0/26.0 [01:23<00:17, 4.30s/exp, Success=100.0%, Failed=0, CSMF=0.604, COD=0.291]VA34 Experiments:  88%|████████▊ | 23.0/26.0 [01:27<00:12, 4.20s/exp, Success=100.0%, Failed=0, CSMF=0.604, COD=0.291]VA34 Experiments:  88%|████████▊ | 23.0/26.0 [01:27<00:12, 4.20s/exp, Success=100.0%, Failed=0, CSMF=0.589, COD=0.280]VA34 Experiments:  92%|█████████▏| 24.0/26.0 [01:29<00:07, 3.56s/exp, Success=100.0%, Failed=0, CSMF=0.589, COD=0.280]VA34 Experiments:  92%|█████████▏| 24.0/26.0 [01:29<00:07, 3.56s/exp, Success=100.0%, Failed=0, CSMF=0.606, COD=0.291]VA34 Experiments:  96%|█████████▌| 25.0/26.0 [01:38<00:05, 5.16s/exp, Success=100.0%, Failed=0, CSMF=0.606, COD=0.291]VA34 Experiments:  96%|█████████▌| 25.0/26.0 [01:38<00:05, 5.16s/exp, Success=100.0%, Failed=0, CSMF=0.601, COD=0.289]2025-07-31 15:31:04 - INFO - Processing batch 2/2
+15:31:04.247 | INFO    | model_comparison.orchestration.prefect_flows - Processing batch 2/2
+VA34 Experiments: 100%|██████████| 26.0/26.0 [02:27<00:00, 18.3s/exp, Success=100.0%, Failed=0, CSMF=0.601, COD=0.289]VA34 Experiments: 100%|██████████| 26.0/26.0 [02:27<00:00, 18.3s/exp, Success=100.0%, Failed=0, CSMF=0.596, COD=0.289]VA34 Experiments: 100%|██████████| 26.0/26.0 [02:27<00:00, 5.67s/exp, Success=100.0%, Failed=0, CSMF=0.596, COD=0.289]
+2025-07-31 15:31:53 - INFO - Completed 26/26 experiments in 0:02:27 (Success rate: 100.0%)
+15:31:53.456 | INFO    | model_comparison.monitoring.progress_tracker - Completed 26/26 experiments in 0:02:27 (Success rate: 100.0%)
+2025-07-31 15:31:53 - INFO - Saved results to results/xgboost_investigation/optimized_subsampling/baseline_enhanced_20250731_152857/va34_comparison_results.csv
+15:31:53.460 | INFO    | model_comparison.orchestration.prefect_flows - Saved results to results/xgboost_investigation/optimized_subsampling/baseline_enhanced_20250731_152857/va34_comparison_results.csv
+2025-07-31 15:31:53 - INFO - Performance summary: {'total_elapsed_seconds': 147.36147904396057, 'total_experiments': 26, 'avg_experiment_seconds': 33.192152353433464, 'min_experiment_seconds': 0.15296697616577148, 'max_experiment_seconds': 95.54480695724487, 'throughput_per_second': 0.17643688275036745, 'worker_count': 16, 'worker_load_balance': {'min_experiments': 1, 'max_experiments': 6, 'avg_experiments': 1.625, 'std_experiments': 1.2686114456365274}}
+15:31:53.461 | INFO    | model_comparison.orchestration.prefect_flows - Performance summary: {'total_elapsed_seconds': 147.36147904396057, 'total_experiments': 26, 'avg_experiment_seconds': 33.192152353433464, 'min_experiment_seconds': 0.15296697616577148, 'max_experiment_seconds': 95.54480695724487, 'throughput_per_second': 0.17643688275036745, 'worker_count': 16, 'worker_load_balance': {'min_experiments': 1, 'max_experiments': 6, 'avg_experiments': 1.625, 'std_experiments': 1.2686114456365274}}
+2025-07-31 15:31:53 - INFO - Generating visualizations...
+15:31:53.461 | INFO    | model_comparison.orchestration.prefect_flows - Generating visualizations...
+2025-07-31 15:31:54 - INFO - Experiment completed in 164.5s (26 experiments, 0.16 exp/s)
+15:31:54.822 | INFO    | model_comparison.orchestration.prefect_flows - Experiment completed in 164.5s (26 experiments, 0.16 exp/s)
+15:31:54.839 | INFO    | Flow run 'tuscan-capybara' - Finished in state Completed()
+2025-07-31 15:31:54 - INFO - 
+==================================================
+15:31:54.840 | INFO    | __main__ - 
+==================================================
+2025-07-31 15:31:54 - INFO - EXPERIMENT SUMMARY
+15:31:54.840 | INFO    | __main__ - EXPERIMENT SUMMARY
+2025-07-31 15:31:54 - INFO - ==================================================
+15:31:54.840 | INFO    | __main__ - ==================================================
+2025-07-31 15:31:54 - INFO - Total experiments: 26
+15:31:54.840 | INFO    | __main__ - Total experiments: 26
+2025-07-31 15:31:54 - INFO - Successful experiments: 26
+15:31:54.841 | INFO    | __main__ - Successful experiments: 26
+2025-07-31 15:31:54 - INFO - Failed experiments: 0
+15:31:54.841 | INFO    | __main__ - Failed experiments: 0
+2025-07-31 15:31:54 - INFO - 
+XGBOOST Performance:
+  Successful experiments: 13/13
+  Avg CSMF Accuracy: 0.699
+  Avg COD Accuracy: 0.354
+15:31:54.841 | INFO    | __main__ - 
+XGBOOST Performance:
+  Successful experiments: 13/13
+  Avg CSMF Accuracy: 0.699
+  Avg COD Accuracy: 0.354
+2025-07-31 15:31:54 - INFO - 
+INSILICO Performance:
+  Successful experiments: 13/13
+  Avg CSMF Accuracy: 0.587
+  Avg COD Accuracy: 0.279
+15:31:54.842 | INFO    | __main__ - 
+INSILICO Performance:
+  Successful experiments: 13/13
+  Avg CSMF Accuracy: 0.587
+  Avg COD Accuracy: 0.279
+2025-07-31 15:31:54 - INFO - 
+Results saved to: results/xgboost_investigation/optimized_subsampling/baseline_enhanced_20250731_152857
+15:31:54.842 | INFO    | __main__ - 
+Results saved to: results/xgboost_investigation/optimized_subsampling/baseline_enhanced_20250731_152857
+15:31:54.876 | INFO    | Flow run 'provocative-frog' - Beginning flow run 'provocative-frog' for flow 'Cleanup Ray Resources'
+2025-07-31 15:31:56 - INFO - Ray shutdown complete
+15:31:56.377 | INFO    | model_comparison.orchestration.prefect_flows - Ray shutdown complete
+15:31:56.391 | INFO    | Flow run 'provocative-frog' - Finished in state Completed()
+15:31:56.395 | INFO    | prefect - Stopping temporary server on http://127.0.0.1:8424
+
+>>> Experiment 4b: Optimized Subsampling Configuration
+Using new optimized subsampling parameters
+Traceback (most recent call last):
+  File "/Users/ericliu/projects5/context-engineering-intro/results/xgboost_investigation/optimized_subsampling/run_with_optimized_config.py", line 13, in <module>
+    from baseline.models.model_factory import ModelFactory
+ModuleNotFoundError: No module named 'baseline.models.model_factory'
+ERROR: Experiment 4b failed!
+
+======================================
+Experiment 5: Advanced Techniques
+======================================
+Running advanced techniques in quick mode (reduced iterations)
+===========================================
+Advanced XGBoost Techniques Experiment
+===========================================
+Starting experiments at Thu Jul 31 15:31:59 EDT 2025
+Output directory: results/xgboost_investigation/advanced_techniques
+Sites: Mexico AP UP Pemba Bohol Dar
+
+>>> Experiment 5a: Custom CSMF-Optimized Objective
+Testing XGBoost with custom objective function optimized for CSMF accuracy
+Traceback (most recent call last):
+  File "/Users/ericliu/projects5/context-engineering-intro/results/xgboost_investigation/advanced_techniques/test_custom_objective.py", line 12, in <module>
+    from data.va_data_handler import VADataHandler
+ModuleNotFoundError: No module named 'data.va_data_handler'
+
+>>> Experiment 5b: Domain Adaptation with Multi-Task Learning
+Testing domain-adaptive XGBoost model
+Traceback (most recent call last):
+  File "/Users/ericliu/projects5/context-engineering-intro/results/xgboost_investigation/advanced_techniques/test_domain_adaptation.py", line 11, in <module>
+    from data.va_data_handler import VADataHandler
+ModuleNotFoundError: No module named 'data.va_data_handler'
+
+>>> Experiment 5c: Ensemble Methods for Robust Predictions
+Testing ensemble of XGBoost models
+Traceback (most recent call last):
+  File "<string>", line 10, in <module>
+ModuleNotFoundError: No module named 'data.va_data_handler'
+
+======================================
+Experiment 6: Ablation Study
+======================================
+===========================================
+XGBoost Ablation Study Experiment
+===========================================
+Starting ablation study at Thu Jul 31 15:32:05 EDT 2025
+Output directory: results/xgboost_investigation/ablation_study
+Sites: Mexico AP Pemba
+Traceback (most recent call last):
+  File "/Users/ericliu/projects5/context-engineering-intro/results/xgboost_investigation/ablation_study/run_ablation_study.py", line 18, in <module>
+    from data.va_data_handler import VADataHandler
+ModuleNotFoundError: No module named 'data.va_data_handler'
+
+>>> Generating Ablation Study Visualization
+Traceback (most recent call last):
+  File "<string>", line 9, in <module>
+  File "/Users/ericliu/projects5/context-engineering-intro/.venv/lib/python3.12/site-packages/pandas/io/parsers/readers.py", line 1026, in read_csv
+    return _read(filepath_or_buffer, kwds)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/ericliu/projects5/context-engineering-intro/.venv/lib/python3.12/site-packages/pandas/io/parsers/readers.py", line 620, in _read
+    parser = TextFileReader(filepath_or_buffer, **kwds)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/ericliu/projects5/context-engineering-intro/.venv/lib/python3.12/site-packages/pandas/io/parsers/readers.py", line 1620, in __init__
+    self._engine = self._make_engine(f, self.engine)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/ericliu/projects5/context-engineering-intro/.venv/lib/python3.12/site-packages/pandas/io/parsers/readers.py", line 1880, in _make_engine
+    self.handles = get_handle(
+                   ^^^^^^^^^^^
+  File "/Users/ericliu/projects5/context-engineering-intro/.venv/lib/python3.12/site-packages/pandas/io/common.py", line 873, in get_handle
+    handle = open(
+             ^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: 'results/xgboost_investigation/ablation_study/ablation_results_detailed.csv'
+
+======================================
+Generating Final Report
+======================================
+
+=== XGBoost Generalization Investigation Summary ===
+
+Baseline Performance (Original Experiment):
+  XGBoost In-domain CSMF: 0.8323
+  XGBoost Out-domain CSMF: 0.3597
+  InSilicoVA In-domain CSMF: 0.7997
+  InSilicoVA Out-domain CSMF: 0.4605
+
+
+1. REGULARIZATION COMPARISON RESULTS:
+--------------------------------------------------
+ENHANCED:
+  Performance gap: 66.0% (Target: <30%)
+CONSERVATIVE:
+  Performance gap: 66.5% (Target: <30%)
+FIXED_CONSERVATIVE:
+  Performance gap: 42.2% (Target: <30%)
+
+
+2. CROSS-DOMAIN TUNING RESULTS:
+--------------------------------------------------
+In-Domain Optimization:
+  Performance gap: 71.7%
+
+
+3. MODEL COMPLEXITY ANALYSIS:
+--------------------------------------------------
+insilico:
+  Overfitting score: 0.539
+  Performance gap: 53.9%
+xgboost:
+  Overfitting score: 0.660
+  Performance gap: 66.0%
+
+
+=== FINAL RECOMMENDATIONS ===
+--------------------------------------------------
+
+✓ BEST STRATEGY: Regularization-fixed_conservative
+  Achieved performance gap: 42.2%
+  Reduced gap from 53.8% to 42.2% (partial improvement)
+
+Implementation recommendations:
+  1. Use XGBoostEnhancedConfig.conservative() as default configuration
+  2. Focus on shallow trees (max_depth=3-4) with strong regularization
+  3. Use high min_child_weight (50-100) to prevent overfitting
+
+Additional recommendations:
+  - Monitor overfitting metrics during training
+  - Consider ensemble methods combining XGBoost and InSilicoVA
+  - Implement domain adaptation techniques for challenging sites like Pemba
+
+Investigation completed successfully!
+
+Copying analysis artifacts to final report directory...
+
+============================================
+Investigation completed at Thu Jul 31 15:32:10 EDT 2025
+Final report saved to: results/xgboost_investigation/final_report_20250731_144628
+============================================
