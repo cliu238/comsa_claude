@@ -63,6 +63,9 @@ class DuckVotingEnsemble(BaseEstimator, ClassifierMixin):
     def _create_estimator(self, model_type: str) -> BaseEstimator:
         """Create an estimator instance based on model type.
         
+        Creates models with configurations optimized for small datasets
+        to avoid internal stratification errors.
+        
         Args:
             model_type: Type of model to create
             
@@ -84,7 +87,21 @@ class DuckVotingEnsemble(BaseEstimator, ClassifierMixin):
             raise ValueError(f"Unknown model type: {model_type}")
             
         model_class, config_class = model_map[model_type]
-        config = config_class()
+        
+        # Create config with settings to avoid internal stratification issues
+        if model_type == "random_forest":
+            # Disable out-of-bag scoring which can fail with small datasets
+            config = config_class(oob_score=False, bootstrap=True)
+        elif model_type == "xgboost":
+            # Use smaller min_child_weight to handle small leaf nodes
+            config = config_class(min_child_weight=1)
+        elif model_type == "categorical_nb":
+            # Use higher alpha for better smoothing with small datasets
+            config = config_class(alpha=1.0)
+        else:
+            # Default config for other models
+            config = config_class()
+            
         return model_class(config=config)
         
     def _calculate_diversity(
@@ -164,38 +181,100 @@ class DuckVotingEnsemble(BaseEstimator, ClassifierMixin):
             
         elif strategy == "performance":
             # Weight by individual performance on validation set
-            from sklearn.model_selection import train_test_split
+            from sklearn.model_selection import train_test_split, KFold
             
-            # Split both data formats if OpenVA is provided
-            X_train, X_val, y_train, y_val = train_test_split(
-                X, y, test_size=0.2, random_state=self.config.random_seed, stratify=y
-            )
+            # Check if we have enough samples for stratified split
+            min_samples_needed = 2  # Minimum samples per class for stratification
+            class_counts = y.value_counts()
+            can_stratify = all(count >= min_samples_needed for count in class_counts.values)
             
-            X_train_openva, X_val_openva = None, None
-            if X_openva is not None:
-                # Split OpenVA data using same indices
-                train_idx = X_train.index
-                val_idx = X_val.index
-                X_train_openva = X_openva.loc[train_idx]
-                X_val_openva = X_openva.loc[val_idx]
+            # For small datasets or when stratification isn't possible, use cross-validation
+            total_samples = len(y)
+            use_cv = total_samples < 100 or not can_stratify
             
-            weights = []
-            for name, estimator in self.estimators_:
-                # Refit on train split with appropriate data format
-                estimator_clone = clone(estimator)
+            if use_cv:
+                # Use cross-validation for small datasets
+                logger.info(
+                    f"Using {3}-fold cross-validation for weight optimization "
+                    f"(total_samples={total_samples}, can_stratify={can_stratify})"
+                )
                 
-                if self.estimator_data_types_.get(name) == "openva" and X_train_openva is not None:
-                    estimator_clone.fit(X_train_openva, y_train)
-                    y_pred = estimator_clone.predict(X_val_openva)
-                else:
-                    estimator_clone.fit(X_train, y_train)
-                    y_pred = estimator_clone.predict(X_val)
+                weights = []
+                kf = KFold(n_splits=min(3, total_samples // 10), shuffle=True, random_state=self.config.random_seed)
                 
-                # Calculate CSMF accuracy on validation
-                from model_comparison.metrics.comparison_metrics import calculate_csmf_accuracy
-                csmf_acc = calculate_csmf_accuracy(y_val, y_pred)
-                weights.append(max(csmf_acc, 0.1))  # Minimum weight of 0.1
+                for name, estimator in self.estimators_:
+                    scores = []
+                    for train_idx, val_idx in kf.split(X):
+                        # Split data
+                        X_train_cv = X.iloc[train_idx]
+                        X_val_cv = X.iloc[val_idx]
+                        y_train_cv = y.iloc[train_idx]
+                        y_val_cv = y.iloc[val_idx]
+                        
+                        # Handle OpenVA data if available
+                        if self.estimator_data_types_.get(name) == "openva" and X_openva is not None:
+                            X_train_cv_openva = X_openva.iloc[train_idx]
+                            X_val_cv_openva = X_openva.iloc[val_idx]
+                            
+                            estimator_clone = clone(estimator)
+                            estimator_clone.fit(X_train_cv_openva, y_train_cv)
+                            y_pred = estimator_clone.predict(X_val_cv_openva)
+                        else:
+                            estimator_clone = clone(estimator)
+                            estimator_clone.fit(X_train_cv, y_train_cv)
+                            y_pred = estimator_clone.predict(X_val_cv)
+                        
+                        # Calculate CSMF accuracy
+                        from model_comparison.metrics.comparison_metrics import calculate_csmf_accuracy
+                        csmf_acc = calculate_csmf_accuracy(y_val_cv, y_pred)
+                        scores.append(csmf_acc)
+                    
+                    # Average score across folds
+                    avg_score = np.mean(scores)
+                    weights.append(max(avg_score, 0.1))  # Minimum weight of 0.1
+                    logger.info(f"{name} CV score: {avg_score:.3f}")
                 
+            else:
+                # Use holdout validation for larger datasets
+                try:
+                    # Try stratified split first
+                    X_train, X_val, y_train, y_val = train_test_split(
+                        X, y, test_size=0.2, random_state=self.config.random_seed, stratify=y
+                    )
+                    logger.info("Using stratified holdout validation for weight optimization")
+                except ValueError as e:
+                    # Fall back to random split if stratification fails
+                    logger.warning(f"Stratified split failed: {e}. Using random split.")
+                    X_train, X_val, y_train, y_val = train_test_split(
+                        X, y, test_size=0.2, random_state=self.config.random_seed
+                    )
+                
+                X_train_openva, X_val_openva = None, None
+                if X_openva is not None:
+                    # Split OpenVA data using same indices
+                    train_idx = X_train.index
+                    val_idx = X_val.index
+                    X_train_openva = X_openva.loc[train_idx]
+                    X_val_openva = X_openva.loc[val_idx]
+                
+                weights = []
+                for name, estimator in self.estimators_:
+                    # Refit on train split with appropriate data format
+                    estimator_clone = clone(estimator)
+                    
+                    if self.estimator_data_types_.get(name) == "openva" and X_train_openva is not None:
+                        estimator_clone.fit(X_train_openva, y_train)
+                        y_pred = estimator_clone.predict(X_val_openva)
+                    else:
+                        estimator_clone.fit(X_train, y_train)
+                        y_pred = estimator_clone.predict(X_val)
+                    
+                    # Calculate CSMF accuracy on validation
+                    from model_comparison.metrics.comparison_metrics import calculate_csmf_accuracy
+                    csmf_acc = calculate_csmf_accuracy(y_val, y_pred)
+                    weights.append(max(csmf_acc, 0.1))  # Minimum weight of 0.1
+                    logger.info(f"{name} holdout score: {csmf_acc:.3f}")
+                    
             weights = np.array(weights)
             return weights / weights.sum()
             
@@ -229,6 +308,33 @@ class DuckVotingEnsemble(BaseEstimator, ClassifierMixin):
         # Get unique classes
         self.classes_ = np.unique(y.values)
         
+        # Check minimum samples before fitting
+        min_samples_per_class = 2
+        class_counts = y.value_counts()
+        rare_classes = class_counts[class_counts < min_samples_per_class]
+        
+        if len(rare_classes) > 0:
+            logger.warning(
+                f"Found {len(rare_classes)} classes with < {min_samples_per_class} samples. "
+                f"Filtering out rare classes to avoid fitting errors."
+            )
+            # Filter out rare classes
+            valid_mask = ~y.isin(rare_classes.index)
+            X_filtered = X[valid_mask]
+            y_filtered = y[valid_mask]
+            if X_openva is not None:
+                X_openva_filtered = X_openva[valid_mask]
+            else:
+                X_openva_filtered = None
+                
+            # Update classes after filtering
+            self.classes_ = np.unique(y_filtered.values)
+            logger.info(f"After filtering: {len(X_filtered)} samples, {len(self.classes_)} classes")
+        else:
+            X_filtered = X
+            y_filtered = y
+            X_openva_filtered = X_openva
+        
         # Create and fit estimators
         self.estimators_ = []
         for name, model_type in self.config.estimators:
@@ -238,30 +344,44 @@ class DuckVotingEnsemble(BaseEstimator, ClassifierMixin):
                 # Load pretrained model (not implemented yet)
                 raise NotImplementedError("Pretrained estimators not yet supported")
             else:
-                # Create and fit new estimator with appropriate data format
-                estimator = self._create_estimator(model_type)
-                
-                if model_type == "insilico" and X_openva is not None:
-                    # InSilicoVA needs OpenVA format
-                    estimator.fit(X_openva, y)
-                    self.estimator_data_types_[name] = "openva"
-                    logger.info(f"  Using OpenVA format for {name}")
-                else:
-                    # Other models use numeric format
-                    estimator.fit(X, y)
-                    self.estimator_data_types_[name] = "numeric"
+                try:
+                    # Create and fit new estimator with appropriate data format
+                    estimator = self._create_estimator(model_type)
                     
-                self.estimators_.append((name, estimator))
+                    if model_type == "insilico" and X_openva_filtered is not None:
+                        # InSilicoVA needs OpenVA format
+                        estimator.fit(X_openva_filtered, y_filtered)
+                        self.estimator_data_types_[name] = "openva"
+                        logger.info(f"  Using OpenVA format for {name}")
+                    else:
+                        # Other models use numeric format
+                        estimator.fit(X_filtered, y_filtered)
+                        self.estimator_data_types_[name] = "numeric"
+                        
+                    self.estimators_.append((name, estimator))
+                    
+                except Exception as e:
+                    logger.error(f"Failed to fit {name}: {str(e)}")
+                    # Skip this estimator but continue with others
+                    if len(self.config.estimators) > 1:
+                        logger.warning(f"Continuing without {name} estimator")
+                    else:
+                        # If this was the only estimator, re-raise
+                        raise
+                        
+        # Ensure we have at least one fitted estimator
+        if len(self.estimators_) == 0:
+            raise RuntimeError("Failed to fit any estimators in the ensemble")
                 
         # Calculate diversity if needed
         if self.config.min_diversity > 0:
             # Use appropriate data format for predictions
             predictions = []
             for name, est in self.estimators_:
-                if self.estimator_data_types_.get(name) == "openva" and X_openva is not None:
-                    pred = est.predict(X_openva)
+                if self.estimator_data_types_.get(name) == "openva" and X_openva_filtered is not None:
+                    pred = est.predict(X_openva_filtered)
                 else:
-                    pred = est.predict(X)
+                    pred = est.predict(X_filtered)
                 predictions.append(pred)
                 
             diversity = self._calculate_diversity(
@@ -276,9 +396,9 @@ class DuckVotingEnsemble(BaseEstimator, ClassifierMixin):
                     f"({self.config.min_diversity})"
                 )
                 
-        # Optimize weights
+        # Optimize weights using filtered data
         self.weights_ = self._optimize_weights(
-            X, y, X_openva, strategy=self.config.weight_optimization
+            X_filtered, y_filtered, X_openva_filtered, strategy=self.config.weight_optimization
         )
         logger.info(f"Estimator weights: {self.weights_}")
         

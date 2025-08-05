@@ -46,6 +46,15 @@ def _generate_ensemble_configurations(config: ExperimentConfig) -> List[Dict]:
     ensemble_configs = []
     base_models = config.ensemble.base_estimators
     
+    # Model name abbreviations for readable IDs
+    model_abbrev = {
+        "xgboost": "xgb",
+        "random_forest": "rf", 
+        "logistic_regression": "lr",
+        "categorical_nb": "cnb",
+        "insilico": "ins"
+    }
+    
     # Generate configurations for each combination of parameters
     for voting in config.ensemble.voting_strategies:
         for weight_strategy in config.ensemble.weight_strategies:
@@ -56,40 +65,82 @@ def _generate_ensemble_configurations(config: ExperimentConfig) -> List[Dict]:
                     from itertools import combinations
                     model_combos = list(combinations(base_models, ensemble_size))
                     # Limit to max combinations if specified
-                    if hasattr(config.ensemble, 'max_combinations'):
-                        model_combos = model_combos[:config.ensemble.max_combinations]
-                elif config.ensemble.estimator_selection_strategy == "smart":
-                    # Smart selection: always include diverse models
-                    model_combos = []
-                    if ensemble_size >= 3:
-                        # Always include at least one of each type if available
-                        combo = []
-                        model_types = set(m[1] for m in base_models)
+                    max_combos = getattr(config.ensemble, 'max_combinations', 10)
+                    if len(model_combos) > max_combos:
+                        logger.info(f"Limiting exhaustive combinations from {len(model_combos)} to {max_combos}")
+                        model_combos = model_combos[:max_combos]
                         
-                        # Add one of each type first
-                        for model_type in list(model_types)[:ensemble_size]:
+                elif config.ensemble.estimator_selection_strategy == "smart":
+                    # Smart selection: generate diverse combinations
+                    model_combos = []
+                    model_types = list(set(m[1] for m in base_models))
+                    
+                    if ensemble_size >= len(model_types):
+                        # Include one of each type
+                        combo = []
+                        for model_type in model_types:
                             model = next((m for m in base_models if m[1] == model_type), None)
                             if model:
                                 combo.append(model)
-                        
-                        # Fill remaining slots with best performers
-                        remaining = ensemble_size - len(combo)
-                        if remaining > 0:
-                            unused = [m for m in base_models if m not in combo]
-                            combo.extend(unused[:remaining])
-                        
-                        if len(combo) == ensemble_size:
-                            model_combos.append(tuple(combo))
-                    else:
-                        # For small ensembles, just take first N models
-                        model_combos = [tuple(base_models[:ensemble_size])]
+                        model_combos.append(tuple(combo[:ensemble_size]))
+                    
+                    # Add performance-focused combination (if we have multiple models)
+                    if ensemble_size >= 2 and len(base_models) >= ensemble_size:
+                        # Prefer models in order: xgboost, random_forest, categorical_nb, logistic_regression, insilico
+                        preferred_order = ["xgboost", "random_forest", "categorical_nb", "logistic_regression", "insilico"]
+                        performance_combo = []
+                        for pref_type in preferred_order:
+                            model = next((m for m in base_models if m[1] == pref_type), None)
+                            if model and model not in performance_combo:
+                                performance_combo.append(model)
+                                if len(performance_combo) >= ensemble_size:
+                                    break
+                        if len(performance_combo) == ensemble_size:
+                            model_combos.append(tuple(performance_combo))
+                    
+                    # Add diversity-focused combination
+                    if ensemble_size >= 3 and len(model_types) >= 3:
+                        # Mix different model types
+                        diversity_combo = []
+                        type_priority = ["xgboost", "categorical_nb", "insilico", "random_forest", "logistic_regression"]
+                        for model_type in type_priority:
+                            model = next((m for m in base_models if m[1] == model_type), None)
+                            if model and model not in diversity_combo:
+                                diversity_combo.append(model)
+                                if len(diversity_combo) >= ensemble_size:
+                                    break
+                        if len(diversity_combo) == ensemble_size and tuple(diversity_combo) not in model_combos:
+                            model_combos.append(tuple(diversity_combo))
+                    
+                    # Remove duplicates
+                    model_combos = list(dict.fromkeys(model_combos))
+                    
+                elif config.ensemble.estimator_selection_strategy == "greedy":
+                    # Greedy: take first N models in order
+                    model_combos = [tuple(base_models[:ensemble_size])]
+                    
+                elif config.ensemble.estimator_selection_strategy == "random":
+                    # Random selection of combinations
+                    import random
+                    from itertools import combinations
+                    random.seed(42)  # For reproducibility
+                    num_random_combos = min(5, len(list(combinations(base_models, ensemble_size))))
+                    model_combos = []
+                    for _ in range(num_random_combos):
+                        combo = tuple(sorted(random.sample(base_models, ensemble_size), key=lambda x: x[0]))
+                        if combo not in model_combos:
+                            model_combos.append(combo)
+                    
                 else:
-                    # Default: just use first N models
+                    # Default: use greedy approach
                     model_combos = [tuple(base_models[:ensemble_size])]
                 
                 # Create configuration for each combination
-                for i, estimators in enumerate(model_combos):
-                    ensemble_id = f"{voting}_{weight_strategy}_size{ensemble_size}_combo{i}"
+                for estimators in model_combos:
+                    # Create descriptive name using model abbreviations
+                    model_names = [model_abbrev.get(est[1], est[1][:3]) for est in estimators]
+                    combo_name = "_".join(model_names)
+                    ensemble_id = f"{voting}_{weight_strategy}_size{ensemble_size}_{combo_name}"
                     
                     ensemble_configs.append({
                         "id": ensemble_id,
@@ -98,8 +149,10 @@ def _generate_ensemble_configurations(config: ExperimentConfig) -> List[Dict]:
                         "estimators": list(estimators),
                         "min_diversity": config.ensemble.min_diversity_threshold,
                     })
+                    
+                    logger.info(f"Created ensemble: {ensemble_id} with models: {[est[1] for est in estimators]}")
     
-    logger.info(f"Generated {len(ensemble_configs)} ensemble configurations")
+    logger.info(f"Generated {len(ensemble_configs)} ensemble configurations using {config.ensemble.estimator_selection_strategy} strategy")
     return ensemble_configs
 
 

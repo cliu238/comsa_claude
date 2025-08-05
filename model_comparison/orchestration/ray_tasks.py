@@ -68,22 +68,43 @@ def train_and_evaluate_model(
         if training_size < 1.0:
             from sklearn.model_selection import train_test_split
             
-            # Subsample the training data while preserving class distribution
-            try:
-                X_train, _, y_train, _ = train_test_split(
-                    X_train, y_train, 
-                    train_size=training_size, 
-                    random_state=42,  # Fixed seed for reproducibility
-                    stratify=y_train
+            # Check if stratification is possible
+            min_samples_needed = 2  # Minimum samples per class for stratification
+            class_counts = y_train.value_counts()
+            can_stratify = all(count >= min_samples_needed for count in class_counts.values)
+            
+            if can_stratify:
+                # Try stratified sampling with additional safety check
+                try:
+                    X_train, _, y_train, _ = train_test_split(
+                        X_train, y_train, 
+                        train_size=training_size, 
+                        random_state=42,  # Fixed seed for reproducibility
+                        stratify=y_train
+                    )
+                    logger.info(
+                        f"Subsampled training data from {len(train_data[0])} to {len(X_train)} samples "
+                        f"(training_size={training_size}, stratified)"
+                    )
+                except ValueError as e:
+                    # Fallback if stratification still fails
+                    logger.warning(
+                        f"Stratified sampling failed despite pre-check: {e}. "
+                        f"Using random sampling instead."
+                    )
+                    X_train, _, y_train, _ = train_test_split(
+                        X_train, y_train, 
+                        train_size=training_size, 
+                        random_state=42
+                    )
+            else:
+                # Use random sampling when stratification isn't possible
+                rare_classes = class_counts[class_counts < min_samples_needed]
+                logger.warning(
+                    f"Cannot use stratified sampling: {len(rare_classes)} classes have < {min_samples_needed} samples. "
+                    f"Classes with insufficient samples: {rare_classes.to_dict()}. "
+                    f"Using random sampling instead."
                 )
-                logger.info(
-                    f"Subsampled training data from {len(train_data[0])} to {len(X_train)} samples "
-                    f"(training_size={training_size})"
-                )
-            except ValueError as e:
-                # If stratification fails (e.g., some classes have only 1 sample), 
-                # fall back to random sampling
-                logger.warning(f"Stratified sampling failed: {e}. Using random sampling.")
                 X_train, _, y_train, _ = train_test_split(
                     X_train, y_train, 
                     train_size=training_size, 
@@ -346,19 +367,43 @@ def tune_and_train_model(
         if training_size < 1.0:
             from sklearn.model_selection import train_test_split
             
-            try:
-                X_train, _, y_train, _ = train_test_split(
-                    X_train, y_train, 
-                    train_size=training_size, 
-                    random_state=42,
-                    stratify=y_train
+            # Check if stratification is possible
+            min_samples_needed = 2  # Minimum samples per class for stratification
+            class_counts = y_train.value_counts()
+            can_stratify = all(count >= min_samples_needed for count in class_counts.values)
+            
+            if can_stratify:
+                # Try stratified sampling with additional safety check
+                try:
+                    X_train, _, y_train, _ = train_test_split(
+                        X_train, y_train, 
+                        train_size=training_size, 
+                        random_state=42,
+                        stratify=y_train
+                    )
+                    logger.info(
+                        f"Subsampled training data from {len(train_data[0])} to {len(X_train)} samples "
+                        f"(training_size={training_size}, stratified)"
+                    )
+                except ValueError as e:
+                    # Fallback if stratification still fails
+                    logger.warning(
+                        f"Stratified sampling failed despite pre-check: {e}. "
+                        f"Using random sampling instead."
+                    )
+                    X_train, _, y_train, _ = train_test_split(
+                        X_train, y_train, 
+                        train_size=training_size, 
+                        random_state=42
+                    )
+            else:
+                # Use random sampling when stratification isn't possible
+                rare_classes = class_counts[class_counts < min_samples_needed]
+                logger.warning(
+                    f"Cannot use stratified sampling: {len(rare_classes)} classes have < {min_samples_needed} samples. "
+                    f"Classes with insufficient samples: {rare_classes.to_dict()}. "
+                    f"Using random sampling instead."
                 )
-                logger.info(
-                    f"Subsampled training data from {len(train_data[0])} to {len(X_train)} samples "
-                    f"(training_size={training_size})"
-                )
-            except ValueError as e:
-                logger.warning(f"Stratified sampling failed: {e}. Using random sampling.")
                 X_train, _, y_train, _ = train_test_split(
                     X_train, y_train, 
                     train_size=training_size, 
@@ -700,12 +745,36 @@ def prepare_data_for_site(
             f"Site {site}: {len(X.columns)} features after dropping {len(columns_to_drop)} columns"
         )
 
-        # Try stratified split, fall back to random if necessary
-        try:
-            X_train, X_test, y_train, y_test = train_test_split(
-                X, y, test_size=test_size, random_state=random_seed, stratify=y
+        # Check if stratification is possible
+        min_samples_per_class = 2  # Need at least 2 samples per class for train/test split
+        class_counts = y.value_counts()
+        can_stratify = all(count >= min_samples_per_class for count in class_counts.values)
+        
+        if can_stratify:
+            # Try stratified split
+            try:
+                X_train, X_test, y_train, y_test = train_test_split(
+                    X, y, test_size=test_size, random_state=random_seed, stratify=y
+                )
+                logger.info(f"Site {site}: Used stratified split with {len(class_counts)} classes")
+            except ValueError as e:
+                # Fallback if stratification still fails
+                logger.warning(
+                    f"Site {site}: Stratified split failed despite pre-check: {e}. "
+                    f"Using random split instead."
+                )
+                X_train, X_test, y_train, y_test = train_test_split(
+                    X, y, test_size=test_size, random_state=random_seed
+                )
+        else:
+            # Use random split when stratification isn't possible
+            rare_classes = class_counts[class_counts < min_samples_per_class]
+            logger.warning(
+                f"Site {site}: Cannot use stratified split. "
+                f"{len(rare_classes)} classes have < {min_samples_per_class} samples. "
+                f"Total samples: {len(y)}, Classes: {len(class_counts)}. "
+                f"Using random split instead."
             )
-        except ValueError:
             X_train, X_test, y_train, y_test = train_test_split(
                 X, y, test_size=test_size, random_state=random_seed
             )

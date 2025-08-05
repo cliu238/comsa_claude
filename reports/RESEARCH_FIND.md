@@ -305,3 +305,50 @@ The dramatic performance variations between sites (Mexico as ideal source, Pemba
 *Updated: July 31, 2025 (Ensemble Model Analysis)*  
 *Data sources: `/results/full_comparison_20250729_155434/va34_comparison_results.csv`, ensemble experiment results*
 *Analysis timestamp: 15:54:34 (baseline), ensemble analysis: July 31, 2025*
+
+
+
+
+ Ensemble vs Individual Model Performance Comparison
+
+  In-Domain Performance
+
+  For in-domain scenarios (training and testing on the same site), ensembles show mixed results:
+
+  1. UP→UP:
+    - Best Ensemble: CSMF=0.850, COD=0.498
+    - Best Individual (InSilico): CSMF=0.868, COD=0.470
+    - Result: Ensemble slightly underperforms (-1.8% CSMF) but has better COD (+2.8%)
+  2. AP→AP:
+    - Best Ensemble: CSMF=0.807, COD=0.438
+    - Best Individual (XGBoost): CSMF=0.861, COD=0.471
+    - Result: Ensemble underperforms (-5.4% CSMF, -3.4% COD)
+  3. Mexico→Mexico:
+    - Best Ensemble: CSMF=0.810, COD=0.395
+    - Best Individual (Random Forest): CSMF=0.814, COD=0.356
+    - Result: Ensemble matches CSMF (-0.4%) but higher COD (+3.9%)
+
+  Out-Domain Performance
+
+  For out-domain scenarios (training on one site, testing on another), ensembles significantly outperform individual models:
+
+  - Ensemble Average: CSMF=0.601 (±0.104), COD=0.281 (±0.065)
+  - Best Individual Model Average (InSilico): CSMF=0.461 (±0.116)
+  - Other Individual Models:
+    - XGBoost: CSMF=0.360 (±0.245)
+    - Random Forest: CSMF=0.306 (±0.241)
+    - Logistic Regression: CSMF=0.335 (±0.204)
+
+  Key Insights
+
+  1. In-domain: Individual models (especially InSilico and XGBoost) often match or slightly outperform ensembles
+  2. Out-domain: Ensembles provide ~30% better performance than the best individual model
+  3. Stability: Ensembles show much lower variance in out-domain scenarios (±0.104 vs ±0.245 for XGBoost)
+  4. Robustness: Ensembles are more robust to domain shift, making them ideal for cross-site applications
+
+  Recommendation
+
+  - For single-site deployment: Individual models (InSilico or XGBoost) may be sufficient
+  - For multi-site or transfer scenarios: Ensembles are strongly recommended due to their superior generalization and stability
+
+  The ensemble approach effectively combines the strengths of different models, providing more reliable predictions when dealing with data from different populations or sites.
