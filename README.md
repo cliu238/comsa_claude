@@ -649,53 +649,49 @@ All models support:
 
 ## Ensemble Model Experiments
 
-Run multi-phase experiments to optimize ensemble models for VA prediction. Requires Phase 1 results from `run_distributed_comparison.py`.
+Run ensemble experiments using the unified distributed comparison framework. Ensembles are now integrated into `run_distributed_comparison.py` with comprehensive configuration options.
 
 ### Usage
 
 ```bash
-# Phase 2: Compare voting strategies (soft vs hard)
-poetry run python model_comparison/scripts/run_ensemble_comparison.py \
+# Run ensemble experiments with soft voting and multiple sizes
+poetry run python model_comparison/scripts/run_distributed_comparison.py \
     --data-path va-data/data/phmrc/IHME_PHMRC_VA_DATA_ADULT_Y2013M09D11_0.csv \
-    --sites Pemba Bohol UP Mexico AP Dar \
-    --base-results results/full_comparison_20250729_155434/va34_comparison_results.csv \
-    --phase voting \
-    --n-bootstrap 100 \
-    --output-dir results/ensemble_phase2
-
-# Phase 3: Test weight optimization
-poetry run python model_comparison/scripts/run_ensemble_comparison.py \
-    --data-path va-data/data/phmrc/IHME_PHMRC_VA_DATA_ADULT_Y2013M09D11_0.csv \
-    --sites Pemba Bohol UP Mexico AP Dar \
-    --base-results results/full_comparison_20250729_155434/va34_comparison_results.csv \
-    --phase weights \
-    --n-bootstrap 100 \
-    --output-dir results/ensemble_phase3
-
-# Phase 4: Comprehensive optimization (all phases)
-poetry run python model_comparison/scripts/run_ensemble_comparison.py \
-    --data-path va-data/data/phmrc/IHME_PHMRC_VA_DATA_ADULT_Y2013M09D11_0.csv \
-    --sites Pemba Bohol UP Mexico AP Dar \
-    --base-results results/full_comparison_20250729_155434/va34_comparison_results.csv \
-    --phase all \
-    --voting-strategies soft \
-    --weight-strategies none \
-    --ensemble-sizes 3 5 7 \
-    --n-bootstrap 100 \
-    --output-dir results/ensemble_phase4
+    --sites Mexico AP UP \
+    --models ensemble \
+    --ensemble-voting-strategies soft \
+    --ensemble-weight-strategies none performance \
+    --ensemble-sizes 3 5 \
+    --ensemble-base-models all \
+    --ensemble-combination-strategy smart \
+    --training-sizes 0.7 \
+    --n-bootstrap 30 \
+    --output-dir results/ensemble_with_names-v2
 ```
 
-### Output
+### Ensemble-Specific Parameters
 
-Results saved to `--output-dir`:
-- `ensemble_results/ensemble_comparison_results.csv` - Performance metrics for each configuration
-- `ensemble_plots/` - Visualization plots:
-  - `voting_strategy_comparison.png` - Soft vs hard voting performance
-  - `weight_optimization_comparison.png` - Weight strategy impact
-  - `ensemble_size_impact.png` - Performance by ensemble size
-  - `diversity_analysis.png` - Model diversity metrics
+- `--ensemble-voting-strategies`: Voting methods (soft, hard)
+- `--ensemble-weight-strategies`: Weight assignment (none, performance)
+- `--ensemble-sizes`: Number of models in ensemble (3, 5, 7)
+- `--ensemble-base-models`: Base models to include (all, or specific list)
+- `--ensemble-combination-strategy`: How to select model combinations (smart, exhaustive)
 
-**Best configuration found**: Soft voting, equal weights, 3 models (99.7% CSMF accuracy, 12.6% improvement over best individual model)
+### Key Findings
+
+Based on comprehensive analysis comparing ensembles with individual models:
+
+**Performance Results (CSMF Accuracy)**:
+- **XGBoost (Individual)**: 74.8% ± 9.2% - **Best overall performer**
+- **5-Model Ensemble**: 67.0% ± 13.1% - Best ensemble, but underperforms XGBoost by 10.4%
+- **3-Model Ensemble**: 59.7% ± 15.0% - Significant underperformance
+
+**Head-to-Head Win Rates** (Ensemble vs Individual Models):
+- vs XGBoost: 11-44% win rate (ensembles consistently lose)
+- vs Random Forest: 33-44% win rate (mixed results)
+- vs Weak models (Categorical NB, Logistic): 67-89% win rate (ensembles usually win)
+
+**Recommendation**: Individual models (especially XGBoost) outperform ensembles while requiring 3-5x less computational resources. Focus on optimizing individual models rather than ensembling.
 
 ## Distributed Model Comparison
 
