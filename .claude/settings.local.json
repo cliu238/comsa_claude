@@ -86,7 +86,8 @@
       "Bash(--base-results results/full_comparison_20250729_155434/va34_comparison_results.csv )",
       "Bash(--phase voting )",
       "Bash(--n-bootstrap 10 )",
-      "Bash(--batch-size 2 )"
+      "Bash(--batch-size 2 )",
+      "Bash(gh auth:*)"
     ],
     "deny": []
   }
