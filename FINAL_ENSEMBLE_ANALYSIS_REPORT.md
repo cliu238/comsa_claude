@@ -261,14 +261,14 @@ The evidence is conclusive: **individual model optimization outperforms ensemble
 ```bash
 poetry run python model_comparison/scripts/run_distributed_comparison.py \
       --data-path va-data/data/phmrc/IHME_PHMRC_VA_DATA_ADULT_Y2013M09D11_0.csv \
-      --sites Mexico AP UP \
+      --sites Mexico AP UP Dar Pemba Bohol\                       
       --models ensemble \
-      --ensemble-voting-strategies soft \
+      --ensemble-voting-strategies soft hard \
       --ensemble-weight-strategies none performance \
       --ensemble-sizes 3 5 \
       --ensemble-base-models all \
       --ensemble-combination-strategy smart \
       --training-sizes 0.7 \
       --n-bootstrap 30 \
-      --output-dir results/ensemble_with_names-v2
+      --output-dir results/ensemble_with_names-v3
 ```

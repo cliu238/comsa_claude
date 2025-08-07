@@ -145,17 +145,45 @@ class CheckpointManager:
                 # Convert row to dict and create ExperimentResult
                 result_dict = row.to_dict()
 
-                # Handle potential None values for lists
-                if pd.isna(result_dict.get("csmf_accuracy_ci")):
-                    result_dict["csmf_accuracy_ci"] = None
-                if pd.isna(result_dict.get("cod_accuracy_ci")):
-                    result_dict["cod_accuracy_ci"] = None
-                    
-                # Handle NaN values for optional string fields
+                # Map transformed field names back to original names
+                # The to_dict() method transforms these for visualization
+                if "model" in result_dict and "model_name" not in result_dict:
+                    result_dict["model_name"] = result_dict.pop("model")
+                if "training_fraction" in result_dict and "training_size" not in result_dict:
+                    result_dict["training_size"] = result_dict.pop("training_fraction")
+
+                # Parse CI fields from string representation to list
+                import ast
+                for ci_field in ["csmf_accuracy_ci", "cod_accuracy_ci"]:
+                    if ci_field in result_dict:
+                        ci_value = result_dict[ci_field]
+                        if isinstance(ci_value, str):
+                            try:
+                                # Parse string representation of list
+                                result_dict[ci_field] = ast.literal_eval(ci_value)
+                            except (ValueError, SyntaxError):
+                                result_dict[ci_field] = None
+                        elif pd.isna(ci_value):
+                            result_dict[ci_field] = None
+
+                # Handle NaN values for optional fields
                 if pd.isna(result_dict.get("worker_id")):
                     result_dict["worker_id"] = None
                 if pd.isna(result_dict.get("error")):
                     result_dict["error"] = None
+                if pd.isna(result_dict.get("additional_metrics")):
+                    result_dict["additional_metrics"] = None
+                if pd.isna(result_dict.get("tuning_time_seconds")):
+                    result_dict["tuning_time_seconds"] = None
+                if pd.isna(result_dict.get("training_time_seconds")):
+                    result_dict["training_time_seconds"] = None
+                if pd.isna(result_dict.get("inference_time_seconds")):
+                    result_dict["inference_time_seconds"] = None
+
+                # Remove visualization-specific fields that aren't part of the model
+                for field in ["csmf_accuracy_ci_lower", "csmf_accuracy_ci_upper", 
+                              "cod_accuracy_ci_lower", "cod_accuracy_ci_upper"]:
+                    result_dict.pop(field, None)
 
                 results.append(ExperimentResult(**result_dict))
 
