@@ -2,7 +2,6 @@
 
 - **This CLAUDE.md file serves as the central planning document** containing the project's architecture, goals, style, and constraints.
 - **Use GitHub Issues/Projects for task management** - Check existing issues before starting a new task. Create new issues for tasks that aren't tracked.
-- **For VA pipeline tasks**, check the appropriate documentation base on the task, either `baseline_benchmark.md`, `transfer_learning.md`, or `active_learning.md`.
 - **Use consistent naming conventions, file structure, and architecture patterns** as described in this document.
 - **Use venv_linux** (the virtual environment) whenever executing Python commands, including for unit tests.
 - ****CRITICAL:** **Poetry is used for dependency management** - use `poetry install` and `poetry add` for package management.
@@ -61,6 +60,25 @@ poetry run
   - Metric calculations (CSMF accuracy, COD accuracy)
   - Stratification logic
 
+### 🚀 Runtime Validation
+
+- **CRITICAL: No feature is complete until it runs successfully**
+  - Code integration alone is NOT sufficient
+  - Must execute the feature end-to-end without crashes
+  - If dependencies fail (segfault, import errors), implement fallback handling before claiming completion
+  
+- **Validation Requirements:**
+  - ✅ Code runs without crashes
+  - ✅ Produces expected outputs  
+  - ✅ Integrates with existing pipeline
+  - ✅ Handles failures gracefully
+  
+- **If external dependencies fail:**
+  - Add try/except protection
+  - Implement fallback behavior
+  - Warn user clearly
+  - DO NOT claim feature is "ready to use"
+
 ### ✅ Task Completion
 
 - **Update GitHub Issues with progress** - Add brief comments about approach and any blockers encountered during development.
@@ -71,7 +89,7 @@ poetry run
   - `results/baseline/benchmark_results.csv`
   - `results/transfer/transfer_results.csv`
   - `results/active/active_learning_results.csv`
-- **After finish implementation, always run it once as confirmation. If it is timeout, you can assume it pass and tell the user run it itself**
+- **After finish implementation, always run it once as confirmation. Feature is NOT complete if it crashes or fails at runtime. If it is timeout, you can assume it pass and tell the user run it itself**
 
 ### 🔄 Development Workflow
 

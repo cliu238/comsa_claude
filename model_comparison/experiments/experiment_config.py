@@ -190,7 +190,7 @@ class ExperimentConfig(BaseModel):
     @field_validator("models")
     def validate_models(cls, v: List[str]) -> List[str]:
         """Validate model names."""
-        valid_models = ["insilico", "xgboost", "random_forest", "logistic_regression", "categorical_nb", "ensemble"]
+        valid_models = ["insilico", "xgboost", "random_forest", "logistic_regression", "categorical_nb", "ensemble", "tabicl"]
         for model in v:
             if model not in valid_models:
                 raise ValueError(f"Model {model} not in {valid_models}")

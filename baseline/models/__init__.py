@@ -23,6 +23,8 @@ from baseline.models.categorical_nb_config import CategoricalNBConfig
 from baseline.models.categorical_nb_model import CategoricalNBModel
 from baseline.models.ensemble_config import EnsembleConfig
 from baseline.models.ensemble_model import DuckVotingEnsemble
+from baseline.models.tabicl_config import TabICLConfig
+from baseline.models.tabicl_model import TabICLModel
 
 __all__ = [
     "InSilicoVAModel",
@@ -43,4 +45,6 @@ __all__ = [
     "quick_tune_categorical_nb",
     "DuckVotingEnsemble",
     "EnsembleConfig",
+    "TabICLModel",
+    "TabICLConfig",
 ]

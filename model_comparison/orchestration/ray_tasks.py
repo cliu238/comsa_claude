@@ -140,6 +140,15 @@ def train_and_evaluate_model(
             )
             
             model = DuckVotingEnsemble(config=ensemble_config)
+        elif model_name == "tabicl":
+            from baseline.models.tabicl_model import TabICLModel
+            from baseline.utils.tabicl_env_config import configure_tabicl_environment
+            
+            # Configure environment for TabICL compatibility
+            configure_tabicl_environment(force=True)
+            
+            # Use TabICL with default config
+            model = TabICLModel()
         else:
             raise ValueError(f"Unknown model: {model_name}")
 
@@ -153,7 +162,7 @@ def train_and_evaluate_model(
             X_train_processed = X_train
             X_test_processed = X_test
         else:
-            # Other models need numeric encoding
+            # Other models (including TabICL) need numeric encoding
             X_train_processed = _preprocess_features(X_train)
             X_test_processed = _preprocess_features(X_test)
 
@@ -344,6 +353,7 @@ def tune_and_train_model(
         from model_comparison.hyperparameter_tuning.search_spaces import (
             get_logistic_regression_search_space,
             get_categorical_nb_search_space,
+            get_tabicl_search_space,
         )
         from model_comparison.metrics.comparison_metrics import calculate_metrics
         from model_comparison.experiments.cross_domain_tuning import (
@@ -450,11 +460,14 @@ def tune_and_train_model(
                 else:
                     xgboost_space = get_xgboost_enhanced_search_space()
                 
+                from baseline.models.tabicl_model import TabICLModel
+                
                 model_classes = {
                     "xgboost": (XGBoostModel, xgboost_space),
                     "random_forest": (RandomForestModel, get_random_forest_enhanced_search_space()),
                     "logistic_regression": (LogisticRegressionModel, get_logistic_regression_search_space()),
-                    "categorical_nb": (CategoricalNBModel, get_categorical_nb_search_space())
+                    "categorical_nb": (CategoricalNBModel, get_categorical_nb_search_space()),
+                    "tabicl": (TabICLModel, get_tabicl_search_space())
                 }
                 
                 if model_name not in model_classes:
@@ -596,7 +609,13 @@ def tune_and_train_model(
                 
                 # Create model with best parameters
                 # Keep the config__ prefix for nested parameters
-                model = model_class()
+                if model_name == "tabicl":
+                    # For TabICL, always use safe wrapper
+                    from baseline.utils.tabicl_env_config import configure_tabicl_environment
+                    configure_tabicl_environment(force=True)
+                    model = model_class(use_safe_wrapper=True)
+                else:
+                    model = model_class()
                 model.set_params(**best_params)
             else:
                 # Use default parameters
@@ -608,6 +627,15 @@ def tune_and_train_model(
                     model = LogisticRegressionModel()
                 elif model_name == "categorical_nb":
                     model = CategoricalNBModel()
+                elif model_name == "tabicl":
+                    from baseline.models.tabicl_model import TabICLModel
+                    from baseline.utils.tabicl_env_config import configure_tabicl_environment
+                    
+                    # Configure environment for TabICL compatibility
+                    configure_tabicl_environment(force=True)
+                    
+                    # Use safe wrapper by default
+                    model = TabICLModel(use_safe_wrapper=True)
                 else:
                     raise ValueError(f"Unknown model: {model_name}")
         

@@ -159,6 +159,27 @@ def filter_params_for_model(params: Dict[str, Any], model_name: str) -> Dict[str
     return filtered_params
 
 
+def get_tabicl_search_space() -> Dict[str, Any]:
+    """Get TabICL hyperparameter search space.
+    
+    TabICL requires minimal tuning as it's a foundation model.
+    We only tune a few key parameters that affect ensemble diversity.
+    
+    Returns:
+        Dictionary mapping parameter names to Ray Tune search spaces
+    """
+    return {
+        # Ensemble size - smaller range since TabICL is memory intensive
+        'config__n_estimators': tune.choice([16, 32, 48]),
+        
+        # Prediction confidence - crucial for calibration
+        'config__softmax_temperature': tune.uniform(0.5, 1.5),
+        
+        # Outlier handling - important for noisy VA data
+        'config__outlier_threshold': tune.choice([3.0, 4.0, 5.0]),
+    }
+
+
 def get_search_space_for_model(model_name: str) -> Dict[str, Any]:
     """Get the appropriate search space for a model.
     
@@ -176,6 +197,7 @@ def get_search_space_for_model(model_name: str) -> Dict[str, Any]:
         "random_forest": get_random_forest_search_space,
         "logistic_regression": get_logistic_regression_search_space,
         "categorical_nb": get_categorical_nb_search_space,
+        "tabicl": get_tabicl_search_space,
     }
     
     if model_name not in search_spaces:

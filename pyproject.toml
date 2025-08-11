@@ -7,7 +7,7 @@ readme = "README.md"
 package-mode = false
 
 [tool.poetry.dependencies]
-python = ">=3.12,<3.14"
+python = ">=3.12,<3.13"
 prefect = "^3.4.1"
 pandas = "^2.2.0"
 scikit-learn = "^1.4.0"
@@ -23,6 +23,8 @@ pandera = "^0.23.1"
 pyyaml = "^6.0.2"
 pydantic = "^2.10.0"
 tqdm = "^4.67.1"
+tabicl = "^0.1.0"
+torch = "^2.0.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.0.0"
