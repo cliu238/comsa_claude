@@ -1,0 +1,34 @@
+{
+  "total_experiments": 200,
+  "models_tested": [
+    "InSilicoVA",
+    "CategoricalNB",
+    "RandomForest",
+    "LogisticRegression",
+    "XGBoost"
+  ],
+  "sites_included": [
+    "Pemba",
+    "Bohol",
+    "UP",
+    "Mexico",
+    "AP",
+    "Dar"
+  ],
+  "training_fractions": [
+    0.25,
+    0.5,
+    0.75,
+    1.0
+  ],
+  "best_overall_csmf_model": "InSilicoVA",
+  "best_overall_csmf_score": 0.5457,
+  "best_overall_cod_model": "InSilicoVA",
+  "best_overall_cod_score": 0.2617,
+  "avg_in_domain_csmf": 0.6774,
+  "avg_out_domain_csmf": 0.3503,
+  "avg_in_domain_cod": 0.3557,
+  "avg_out_domain_cod": 0.1568,
+  "fastest_model": "InSilicoVA",
+  "slowest_model": "LogisticRegression"
+}

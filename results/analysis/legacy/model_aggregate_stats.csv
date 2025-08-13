@@ -1,0 +1,8 @@
+,csmf_accuracy,csmf_accuracy,csmf_accuracy,csmf_accuracy,csmf_accuracy,cod_accuracy,cod_accuracy,cod_accuracy,cod_accuracy,cod_accuracy,execution_time_seconds,execution_time_seconds,execution_time_seconds
+,mean,std,min,max,count,mean,std,min,max,count,mean,std,median
+model_display,,,,,,,,,,,,,
+CategoricalNB,0.3319,0.1877,0.0833,0.7679,40,0.1341,0.0973,0.0261,0.4093,40,5758.8492,2867.5002,5189.3122
+InSilicoVA,0.5457,0.1814,0.2557,0.8814,40,0.2617,0.1047,0.0882,0.5333,40,237.8236,280.0236,114.8637
+LogisticRegression,0.4006,0.2512,0.0,0.8446,40,0.168,0.133,0.0,0.484,40,6783.8901,3029.4054,5924.6276
+RandomForest,0.4227,0.2933,0.0065,0.8667,40,0.2153,0.1652,0.0,0.5833,40,6569.1871,3031.6982,5513.1951
+XGBoost,0.48,0.2993,0.0286,0.8851,40,0.2532,0.17,0.0159,0.5167,40,6744.6861,2965.2214,5890.0972

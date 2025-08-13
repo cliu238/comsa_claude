@@ -1,0 +1,6 @@
+model_display,execution_time_seconds_mean,execution_time_seconds_std,execution_time_seconds_min,execution_time_seconds_max,training_time_seconds_mean,inference_time_seconds_mean,Rank
+InSilicoVA,193.34,240.48,23.29,792.23,0.0,192.96,1
+CategoricalNB,5893.87,2940.59,1416.71,13092.08,0.06,0.09,2
+RandomForest,6698.12,3115.47,3303.34,14093.04,0.23,0.13,3
+XGBoost,6869.25,3045.47,3038.72,13936.77,1.77,0.12,4
+LogisticRegression,6942.46,3092.38,3351.23,14104.57,106.64,0.07,5

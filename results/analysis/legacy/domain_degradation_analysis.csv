@@ -1,0 +1,6 @@
+model,csmf_degradation_percent,cod_degradation_percent,csmf_t_statistic,csmf_p_value,cod_t_statistic,cod_p_value,csmf_significant,cod_significant
+InSilicoVA,42.41,47.64,6.8908,0.0,6.5501,0.0,True,True
+CategoricalNB,23.08,41.26,1.1162,0.2722,1.9567,0.0586,False,False
+RandomForest,60.07,66.08,4.5905,0.0001,5.2845,0.0,True,True
+LogisticRegression,45.25,56.6,2.6918,0.0109,3.2465,0.0026,True,True
+XGBoost,56.79,59.09,4.6547,0.0,4.5696,0.0001,True,True
