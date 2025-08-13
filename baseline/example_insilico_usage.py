@@ -218,54 +218,5 @@ def main():
     return 0
 
 
-def create_dummy_va_data():
-    """Create a dummy CSV file for demonstration."""
-    import tempfile
-    
-    # Create minimal dummy data
-    data = {
-        'site': ['Site_A'] * 10,
-        'gs_text34': ['Cause_1'] * 5 + ['Cause_2'] * 5,
-        'symptom_1': [1, 0, 1, 0, 1] * 2,
-        'symptom_2': [0, 1, 0, 1, 0] * 2,
-    }
-    
-    df = pd.DataFrame(data)
-    
-    # Save to temporary file
-    temp_file = tempfile.NamedTemporaryFile(mode='w', suffix='.csv', delete=False)
-    df.to_csv(temp_file.name, index=False)
-    temp_file.close()
-    
-    return temp_file.name
-
-
-def create_synthetic_va_data(n_samples=200, n_features=50, n_causes=10):
-    """Create synthetic VA data for demonstration."""
-    np.random.seed(42)
-    
-    # Create symptom features (binary)
-    features = {}
-    for i in range(n_features):
-        features[f'symptom_{i:03d}'] = np.random.binomial(1, 0.3, n_samples)
-    
-    # Create sites
-    sites = [f'Site_{chr(65+i)}' for i in range(4)]
-    features['site'] = np.random.choice(sites, n_samples)
-    
-    # Create causes with some realistic distribution
-    causes = [f'Cause_{i:02d}' for i in range(1, n_causes + 1)]
-    cause_probs = np.random.dirichlet(np.ones(n_causes) * 2)
-    features['gs_text34'] = np.random.choice(causes, n_samples, p=cause_probs)
-    
-    df = pd.DataFrame(features)
-    
-    # Add some NA values
-    mask = np.random.random(df.iloc[:, :-2].shape) < 0.05
-    df.iloc[:, :-2][mask] = np.nan
-    
-    return df
-
-
 if __name__ == "__main__":
     sys.exit(main())
