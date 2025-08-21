@@ -80,10 +80,10 @@ def analyze_site_performance(df, model_name):
 
 def create_model_comparison_plot(cod5_stats, va34_stats, output_dir):
     """Create comparison plots for models"""
-    fig, axes = plt.subplots(1, 2, figsize=(14, 6))
+    fig, axes = plt.subplots(1, 2, figsize=(18, 7))
     
     # Prepare data for plotting
-    models = ['xgboost', 'insilico']
+    models = ['categorical_nb', 'random_forest', 'xgboost', 'logistic_regression', 'insilico']
     
     # CSMF Accuracy Comparison
     ax = axes[0]
@@ -100,10 +100,10 @@ def create_model_comparison_plot(cod5_stats, va34_stats, output_dir):
     ax.set_ylabel('CSMF Accuracy', fontsize=12)
     ax.set_title('CSMF Accuracy: In-Domain Performance', fontsize=14, fontweight='bold')
     ax.set_xticks(x)
-    ax.set_xticklabels([m.upper() for m in models], fontsize=11)
+    ax.set_xticklabels(['Cat. NB', 'RF', 'XGB', 'Log. Reg', 'InSilico'], fontsize=10, rotation=45, ha='right')
     ax.legend(loc='upper right', fontsize=11)
     ax.grid(True, alpha=0.3)
-    ax.set_ylim([0.7, 1.0])
+    ax.set_ylim([0.0, 1.0])
     
     # COD Accuracy Comparison
     ax = axes[1]
@@ -117,10 +117,10 @@ def create_model_comparison_plot(cod5_stats, va34_stats, output_dir):
     ax.set_ylabel('COD Accuracy', fontsize=12)
     ax.set_title('COD Accuracy: In-Domain Performance', fontsize=14, fontweight='bold')
     ax.set_xticks(x)
-    ax.set_xticklabels([m.upper() for m in models], fontsize=11)
+    ax.set_xticklabels(['Cat. NB', 'RF', 'XGB', 'Log. Reg', 'InSilico'], fontsize=10, rotation=45, ha='right')
     ax.legend(loc='upper right', fontsize=11)
     ax.grid(True, alpha=0.3)
-    ax.set_ylim([0.3, 0.8])
+    ax.set_ylim([0.0, 1.0])
     
     # Add value labels on bars
     for ax_idx, (ax_obj, values_cod5, values_va34) in enumerate([(axes[0], cod5_csmf, va34_csmf), 
@@ -136,11 +136,11 @@ def create_model_comparison_plot(cod5_stats, va34_stats, output_dir):
 
 def create_site_heatmap(cod5_site_data, va34_site_data, output_dir):
     """Create heatmap of site-specific performance"""
-    fig, axes = plt.subplots(2, 2, figsize=(14, 8))
+    fig, axes = plt.subplots(2, 2, figsize=(18, 10))
     
     # Prepare data for heatmaps
     sites = sorted(set(cod5_site_data['site'].unique()) | set(va34_site_data['site'].unique()))
-    models = ['xgboost', 'insilico']
+    models = ['categorical_nb', 'random_forest', 'xgboost', 'logistic_regression', 'insilico']
     
     # COD5 CSMF Heatmap
     cod5_csmf_matrix = pd.DataFrame(index=sites, columns=models)
@@ -150,8 +150,8 @@ def create_site_heatmap(cod5_site_data, va34_site_data, output_dir):
             cod5_csmf_matrix.loc[row['site'], model] = row['csmf_accuracy']
     
     ax = axes[0, 0]
-    sns.heatmap(cod5_csmf_matrix.astype(float), annot=True, fmt='.3f', cmap='YlOrRd', 
-                ax=ax, vmin=0.8, vmax=1.0, cbar_kws={'label': 'Accuracy'})
+    sns.heatmap(cod5_csmf_matrix.astype(float), annot=True, fmt='.2f', cmap='YlOrRd', 
+                ax=ax, vmin=0.2, vmax=1.0, cbar_kws={'label': 'Accuracy'}, annot_kws={'fontsize': 8})
     ax.set_title('COD5: CSMF Accuracy by Site')
     ax.set_ylabel('Site')
     ax.set_xlabel('Model')
@@ -164,8 +164,8 @@ def create_site_heatmap(cod5_site_data, va34_site_data, output_dir):
             cod5_cod_matrix.loc[row['site'], model] = row['cod_accuracy']
     
     ax = axes[0, 1]
-    sns.heatmap(cod5_cod_matrix.astype(float), annot=True, fmt='.3f', cmap='YlGnBu', 
-                ax=ax, vmin=0.4, vmax=0.8, cbar_kws={'label': 'Accuracy'})
+    sns.heatmap(cod5_cod_matrix.astype(float), annot=True, fmt='.2f', cmap='YlGnBu', 
+                ax=ax, vmin=0.1, vmax=0.8, cbar_kws={'label': 'Accuracy'}, annot_kws={'fontsize': 8})
     ax.set_title('COD5: COD Accuracy by Site')
     ax.set_ylabel('Site')
     ax.set_xlabel('Model')
@@ -178,8 +178,8 @@ def create_site_heatmap(cod5_site_data, va34_site_data, output_dir):
             va34_csmf_matrix.loc[row['site'], model] = row['csmf_accuracy']
     
     ax = axes[1, 0]
-    sns.heatmap(va34_csmf_matrix.astype(float), annot=True, fmt='.3f', cmap='YlOrRd', 
-                ax=ax, vmin=0.7, vmax=0.95, cbar_kws={'label': 'Accuracy'})
+    sns.heatmap(va34_csmf_matrix.astype(float), annot=True, fmt='.2f', cmap='YlOrRd', 
+                ax=ax, vmin=0.1, vmax=0.95, cbar_kws={'label': 'Accuracy'}, annot_kws={'fontsize': 8})
     ax.set_title('VA34: CSMF Accuracy by Site')
     ax.set_ylabel('Site')
     ax.set_xlabel('Model')
@@ -192,8 +192,8 @@ def create_site_heatmap(cod5_site_data, va34_site_data, output_dir):
             va34_cod_matrix.loc[row['site'], model] = row['cod_accuracy']
     
     ax = axes[1, 1]
-    sns.heatmap(va34_cod_matrix.astype(float), annot=True, fmt='.3f', cmap='YlGnBu', 
-                ax=ax, vmin=0.2, vmax=0.65, cbar_kws={'label': 'Accuracy'})
+    sns.heatmap(va34_cod_matrix.astype(float), annot=True, fmt='.2f', cmap='YlGnBu', 
+                ax=ax, vmin=0.05, vmax=0.65, cbar_kws={'label': 'Accuracy'}, annot_kws={'fontsize': 8})
     ax.set_title('VA34: COD Accuracy by Site')
     ax.set_ylabel('Site')
     ax.set_xlabel('Model')
@@ -208,28 +208,34 @@ def generate_report(cod5_stats, va34_stats, cod5_site_data, va34_site_data, outp
     report.append("# In-Domain Model Performance Analysis Report\n")
     report.append("## Executive Summary\n")
     
-    # Calculate key metrics
-    xgb_cod5_csmf = cod5_stats[cod5_stats['model'] == 'xgboost']['csmf_mean'].iloc[0]
-    xgb_cod5_cod = cod5_stats[cod5_stats['model'] == 'xgboost']['cod_mean'].iloc[0]
-    ins_cod5_csmf = cod5_stats[cod5_stats['model'] == 'insilico']['csmf_mean'].iloc[0]
-    ins_cod5_cod = cod5_stats[cod5_stats['model'] == 'insilico']['cod_mean'].iloc[0]
+    # Find best performing models
+    best_cod5_model = cod5_stats.loc[cod5_stats['cod_mean'].idxmax(), 'model']
+    best_cod5_cod = cod5_stats.loc[cod5_stats['cod_mean'].idxmax(), 'cod_mean']
+    best_va34_model = va34_stats.loc[va34_stats['cod_mean'].idxmax(), 'model']
+    best_va34_cod = va34_stats.loc[va34_stats['cod_mean'].idxmax(), 'cod_mean']
     
-    xgb_va34_csmf = va34_stats[va34_stats['model'] == 'xgboost']['csmf_mean'].iloc[0]
-    xgb_va34_cod = va34_stats[va34_stats['model'] == 'xgboost']['cod_mean'].iloc[0]
-    ins_va34_csmf = va34_stats[va34_stats['model'] == 'insilico']['csmf_mean'].iloc[0]
-    ins_va34_cod = va34_stats[va34_stats['model'] == 'insilico']['cod_mean'].iloc[0]
+    # Find worst performing models
+    worst_cod5_model = cod5_stats.loc[cod5_stats['cod_mean'].idxmin(), 'model']
+    worst_cod5_cod = cod5_stats.loc[cod5_stats['cod_mean'].idxmin(), 'cod_mean']
+    worst_va34_model = va34_stats.loc[va34_stats['cod_mean'].idxmin(), 'model']
+    worst_va34_cod = va34_stats.loc[va34_stats['cod_mean'].idxmin(), 'cod_mean']
     
     report.append("### Key Findings:\n")
-    report.append(f"1. **XGBoost consistently outperforms InSilico** across both classification tasks\n")
-    report.append(f"   - COD5: XGBoost achieves {xgb_cod5_cod:.1%} vs InSilico {ins_cod5_cod:.1%} COD accuracy\n")
-    report.append(f"   - VA34: XGBoost achieves {xgb_va34_cod:.1%} vs InSilico {ins_va34_cod:.1%} COD accuracy\n\n")
+    report.append(f"1. **Best performing models vary by classification complexity**\n")
+    report.append(f"   - COD5: {best_cod5_model.upper()} achieves {best_cod5_cod:.1%} COD accuracy\n")
+    report.append(f"   - VA34: {best_va34_model.upper()} achieves {best_va34_cod:.1%} COD accuracy\n\n")
     
-    report.append(f"2. **Significant performance degradation from COD5 to VA34**\n")
-    report.append(f"   - XGBoost: {(xgb_cod5_cod - xgb_va34_cod):.1%} COD accuracy drop\n")
-    report.append(f"   - InSilico: {(ins_cod5_cod - ins_va34_cod):.1%} COD accuracy drop\n\n")
+    report.append(f"2. **Significant performance range across models**\n")
+    report.append(f"   - COD5: {worst_cod5_model.upper()} ({worst_cod5_cod:.1%}) to {best_cod5_model.upper()} ({best_cod5_cod:.1%})\n")
+    report.append(f"   - VA34: {worst_va34_model.upper()} ({worst_va34_cod:.1%}) to {best_va34_model.upper()} ({best_va34_cod:.1%})\n\n")
     
-    report.append(f"3. **CSMF accuracy remains relatively stable**\n")
-    report.append(f"   - Less affected by classification granularity increase\n\n")
+    report.append(f"3. **Performance degradation from COD5 to VA34 affects all models**\n")
+    for _, row in cod5_stats.iterrows():
+        model = row['model']
+        cod5_acc = row['cod_mean']
+        va34_acc = va34_stats[va34_stats['model'] == model]['cod_mean'].iloc[0]
+        report.append(f"   - {model.upper()}: {(cod5_acc - va34_acc):.1%} drop\n")
+    report.append("\n")
     
     report.append("## Detailed Performance Metrics\n")
     report.append("### COD5 Classification (5 causes)\n")
@@ -252,46 +258,57 @@ def generate_report(cod5_stats, va34_stats, cod5_site_data, va34_site_data, outp
     report.append("### Best Performing Sites\n")
     
     # Find best sites for each model/classification
-    cod5_xgb_site = cod5_site_data[cod5_site_data['model'] == 'xgboost'].nlargest(1, 'cod_accuracy')
-    cod5_ins_site = cod5_site_data[cod5_site_data['model'] == 'insilico'].nlargest(1, 'cod_accuracy')
-    va34_xgb_site = va34_site_data[va34_site_data['model'] == 'xgboost'].nlargest(1, 'cod_accuracy')
-    va34_ins_site = va34_site_data[va34_site_data['model'] == 'insilico'].nlargest(1, 'cod_accuracy')
-    
     report.append("| Classification | Model | Best Site | COD Accuracy |\n")
     report.append("|---------------|-------|-----------|-------------|\n")
-    report.append(f"| COD5 | XGBoost | {cod5_xgb_site['site'].iloc[0]} | {cod5_xgb_site['cod_accuracy'].iloc[0]:.3f} |\n")
-    report.append(f"| COD5 | InSilico | {cod5_ins_site['site'].iloc[0]} | {cod5_ins_site['cod_accuracy'].iloc[0]:.3f} |\n")
-    report.append(f"| VA34 | XGBoost | {va34_xgb_site['site'].iloc[0]} | {va34_xgb_site['cod_accuracy'].iloc[0]:.3f} |\n")
-    report.append(f"| VA34 | InSilico | {va34_ins_site['site'].iloc[0]} | {va34_ins_site['cod_accuracy'].iloc[0]:.3f} |\n")
+    
+    for model in ['categorical_nb', 'random_forest', 'xgboost', 'logistic_regression', 'insilico']:
+        cod5_model_site = cod5_site_data[cod5_site_data['model'] == model].nlargest(1, 'cod_accuracy')
+        va34_model_site = va34_site_data[va34_site_data['model'] == model].nlargest(1, 'cod_accuracy')
+        if not cod5_model_site.empty:
+            report.append(f"| COD5 | {model.upper()} | {cod5_model_site['site'].iloc[0]} | {cod5_model_site['cod_accuracy'].iloc[0]:.3f} |\n")
+        if not va34_model_site.empty:
+            report.append(f"| VA34 | {model.upper()} | {va34_model_site['site'].iloc[0]} | {va34_model_site['cod_accuracy'].iloc[0]:.3f} |\n")
     
     report.append("\n## Statistical Analysis\n")
     
-    # Perform paired t-test between models
-    cod5_xgb_values = cod5_site_data[cod5_site_data['model'] == 'xgboost']['cod_accuracy'].values
-    cod5_ins_values = cod5_site_data[cod5_site_data['model'] == 'insilico']['cod_accuracy'].values
+    # Perform ANOVA to compare all models
+    report.append("### Model Performance Comparison (One-way ANOVA)\n")
     
-    if len(cod5_xgb_values) == len(cod5_ins_values):
-        t_stat, p_value = stats.ttest_rel(cod5_xgb_values, cod5_ins_values)
-        report.append(f"### COD5: XGBoost vs InSilico (Paired t-test)\n")
-        report.append(f"- t-statistic: {t_stat:.3f}\n")
+    # COD5 ANOVA
+    cod5_groups = []
+    for model in ['categorical_nb', 'random_forest', 'xgboost', 'logistic_regression', 'insilico']:
+        model_values = cod5_site_data[cod5_site_data['model'] == model]['cod_accuracy'].values
+        if len(model_values) > 0:
+            cod5_groups.append(model_values)
+    
+    if len(cod5_groups) > 1:
+        f_stat, p_value = stats.f_oneway(*cod5_groups)
+        report.append(f"#### COD5 Classification:\n")
+        report.append(f"- F-statistic: {f_stat:.3f}\n")
         report.append(f"- p-value: {p_value:.4f}\n")
-        report.append(f"- Significant difference: {'Yes' if p_value < 0.05 else 'No'} (α=0.05)\n\n")
+        report.append(f"- Significant difference between models: {'Yes' if p_value < 0.05 else 'No'} (α=0.05)\n\n")
     
-    va34_xgb_values = va34_site_data[va34_site_data['model'] == 'xgboost']['cod_accuracy'].values
-    va34_ins_values = va34_site_data[va34_site_data['model'] == 'insilico']['cod_accuracy'].values
+    # VA34 ANOVA
+    va34_groups = []
+    for model in ['categorical_nb', 'random_forest', 'xgboost', 'logistic_regression', 'insilico']:
+        model_values = va34_site_data[va34_site_data['model'] == model]['cod_accuracy'].values
+        if len(model_values) > 0:
+            va34_groups.append(model_values)
     
-    if len(va34_xgb_values) == len(va34_ins_values):
-        t_stat, p_value = stats.ttest_rel(va34_xgb_values, va34_ins_values)
-        report.append(f"### VA34: XGBoost vs InSilico (Paired t-test)\n")
-        report.append(f"- t-statistic: {t_stat:.3f}\n")
+    if len(va34_groups) > 1:
+        f_stat, p_value = stats.f_oneway(*va34_groups)
+        report.append(f"#### VA34 Classification:\n")
+        report.append(f"- F-statistic: {f_stat:.3f}\n")
         report.append(f"- p-value: {p_value:.4f}\n")
-        report.append(f"- Significant difference: {'Yes' if p_value < 0.05 else 'No'} (α=0.05)\n\n")
+        report.append(f"- Significant difference between models: {'Yes' if p_value < 0.05 else 'No'} (α=0.05)\n\n")
     
     report.append("## Recommendations\n")
-    report.append("1. **Use XGBoost for production deployments** - consistently superior performance\n")
-    report.append("2. **Consider COD5 for initial deployments** - better accuracy/complexity trade-off\n")
-    report.append("3. **Site-specific calibration recommended** - significant performance variations across sites\n")
-    report.append("4. **Focus on improving VA34 performance** - current accuracy may be insufficient for clinical use\n")
+    best_overall = cod5_stats.loc[cod5_stats['cod_mean'].idxmax(), 'model']
+    report.append(f"1. **Consider {best_overall.upper()} for COD5 classification** - best overall performance\n")
+    report.append("2. **Avoid Categorical Naive Bayes** - consistently poor performance across tasks\n")
+    report.append("3. **Site-specific calibration is critical** - performance varies significantly by location\n")
+    report.append("4. **COD5 classification recommended over VA34** - better accuracy for practical deployment\n")
+    report.append("5. **Ensemble methods (RF, XGBoost) generally outperform single models**\n")
     
     # Write report
     with open(output_dir / 'indomain_analysis_report.md', 'w') as f:
@@ -301,8 +318,8 @@ def generate_report(cod5_stats, va34_stats, cod5_site_data, va34_site_data, outp
 
 def main():
     # Define paths
-    cod5_path = Path('/Users/ericliu/projects5/context-engineering-intro/results/test_complete_cod5/cod5_comparison_results.csv')
-    va34_path = Path('/Users/ericliu/projects5/context-engineering-intro/results/test_complete_va34/va34_comparison_results.csv')
+    cod5_path = Path('/Users/ericliu/projects5/context-engineering-intro/results/full_comparison_20250821_144955_cod5/cod5_comparison_results.csv')
+    va34_path = Path('/Users/ericliu/projects5/context-engineering-intro/results/full_comparison_20250821_145007_va34/va34_comparison_results.csv')
     output_dir = Path('/Users/ericliu/projects5/context-engineering-intro/results/indomain_analysis')
     
     # Create output directory
@@ -316,7 +333,7 @@ def main():
     cod5_stats = []
     va34_stats = []
     
-    for model in ['xgboost', 'insilico']:
+    for model in ['categorical_nb', 'random_forest', 'xgboost', 'logistic_regression', 'insilico']:
         cod5_stats.append(calculate_summary_statistics(cod5_indomain, model, 'COD5'))
         va34_stats.append(calculate_summary_statistics(va34_indomain, model, 'VA34'))
     
@@ -334,7 +351,7 @@ def main():
     cod5_site_data = []
     va34_site_data = []
     
-    for model in ['xgboost', 'insilico']:
+    for model in ['categorical_nb', 'random_forest', 'xgboost', 'logistic_regression', 'insilico']:
         cod5_site_data.append(analyze_site_performance(cod5_indomain, model))
         va34_site_data.append(analyze_site_performance(va34_indomain, model))
     
@@ -358,9 +375,10 @@ def main():
     
     print(f"\nAnalysis complete! Results saved to {output_dir}")
     print("\nKey Findings:")
-    print("1. XGBoost outperforms InSilico in both COD5 and VA34 classifications")
-    print("2. Significant performance drop from COD5 to VA34 due to increased complexity")
+    print("1. Model performance varies significantly - from Categorical NB (lowest) to XGBoost/RF (highest)")
+    print("2. All models show performance degradation from COD5 to VA34 classification")
     print("3. Site-specific variations suggest population-specific mortality patterns")
+    print("4. Ensemble methods (Random Forest, XGBoost) consistently outperform simpler models")
 
 if __name__ == "__main__":
     main()

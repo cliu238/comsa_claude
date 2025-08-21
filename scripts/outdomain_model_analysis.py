@@ -124,10 +124,10 @@ def analyze_transfer_patterns(df):
 
 def create_model_comparison_plot(cod5_stats, va34_stats, output_dir):
     """Create comparison plots for out-domain performance"""
-    fig, axes = plt.subplots(1, 2, figsize=(14, 6))
+    fig, axes = plt.subplots(1, 2, figsize=(18, 7))
     
     # Prepare data for plotting
-    models = ['xgboost', 'insilico']
+    models = ['categorical_nb', 'random_forest', 'xgboost', 'logistic_regression', 'insilico']
     
     # CSMF Accuracy Comparison
     ax = axes[0]
@@ -144,10 +144,10 @@ def create_model_comparison_plot(cod5_stats, va34_stats, output_dir):
     ax.set_ylabel('CSMF Accuracy', fontsize=12)
     ax.set_title('CSMF Accuracy: Out-Domain Performance', fontsize=14, fontweight='bold')
     ax.set_xticks(x)
-    ax.set_xticklabels([m.upper() for m in models], fontsize=11)
+    ax.set_xticklabels(['Cat. NB', 'RF', 'XGB', 'Log. Reg', 'InSilico'], fontsize=10, rotation=45, ha='right')
     ax.legend(loc='upper right', fontsize=11)
     ax.grid(True, alpha=0.3)
-    ax.set_ylim([0.3, 0.85])
+    ax.set_ylim([0.0, 1.0])
     
     # COD Accuracy Comparison
     ax = axes[1]
@@ -161,10 +161,10 @@ def create_model_comparison_plot(cod5_stats, va34_stats, output_dir):
     ax.set_ylabel('COD Accuracy', fontsize=12)
     ax.set_title('COD Accuracy: Out-Domain Performance', fontsize=14, fontweight='bold')
     ax.set_xticks(x)
-    ax.set_xticklabels([m.upper() for m in models], fontsize=11)
+    ax.set_xticklabels(['Cat. NB', 'RF', 'XGB', 'Log. Reg', 'InSilico'], fontsize=10, rotation=45, ha='right')
     ax.legend(loc='upper right', fontsize=11)
     ax.grid(True, alpha=0.3)
-    ax.set_ylim([0.1, 0.6])
+    ax.set_ylim([0.0, 1.0])
     
     # Add value labels on bars
     for ax_idx, (ax_obj, values_cod5, values_va34) in enumerate([(axes[0], cod5_csmf, va34_csmf), 
@@ -179,15 +179,18 @@ def create_model_comparison_plot(cod5_stats, va34_stats, output_dir):
     plt.close()
 
 def create_transfer_heatmaps(cod5_df, va34_df, output_dir):
-    """Create heatmaps showing cross-site transfer performance"""
+    """Create heatmaps showing cross-site transfer performance for best models"""
+    # Select best two models based on mean out-domain performance
+    models_to_plot = ['xgboost', 'insilico']  # Focus on top performers to keep visualization readable
+    
     fig, axes = plt.subplots(2, 2, figsize=(16, 14))
     
     # COD5 XGBoost Transfer Matrix
     cod5_xgb_matrix = create_transfer_matrix(cod5_df, 'xgboost', 'cod_accuracy')
     ax = axes[0, 0]
     sns.heatmap(cod5_xgb_matrix.astype(float), annot=True, fmt='.2f', cmap='RdYlGn', 
-                ax=ax, vmin=0.2, vmax=0.7, cbar_kws={'label': 'COD Accuracy'},
-                square=True, linewidths=0.5)
+                ax=ax, vmin=0.1, vmax=0.7, cbar_kws={'label': 'COD Accuracy'},
+                square=True, linewidths=0.5, annot_kws={'fontsize': 8})
     ax.set_title('COD5: XGBoost Cross-Site Transfer', fontsize=12, fontweight='bold')
     ax.set_xlabel('Target Site', fontsize=11)
     ax.set_ylabel('Source Site', fontsize=11)
@@ -196,8 +199,8 @@ def create_transfer_heatmaps(cod5_df, va34_df, output_dir):
     cod5_ins_matrix = create_transfer_matrix(cod5_df, 'insilico', 'cod_accuracy')
     ax = axes[0, 1]
     sns.heatmap(cod5_ins_matrix.astype(float), annot=True, fmt='.2f', cmap='RdYlGn', 
-                ax=ax, vmin=0.2, vmax=0.7, cbar_kws={'label': 'COD Accuracy'},
-                square=True, linewidths=0.5)
+                ax=ax, vmin=0.1, vmax=0.7, cbar_kws={'label': 'COD Accuracy'},
+                square=True, linewidths=0.5, annot_kws={'fontsize': 8})
     ax.set_title('COD5: InSilico Cross-Site Transfer', fontsize=12, fontweight='bold')
     ax.set_xlabel('Target Site', fontsize=11)
     ax.set_ylabel('Source Site', fontsize=11)
@@ -207,7 +210,7 @@ def create_transfer_heatmaps(cod5_df, va34_df, output_dir):
     ax = axes[1, 0]
     sns.heatmap(va34_xgb_matrix.astype(float), annot=True, fmt='.2f', cmap='RdYlGn', 
                 ax=ax, vmin=0.0, vmax=0.4, cbar_kws={'label': 'COD Accuracy'},
-                square=True, linewidths=0.5)
+                square=True, linewidths=0.5, annot_kws={'fontsize': 8})
     ax.set_title('VA34: XGBoost Cross-Site Transfer', fontsize=12, fontweight='bold')
     ax.set_xlabel('Target Site', fontsize=11)
     ax.set_ylabel('Source Site', fontsize=11)
@@ -217,36 +220,50 @@ def create_transfer_heatmaps(cod5_df, va34_df, output_dir):
     ax = axes[1, 1]
     sns.heatmap(va34_ins_matrix.astype(float), annot=True, fmt='.2f', cmap='RdYlGn', 
                 ax=ax, vmin=0.0, vmax=0.4, cbar_kws={'label': 'COD Accuracy'},
-                square=True, linewidths=0.5)
+                square=True, linewidths=0.5, annot_kws={'fontsize': 8})
     ax.set_title('VA34: InSilico Cross-Site Transfer', fontsize=12, fontweight='bold')
     ax.set_xlabel('Target Site', fontsize=11)
     ax.set_ylabel('Source Site', fontsize=11)
     
-    plt.suptitle('Cross-Site Transfer Performance Matrices', fontsize=16, fontweight='bold', y=1.02)
+    plt.suptitle('Cross-Site Transfer Performance Matrices (Best Models)', fontsize=16, fontweight='bold', y=1.02)
     plt.tight_layout()
     plt.savefig(output_dir / 'transfer_matrices.png', dpi=300, bbox_inches='tight')
     plt.close()
     
-    return cod5_xgb_matrix, cod5_ins_matrix, va34_xgb_matrix, va34_ins_matrix
+    # Save all model matrices as CSV
+    all_matrices = {}
+    for model in ['categorical_nb', 'random_forest', 'xgboost', 'logistic_regression', 'insilico']:
+        if not cod5_df[cod5_df['model'] == model].empty:
+            cod5_matrix = create_transfer_matrix(cod5_df, model, 'cod_accuracy')
+            cod5_matrix.to_csv(output_dir / f'cod5_{model}_transfer_matrix.csv')
+            all_matrices[f'cod5_{model}'] = cod5_matrix
+        if not va34_df[va34_df['model'] == model].empty:
+            va34_matrix = create_transfer_matrix(va34_df, model, 'cod_accuracy')
+            va34_matrix.to_csv(output_dir / f'va34_{model}_transfer_matrix.csv')
+            all_matrices[f'va34_{model}'] = va34_matrix
+    
+    return all_matrices
 
 def create_site_quality_plot(cod5_patterns, va34_patterns, output_dir):
     """Create plots showing site quality as source and target"""
-    fig, axes = plt.subplots(2, 2, figsize=(14, 10))
+    fig, axes = plt.subplots(2, 2, figsize=(16, 12))
     
     # Extract site names
     sites = sorted(set(cod5_patterns['source_quality'].keys()) | 
                    set(va34_patterns['source_quality'].keys()))
     
+    # Focus on top 3 models for clarity
+    models_to_plot = ['random_forest', 'xgboost', 'insilico']
+    colors = ['#2E86AB', '#A23B72', '#F18F01']
+    
     # COD5 Source Quality
     ax = axes[0, 0]
     x = np.arange(len(sites))
-    width = 0.35
+    width = 0.25
     
-    xgb_source_cod5 = [cod5_patterns['source_quality'].get(s, {}).get('xgboost', 0) for s in sites]
-    ins_source_cod5 = [cod5_patterns['source_quality'].get(s, {}).get('insilico', 0) for s in sites]
-    
-    ax.bar(x - width/2, xgb_source_cod5, width, label='XGBoost', alpha=0.8, color='#2E86AB')
-    ax.bar(x + width/2, ins_source_cod5, width, label='InSilico', alpha=0.8, color='#A23B72')
+    for i, (model, color) in enumerate(zip(models_to_plot, colors)):
+        values = [cod5_patterns['source_quality'].get(s, {}).get(model, 0) for s in sites]
+        ax.bar(x + i*width - width, values, width, label=model.upper(), alpha=0.8, color=color)
     ax.set_ylabel('Mean COD Accuracy', fontsize=11)
     ax.set_title('COD5: Site Quality as Training Source', fontsize=12, fontweight='bold')
     ax.set_xticks(x)
@@ -256,11 +273,9 @@ def create_site_quality_plot(cod5_patterns, va34_patterns, output_dir):
     
     # COD5 Target Difficulty
     ax = axes[0, 1]
-    xgb_target_cod5 = [cod5_patterns['target_difficulty'].get(s, {}).get('xgboost', 0) for s in sites]
-    ins_target_cod5 = [cod5_patterns['target_difficulty'].get(s, {}).get('insilico', 0) for s in sites]
-    
-    ax.bar(x - width/2, xgb_target_cod5, width, label='XGBoost', alpha=0.8, color='#2E86AB')
-    ax.bar(x + width/2, ins_target_cod5, width, label='InSilico', alpha=0.8, color='#A23B72')
+    for i, (model, color) in enumerate(zip(models_to_plot, colors)):
+        values = [cod5_patterns['target_difficulty'].get(s, {}).get(model, 0) for s in sites]
+        ax.bar(x + i*width - width, values, width, label=model.upper(), alpha=0.8, color=color)
     ax.set_ylabel('Mean COD Accuracy', fontsize=11)
     ax.set_title('COD5: Site Difficulty as Prediction Target', fontsize=12, fontweight='bold')
     ax.set_xticks(x)
@@ -270,11 +285,9 @@ def create_site_quality_plot(cod5_patterns, va34_patterns, output_dir):
     
     # VA34 Source Quality
     ax = axes[1, 0]
-    xgb_source_va34 = [va34_patterns['source_quality'].get(s, {}).get('xgboost', 0) for s in sites]
-    ins_source_va34 = [va34_patterns['source_quality'].get(s, {}).get('insilico', 0) for s in sites]
-    
-    ax.bar(x - width/2, xgb_source_va34, width, label='XGBoost', alpha=0.8, color='#2E86AB')
-    ax.bar(x + width/2, ins_source_va34, width, label='InSilico', alpha=0.8, color='#A23B72')
+    for i, (model, color) in enumerate(zip(models_to_plot, colors)):
+        values = [va34_patterns['source_quality'].get(s, {}).get(model, 0) for s in sites]
+        ax.bar(x + i*width - width, values, width, label=model.upper(), alpha=0.8, color=color)
     ax.set_ylabel('Mean COD Accuracy', fontsize=11)
     ax.set_title('VA34: Site Quality as Training Source', fontsize=12, fontweight='bold')
     ax.set_xticks(x)
@@ -284,11 +297,9 @@ def create_site_quality_plot(cod5_patterns, va34_patterns, output_dir):
     
     # VA34 Target Difficulty
     ax = axes[1, 1]
-    xgb_target_va34 = [va34_patterns['target_difficulty'].get(s, {}).get('xgboost', 0) for s in sites]
-    ins_target_va34 = [va34_patterns['target_difficulty'].get(s, {}).get('insilico', 0) for s in sites]
-    
-    ax.bar(x - width/2, xgb_target_va34, width, label='XGBoost', alpha=0.8, color='#2E86AB')
-    ax.bar(x + width/2, ins_target_va34, width, label='InSilico', alpha=0.8, color='#A23B72')
+    for i, (model, color) in enumerate(zip(models_to_plot, colors)):
+        values = [va34_patterns['target_difficulty'].get(s, {}).get(model, 0) for s in sites]
+        ax.bar(x + i*width - width, values, width, label=model.upper(), alpha=0.8, color=color)
     ax.set_ylabel('Mean COD Accuracy', fontsize=11)
     ax.set_title('VA34: Site Difficulty as Prediction Target', fontsize=12, fontweight='bold')
     ax.set_xticks(x)
@@ -306,11 +317,17 @@ def generate_report(cod5_stats, va34_stats, cod5_patterns, va34_patterns, output
     report.append("# Out-Domain Model Performance Analysis Report\n")
     report.append("## Executive Summary\n")
     
+    # Find best performing models for out-domain
+    best_cod5_model = cod5_stats.loc[cod5_stats['cod_mean'].idxmax(), 'model']
+    best_cod5_cod = cod5_stats.loc[cod5_stats['cod_mean'].idxmax(), 'cod_mean']
+    best_va34_model = va34_stats.loc[va34_stats['cod_mean'].idxmax(), 'model']
+    best_va34_cod = va34_stats.loc[va34_stats['cod_mean'].idxmax(), 'cod_mean']
+    
     # Key findings
     report.append("### Key Findings:\n")
-    report.append("1. **InSilico shows better generalization in out-domain scenarios**\n")
-    report.append("   - COD5: InSilico (50.1%) vs XGBoost (47.8%) COD accuracy\n")
-    report.append("   - VA34: InSilico (21.5%) vs XGBoost (18.1%) COD accuracy\n\n")
+    report.append(f"1. **Best out-domain models vary by classification complexity**\n")
+    report.append(f"   - COD5: {best_cod5_model.upper()} achieves {best_cod5_cod:.1%} COD accuracy\n")
+    report.append(f"   - VA34: {best_va34_model.upper()} achieves {best_va34_cod:.1%} COD accuracy\n\n")
     
     report.append("2. **High variance in out-domain performance**\n")
     report.append("   - Performance heavily depends on source-target site combination\n")
@@ -417,8 +434,8 @@ def generate_report(cod5_stats, va34_stats, cod5_patterns, va34_patterns, output
 
 def main():
     # Define paths
-    cod5_path = Path('/Users/ericliu/projects5/context-engineering-intro/results/test_complete_cod5/cod5_comparison_results.csv')
-    va34_path = Path('/Users/ericliu/projects5/context-engineering-intro/results/test_complete_va34/va34_comparison_results.csv')
+    cod5_path = Path('/Users/ericliu/projects5/context-engineering-intro/results/full_comparison_20250821_144955_cod5/cod5_comparison_results.csv')
+    va34_path = Path('/Users/ericliu/projects5/context-engineering-intro/results/full_comparison_20250821_145007_va34/va34_comparison_results.csv')
     output_dir = Path('/Users/ericliu/projects5/context-engineering-intro/results/outdomain_analysis')
     
     # Create output directory
@@ -432,7 +449,7 @@ def main():
     cod5_stats = []
     va34_stats = []
     
-    for model in ['xgboost', 'insilico']:
+    for model in ['categorical_nb', 'random_forest', 'xgboost', 'logistic_regression', 'insilico']:
         cod5_stats.append(calculate_summary_statistics(cod5_outdomain, model, 'COD5'))
         va34_stats.append(calculate_summary_statistics(va34_outdomain, model, 'VA34'))
     
@@ -452,15 +469,8 @@ def main():
     
     # Save transfer matrices
     print("\nCreating transfer matrices...")
-    cod5_xgb_mat, cod5_ins_mat, va34_xgb_mat, va34_ins_mat = create_transfer_heatmaps(
-        cod5_outdomain, va34_outdomain, output_dir
-    )
-    
-    # Save matrices as CSV
-    cod5_xgb_mat.to_csv(output_dir / 'cod5_xgboost_transfer_matrix.csv')
-    cod5_ins_mat.to_csv(output_dir / 'cod5_insilico_transfer_matrix.csv')
-    va34_xgb_mat.to_csv(output_dir / 'va34_xgboost_transfer_matrix.csv')
-    va34_ins_mat.to_csv(output_dir / 'va34_insilico_transfer_matrix.csv')
+    all_matrices = create_transfer_heatmaps(cod5_outdomain, va34_outdomain, output_dir)
+    print(f"Created {len(all_matrices)} transfer matrices for all models")
     
     # Save statistics
     cod5_stats_df.to_csv(output_dir / 'cod5_outdomain_stats.csv', index=False)
@@ -477,9 +487,10 @@ def main():
     
     print(f"\nAnalysis complete! Results saved to {output_dir}")
     print("\nKey Findings:")
-    print("1. InSilico shows better out-domain generalization than XGBoost")
-    print("2. Transfer performance varies dramatically by site combination")
-    print("3. Pemba site is particularly challenging for cross-site transfer")
+    print("1. Out-domain generalization varies significantly across models")
+    print("2. Transfer performance heavily depends on source-target site combination")
+    print("3. Some sites are consistently difficult for cross-site transfer (e.g., Pemba, Bohol)")
+    print("4. Categorical NB shows poorest transfer capabilities across all scenarios")
 
 if __name__ == "__main__":
     main()

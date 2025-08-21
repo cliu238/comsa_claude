@@ -87,7 +87,9 @@
       "Bash(--phase voting )",
       "Bash(--n-bootstrap 10 )",
       "Bash(--batch-size 2 )",
-      "Bash(gh auth:*)"
+      "Bash(gh auth:*)",
+      "WebSearch",
+      "WebFetch(domain:cran.r-project.org)"
     ],
     "deny": []
   },
