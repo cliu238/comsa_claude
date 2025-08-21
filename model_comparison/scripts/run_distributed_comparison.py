@@ -56,6 +56,12 @@ def parse_arguments():
         required=True,
         help="List of sites to include in comparison",
     )
+    parser.add_argument(
+        "--label-type",
+        default="va34",
+        choices=["va34", "cod5"],
+        help="Label system to use: va34 (34 causes) or cod5 (5 broad categories)",
+    )
 
     # Model arguments
     parser.add_argument(
@@ -306,6 +312,7 @@ async def main():
         generate_plots=not args.no_plots,
         tuning=tuning_config,
         ensemble=ensemble_config,
+        label_type=args.label_type,
     )
 
     parallel_config = ParallelConfig(
@@ -319,10 +326,11 @@ async def main():
     )
 
     # Log configuration
-    logger.info("Starting distributed VA34 comparison")
+    logger.info(f"Starting distributed VA comparison ({args.label_type})")
     logger.info(f"Data path: {args.data_path}")
     logger.info(f"Sites: {args.sites}")
     logger.info(f"Models: {args.models}")
+    logger.info(f"Label type: {args.label_type}")
     logger.info(f"Workers: {args.n_workers}")
     logger.info(f"Output directory: {args.output_dir}")
     

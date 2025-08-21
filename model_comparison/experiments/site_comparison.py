@@ -117,11 +117,16 @@ class SiteComparisonExperiment:
             data = data[data["site"].isin(self.config.sites)]
             logger.info(f"Filtered to {len(self.config.sites)} sites")
 
-        # Handle va34 column (rename to cause for compatibility)
-        if "va34" in data.columns and "cause" not in data.columns:
-            data["cause"] = data["va34"].astype(str)  # Convert to string for consistency
-            logger.info("Renamed va34 column to cause")
-            # Don't drop va34 yet - will be dropped with other label columns later
+        # Handle label column based on config (rename to cause for compatibility)
+        if self.config.label_type == "cod5":
+            if "cod5" in data.columns and "cause" not in data.columns:
+                data["cause"] = data["cod5"].astype(str)  # Convert to string for consistency
+                logger.info("Using cod5 (5-class grouping) as cause column")
+        else:  # default to va34
+            if "va34" in data.columns and "cause" not in data.columns:
+                data["cause"] = data["va34"].astype(str)  # Convert to string for consistency
+                logger.info("Using va34 (34-class) as cause column")
+        # Don't drop the original columns yet - will be dropped with other label columns later
 
         # Ensure we have the expected columns
         required_cols = ["site", "cause"]

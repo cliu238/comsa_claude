@@ -90,5 +90,6 @@
       "Bash(gh auth:*)"
     ],
     "deny": []
-  }
+  },
+  "outputStyle": "Explanatory"
 }

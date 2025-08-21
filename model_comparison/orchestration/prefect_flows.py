@@ -501,14 +501,14 @@ def batch_experiments(experiments: List[Dict], batch_size: int) -> List[List[Dic
 
 
 @flow(
-    name="VA34 Comparison Experiment",
+    name="VA Comparison Experiment",
     task_runner=ConcurrentTaskRunner(max_workers=10),
     persist_result=True,
 )
 async def va34_comparison_flow(
     config: ExperimentConfig, parallel_config: ParallelConfig
 ) -> pd.DataFrame:
-    """Main Prefect flow for VA34 comparison experiments.
+    """Main Prefect flow for VA comparison experiments.
 
     Args:
         config: Experiment configuration
@@ -518,7 +518,7 @@ async def va34_comparison_flow(
         DataFrame with all experiment results
     """
     start_time = time.time()
-    logger.info("Starting VA34 comparison flow")
+    logger.info(f"Starting VA comparison flow ({config.label_type})")
 
     # Initialize Ray if needed
     if not ray.is_initialized():
@@ -551,7 +551,7 @@ async def va34_comparison_flow(
         output_dir=config.output_dir,
         openva_encoding=False,  # Load numeric first for ML models
         stratify_by_site=False,
-        label_column="va34"
+        label_column=config.label_type  # Use configured label type instead of hardcoded va34
     )
     
     processor = VADataProcessor(data_config)
@@ -563,7 +563,7 @@ async def va34_comparison_flow(
         output_dir=config.output_dir,
         openva_encoding=True,  # OpenVA format for InSilico
         stratify_by_site=False,
-        label_column="va34"
+        label_column=config.label_type  # Use configured label type instead of hardcoded va34
     )
     processor_openva = VADataProcessor(data_config_openva)
     data_openva = processor_openva.load_and_process()
@@ -573,12 +573,13 @@ async def va34_comparison_flow(
         data = data[data["site"].isin(config.sites)]
         data_openva = data_openva[data_openva["site"].isin(config.sites)]
 
-    # Handle va34 column - ensure all models use "cause" as the label column
+    # Handle label column - ensure all models use "cause" as the label column
     # This standardization is critical for consistent model comparison
-    if "va34" in data.columns and "cause" not in data.columns:
-        data["cause"] = data["va34"].astype(str)
-    if "va34" in data_openva.columns and "cause" not in data_openva.columns:
-        data_openva["cause"] = data_openva["va34"].astype(str)
+    if config.label_type in data.columns and "cause" not in data.columns:
+        data["cause"] = data[config.label_type].astype(str)
+        logger.info(f"Using {config.label_type} as cause column")
+    if config.label_type in data_openva.columns and "cause" not in data_openva.columns:
+        data_openva["cause"] = data_openva[config.label_type].astype(str)
 
     logger.info(f"Loaded ML data with shape: {data.shape}")
     logger.info(f"Loaded OpenVA data with shape: {data_openva.shape}")
@@ -607,7 +608,7 @@ async def va34_comparison_flow(
     progress_actor = ProgressReporter.remote(len(experiments))
     progress_tracker = RayProgressTracker(
         total_experiments=len(experiments) + len(existing_results),
-        description="VA34 Experiments",
+        description=f"VA Experiments ({config.label_type})",
         progress_actor=progress_actor,
     )
 
@@ -677,7 +678,7 @@ async def va34_comparison_flow(
 
     # Save final results
     final_results = pd.DataFrame([r.to_dict() for r in all_results])
-    output_path = Path(config.output_dir) / "va34_comparison_results.csv"
+    output_path = Path(config.output_dir) / f"{config.label_type}_comparison_results.csv"
     final_results.to_csv(output_path, index=False)
     logger.info(f"Saved results to {output_path}")
 

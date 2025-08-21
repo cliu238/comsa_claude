@@ -275,11 +275,11 @@ class ParallelSiteComparisonExperiment(SiteComparisonExperiment):
             # Try stratified split, fall back to random if necessary
             try:
                 X_train, X_test, y_train, y_test = train_test_split(
-                    X, y, test_size=0.2, random_state=self.config.random_seed, stratify=y
+                    X, y, test_size=0.25, random_state=self.config.random_seed, stratify=y
                 )
             except ValueError:
                 X_train, X_test, y_train, y_test = train_test_split(
-                    X, y, test_size=0.2, random_state=self.config.random_seed
+                    X, y, test_size=0.25, random_state=self.config.random_seed
                 )
 
             site_splits[site] = {
