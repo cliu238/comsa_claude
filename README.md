@@ -820,11 +820,11 @@ poetry run python model_comparison/scripts/run_distributed_comparison.py \
     --data-path va-data/data/phmrc/IHME_PHMRC_VA_DATA_ADULT_Y2013M09D11_0.csv \
     --sites Mexico AP UP Dar Bohol Pemba \
     --models logistic_regression random_forest xgboost categorical_nb insilico \
-    --n-workers 14 \
-    --training-sizes 0.25 0.5 0.75 1.0 \
-    --n-bootstrap 100 \
-    --batch-size 100 \
-    --output-dir results/model_comparison_all_sites \
+    --n-workers 4 \
+    --training-sizes 1.0 \
+    --n-bootstrap 10 \
+    --batch-size 10 \
+    --output-dir results/full_comparison_$(date +%Y%m%d_%H%M%S) \
     --no-plots
 ```
 
@@ -957,3 +957,63 @@ When enabled, the output CSV will include additional columns:
 
 - [Claude Code Documentation](https://docs.anthropic.com/en/docs/claude-code)
 - [Context Engineering Best Practices](https://www.philschmid.de/context-engineering)
+
+
+For COD5 VS VA34
+```bash
+poetry run python model_comparison/scripts/run_distributed_comparison.py \
+    --data-path va-data/data/phmrc/IHME_PHMRC_VA_DATA_ADULT_Y2013M09D11_0.csv \
+    --sites Mexico AP UP Dar Bohol Pemba \
+    --label-type cod5 \
+    --models logistic_regression random_forest xgboost categorical_nb insilico \
+    --n-workers 4 \
+    --training-sizes 1.0 \
+    --n-bootstrap 10 \
+    --batch-size 10 \
+    --output-dir results/full_comparison_$(date +%Y%m%d_%H%M%S)_cod5 \
+    --no-plots
+```
+
+```bash
+poetry run python model_comparison/scripts/run_distributed_comparison.py \
+    --data-path va-data/data/phmrc/IHME_PHMRC_VA_DATA_ADULT_Y2013M09D11_0.csv \
+    --sites Mexico AP UP Dar Bohol Pemba \
+    --label-type va34 \
+    --models logistic_regression random_forest xgboost categorical_nb insilico \
+    --n-workers 4 \
+    --training-sizes 1.0 \
+    --n-bootstrap 10 \
+    --batch-size 10 \
+    --output-dir results/full_comparison_$(date +%Y%m%d_%H%M%S)_va34 \
+    --no-plots
+```
+
+
+For COD5 VS VA34
+```bash
+poetry run python model_comparison/scripts/run_distributed_comparison.py \
+    --data-path va-data/data/phmrc/IHME_PHMRC_VA_DATA_ADULT_Y2013M09D11_0.csv \
+    --sites Mexico AP UP Dar Bohol Pemba \
+    --label-type cod5 \
+    --models logistic_regression random_forest xgboost categorical_nb insilico \
+    --n-workers 4 \
+    --training-sizes 1.0 \
+    --n-bootstrap 10 \
+    --batch-size 10 \
+    --output-dir results/full_comparison_$(date +%Y%m%d_%H%M%S)_cod5 \
+    --no-plots
+```
+
+```bash
+poetry run python model_comparison/scripts/run_distributed_comparison.py \
+    --data-path va-data/data/phmrc/IHME_PHMRC_VA_DATA_ADULT_Y2013M09D11_0.csv \
+    --sites Mexico AP UP Dar Bohol Pemba \
+    --label-type va34 \
+    --models logistic_regression random_forest xgboost categorical_nb insilico \
+    --n-workers 4 \
+    --training-sizes 1.0 \
+    --n-bootstrap 10 \
+    --batch-size 10 \
+    --output-dir results/full_comparison_$(date +%Y%m%d_%H%M%S)_va34 \
+    --no-plots
+```

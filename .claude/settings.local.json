@@ -89,7 +89,8 @@
       "Bash(--batch-size 2 )",
       "Bash(gh auth:*)",
       "WebSearch",
-      "WebFetch(domain:cran.r-project.org)"
+      "WebFetch(domain:cran.r-project.org)",
+      "WebFetch(domain:rdrr.io)"
     ],
     "deny": []
   },
