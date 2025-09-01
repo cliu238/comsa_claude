@@ -67,34 +67,42 @@ class SiteComparisonExperiment:
         data = self._load_data()
         logger.info(f"Loaded data with shape: {data.shape}")
 
-        # Run in-domain experiments
-        logger.info("Running in-domain experiments...")
-        in_domain_results = self._run_in_domain_experiments(data)
-        
-        # Save checkpoint after in-domain experiments
-        if self.checkpoint_callback and len(in_domain_results) > 0:
-            self.checkpoint_callback(in_domain_results, "in_domain_complete")
+        # Initialize results list
+        results_to_combine = []
 
-        # Run out-domain experiments
-        logger.info("Running out-domain experiments...")
-        out_domain_results = self._run_out_domain_experiments(data)
-        
-        # Save checkpoint after out-domain experiments
-        if self.checkpoint_callback and len(out_domain_results) > 0:
-            self.checkpoint_callback(out_domain_results, "out_domain_complete")
+        # Run in-domain experiments if requested
+        if "in_domain" in self.config.experiment_types:
+            logger.info("Running in-domain experiments...")
+            in_domain_results = self._run_in_domain_experiments(data)
+            if len(in_domain_results) > 0:
+                results_to_combine.append(in_domain_results)
+                if self.checkpoint_callback:
+                    self.checkpoint_callback(in_domain_results, "in_domain_complete")
 
-        # Run training size experiments
-        logger.info("Running training size experiments...")
-        size_results = self._run_training_size_experiments(data)
-        
-        # Save checkpoint after training size experiments
-        if self.checkpoint_callback and len(size_results) > 0:
-            self.checkpoint_callback(size_results, "training_size_complete")
+        # Run out-domain experiments if requested
+        if "out_domain" in self.config.experiment_types:
+            logger.info("Running out-domain experiments...")
+            out_domain_results = self._run_out_domain_experiments(data)
+            if len(out_domain_results) > 0:
+                results_to_combine.append(out_domain_results)
+                if self.checkpoint_callback:
+                    self.checkpoint_callback(out_domain_results, "out_domain_complete")
+
+        # Run training size experiments if requested
+        if "training_size" in self.config.experiment_types:
+            logger.info("Running training size experiments...")
+            size_results = self._run_training_size_experiments(data)
+            if len(size_results) > 0:
+                results_to_combine.append(size_results)
+                if self.checkpoint_callback:
+                    self.checkpoint_callback(size_results, "training_size_complete")
 
         # Combine all results
-        all_results = pd.concat(
-            [in_domain_results, out_domain_results, size_results], ignore_index=True
-        )
+        if results_to_combine:
+            all_results = pd.concat(results_to_combine, ignore_index=True)
+        else:
+            # Return empty DataFrame if no experiments were run
+            all_results = pd.DataFrame()
 
         # Save results
         self._save_results(all_results)

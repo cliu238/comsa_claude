@@ -202,6 +202,7 @@ class CheckpointManager:
         test_site: str,
         training_size: float = 1.0,
         random_seed: int = None,
+        include_training_size: bool = False,
     ) -> str:
         """Create unique experiment ID.
 
@@ -212,6 +213,7 @@ class CheckpointManager:
             test_site: Test site
             training_size: Training data fraction
             random_seed: Random seed for reproducibility
+            include_training_size: Whether to include training size in ID
 
         Returns:
             Unique experiment identifier
@@ -221,8 +223,13 @@ class CheckpointManager:
             experiment_type,
             train_site,
             test_site,
-            f"size{training_size}",
         ]
+        
+        # Include training size in ID when:
+        # 1. Explicitly requested (for consistency when training_size experiments exist)
+        # 2. For training_size experiments (always, to distinguish different sizes)
+        if include_training_size or experiment_type == "training_size":
+            components.append(f"size{training_size}")
         
         # Add random seed if provided
         if random_seed is not None:

@@ -156,10 +156,22 @@ class ExperimentConfig(BaseModel):
     models: List[str] = Field(
         default=["insilico", "xgboost"], description="Models to compare"
     )
+    
+    # Experiment type configuration
+    experiment_types: List[str] = Field(
+        default=["in_domain", "out_domain"],
+        description="Types of experiments to run (in_domain, out_domain, training_size)"
+    )
 
     # Experiment settings
-    n_bootstrap: int = Field(default=100, description="Bootstrap iterations")
-    random_seeds: List[int] = Field(default=[42], description="Random seeds for multi-seed experiments")
+    n_bootstrap: int = Field(
+        default=0, 
+        description="Bootstrap iterations for confidence intervals (0 to disable, use random_seeds for robustness)"
+    )
+    random_seeds: List[int] = Field(
+        default=[42], 
+        description="Random seeds for multi-seed experiments (provides better robustness than bootstrap)"
+    )
     n_jobs: int = Field(default=-1, description="Parallel jobs")
 
     # Output configuration
@@ -202,6 +214,15 @@ class ExperimentConfig(BaseModel):
         valid_types = ["va34", "cod5"]
         if v not in valid_types:
             raise ValueError(f"Label type {v} not in {valid_types}")
+        return v
+    
+    @field_validator("experiment_types")
+    def validate_experiment_types(cls, v: List[str]) -> List[str]:
+        """Validate experiment types."""
+        valid_types = ["in_domain", "out_domain", "training_size"]
+        for exp_type in v:
+            if exp_type not in valid_types:
+                raise ValueError(f"Experiment type {exp_type} not in {valid_types}")
         return v
 
     model_config = {"validate_assignment": True}

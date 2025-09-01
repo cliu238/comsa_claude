@@ -1,19 +1,27 @@
 #!/usr/bin/env python
-"""Distributed VA model comparison using Ray for parallel execution.
+"""ADVANCED VERSION: Distributed VA34 model comparison with hyperparameter tuning and ensemble experiments.
 
-Simplified script for standard model comparison experiments.
-For advanced features (hyperparameter tuning, ensembles, bootstrap CI),
-use run_distributed_comparison_advanced.py.
+THIS IS THE ADVANCED VERSION WITH ALL EXPERIMENTAL FEATURES INCLUDING:
+- Hyperparameter tuning with Ray Tune
+- Ensemble model experiments  
+- Bootstrap confidence intervals
+- Component timing tracking
 
-Usage:
-    python run_distributed_comparison.py \
+For standard model comparisons, use run_distributed_comparison.py instead.
+
+Usage for advanced features:
+    python run_distributed_comparison_advanced.py \
         --data-path data/va34_data.csv \
         --sites site_1 site_2 site_3 \
         --models xgboost insilico \
+        --enable-tuning \
+        --tuning-trials 100 \
+        --enable-ensemble-exploration \
+        --n-bootstrap 100 \
         --n-workers 4 \
-        --output-dir results/comparison
+        --output-dir results/advanced
 
-Expected runtime: Minutes to hours depending on data size and models
+Expected runtime: Can be very long with tuning enabled (hours to days)
 Progress will be displayed in real-time with checkpoint saves
 """
 
@@ -29,7 +37,7 @@ from prefect import serve
 sys.path.append(str(Path(__file__).parent.parent.parent))
 
 from baseline.utils import get_logger
-from model_comparison.experiments.experiment_config import ExperimentConfig
+from model_comparison.experiments.experiment_config import ExperimentConfig, TuningConfig
 from model_comparison.orchestration.config import ParallelConfig
 from model_comparison.orchestration.prefect_flows import (
     cleanup_ray_resources,
@@ -68,7 +76,7 @@ def parse_arguments():
         "--models",
         nargs="+",
         default=["xgboost", "insilico"],
-        choices=["xgboost", "insilico", "random_forest", "logistic_regression", "categorical_nb", "tabicl"],
+        choices=["xgboost", "insilico", "random_forest", "logistic_regression", "categorical_nb", "ensemble", "tabicl"],
         help="Models to compare",
     )
 
@@ -80,14 +88,11 @@ def parse_arguments():
         default=[0.25, 0.5, 0.75, 1.0],
         help="Training data fractions for size experiments",
     )
-    
-    # Experiment type configuration
     parser.add_argument(
-        "--experiment-types",
-        nargs="+",
-        default=["in_domain", "out_domain"],
-        choices=["in_domain", "out_domain", "training_size"],
-        help="Types of experiments to run (default: in_domain out_domain)",
+        "--n-bootstrap",
+        type=int,
+        default=100,
+        help="Number of bootstrap iterations for metrics",
     )
 
     # Parallel execution arguments
@@ -144,6 +149,108 @@ def parse_arguments():
         action="store_true",
         help="Skip generating visualization plots",
     )
+
+    # Hyperparameter tuning arguments
+    parser.add_argument(
+        "--enable-tuning",
+        action="store_true",
+        help="Enable hyperparameter tuning for ML models",
+    )
+    parser.add_argument(
+        "--tuning-trials",
+        type=int,
+        default=100,
+        help="Number of tuning trials per model",
+    )
+    parser.add_argument(
+        "--tuning-algorithm",
+        choices=["grid", "random", "bayesian"],
+        default="bayesian",
+        help="Hyperparameter search algorithm",
+    )
+    parser.add_argument(
+        "--tuning-metric",
+        choices=["csmf_accuracy", "cod_accuracy"],
+        default="csmf_accuracy",
+        help="Metric to optimize during tuning",
+    )
+    parser.add_argument(
+        "--tuning-cv-folds",
+        type=int,
+        default=5,
+        help="Cross-validation folds for tuning",
+    )
+    parser.add_argument(
+        "--tuning-cpus-per-trial",
+        type=float,
+        default=1.0,
+        help="CPUs allocated per tuning trial",
+    )
+    parser.add_argument(
+        "--tuning-max-concurrent-trials",
+        type=int,
+        default=2,
+        help="Maximum concurrent tuning trials (prevents resource explosion)",
+    )
+    
+    # Timing tracking arguments
+    parser.add_argument(
+        "--track-component-times",
+        action="store_true",
+        help="Track separate timing for tuning, training, and inference components",
+    )
+    
+    # Ensemble-specific arguments
+    parser.add_argument(
+        "--enable-ensemble-exploration",
+        action="store_true",
+        help="Enable ensemble exploration experiments",
+    )
+    parser.add_argument(
+        "--ensemble-voting-strategies",
+        nargs="+",
+        default=["soft", "hard"],
+        choices=["soft", "hard"],
+        help="Voting strategies to test for ensembles",
+    )
+    parser.add_argument(
+        "--ensemble-weight-strategies",
+        nargs="+",
+        default=["none", "performance"],
+        choices=["none", "manual", "cv", "performance"],
+        help="Weight optimization strategies for ensembles",
+    )
+    parser.add_argument(
+        "--ensemble-sizes",
+        nargs="+",
+        type=int,
+        default=[3, 5],
+        help="Number of models in each ensemble",
+    )
+    parser.add_argument(
+        "--ensemble-base-models",
+        nargs="+",
+        default=["all"],
+        help="Base models to consider for ensembles ('all' or specific models)",
+    )
+    parser.add_argument(
+        "--ensemble-selection-metric",
+        default="combined",
+        choices=["in_domain", "out_domain", "combined"],
+        help="Metric to optimize when selecting ensemble members",
+    )
+    parser.add_argument(
+        "--ensemble-combination-strategy",
+        default="smart",
+        choices=["exhaustive", "greedy", "random", "smart"],
+        help="Strategy for generating ensemble combinations",
+    )
+    parser.add_argument(
+        "--ensemble-max-combinations",
+        type=int,
+        default=50,
+        help="Maximum number of ensemble combinations to test",
+    )
     
     # Other arguments
     parser.add_argument(
@@ -170,6 +277,40 @@ def parse_arguments():
 async def main():
     """Main execution function."""
     args = parse_arguments()
+
+    # Create tuning configuration
+    tuning_config = TuningConfig(
+        enabled=args.enable_tuning,
+        n_trials=args.tuning_trials,
+        search_algorithm=args.tuning_algorithm,
+        tuning_metric=args.tuning_metric,
+        cv_folds=args.tuning_cv_folds,
+        n_cpus_per_trial=args.tuning_cpus_per_trial,
+        max_concurrent_tuning_trials=args.tuning_max_concurrent_trials,
+    )
+    
+    # Create ensemble configuration if needed
+    ensemble_config = None
+    if args.enable_ensemble_exploration or "ensemble" in args.models:
+        from model_comparison.experiments.experiment_config import EnsembleExperimentConfig
+        
+        # Determine base models
+        base_models = args.ensemble_base_models
+        if "all" in base_models:
+            base_models = ["xgboost", "random_forest", "categorical_nb", "logistic_regression", "insilico"]
+        
+        # Create base estimators list
+        base_estimators = [(f"{model}_est", model) for model in base_models]
+        
+        ensemble_config = EnsembleExperimentConfig(
+            base_estimators=base_estimators,
+            voting_strategies=args.ensemble_voting_strategies,
+            weight_strategies=args.ensemble_weight_strategies,
+            ensemble_sizes=args.ensemble_sizes,
+            min_diversity_threshold=0.2,
+            use_pretrained_base_models=False,  # We'll train them fresh
+            estimator_selection_strategy=args.ensemble_combination_strategy,
+        )
     
     # Create configurations
     experiment_config = ExperimentConfig(
@@ -177,12 +318,13 @@ async def main():
         sites=args.sites,
         models=args.models,
         training_sizes=args.training_sizes,
-        n_bootstrap=0,  # No bootstrap CI, use random_seeds for robustness
+        n_bootstrap=args.n_bootstrap,
         random_seeds=args.random_seeds,
         output_dir=args.output_dir,
         generate_plots=not args.no_plots,
+        tuning=tuning_config,
+        ensemble=ensemble_config,
         label_type=args.label_type,
-        experiment_types=args.experiment_types,
     )
 
     parallel_config = ParallelConfig(
@@ -201,11 +343,25 @@ async def main():
     logger.info(f"Sites: {args.sites}")
     logger.info(f"Models: {args.models}")
     logger.info(f"Label type: {args.label_type}")
-    logger.info(f"Experiment types: {args.experiment_types}")
-    logger.info(f"Random seeds: {args.random_seeds}")
-    logger.info(f"Training sizes: {args.training_sizes}")
     logger.info(f"Workers: {args.n_workers}")
     logger.info(f"Output directory: {args.output_dir}")
+    
+    # Warn about resource usage with high tuning trials
+    if args.enable_tuning and args.tuning_trials > 100 and args.n_workers == -1:
+        logger.warning(
+            f"WARNING: High tuning trials ({args.tuning_trials}) with unlimited workers "
+            f"may cause resource exhaustion. Consider setting --n-workers to a specific value."
+        )
+    
+    if args.enable_tuning:
+        total_tuning_operations = (
+            len(args.models) * args.tuning_trials * args.tuning_cv_folds
+        )
+        logger.info(
+            f"Tuning enabled: {args.tuning_trials} trials × {len(args.models)} models "
+            f"× {args.tuning_cv_folds} CV folds = {total_tuning_operations} total model trainings per experiment"
+        )
+        logger.info(f"Max concurrent tuning trials: {args.tuning_max_concurrent_trials}")
 
     # Clear checkpoints if requested
     if args.clear_checkpoints:

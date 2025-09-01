@@ -284,100 +284,103 @@ def generate_experiment_configs(
         else:
             non_ensemble_models = config.models
 
-        # In-domain experiments for non-ensemble models
-        for site in config.sites:
-            for model_name in non_ensemble_models:
-                experiment_id = checkpoint_manager.create_experiment_id(
-                    model_name=model_name,
-                    experiment_type="in_domain",
-                    train_site=site,
-                    test_site=site,
-                    random_seed=seed,
-                )
-
-
-                experiments.append(
-                    {
-                        "model_name": model_name,
-                        "site": site,
-                        "experiment_type": "in_domain",
-                        "data_ref": data_ref,
-                        "experiment_metadata": {
-                            "experiment_id": experiment_id,
-                            "experiment_type": "in_domain",
-                            "train_site": site,
-                            "test_site": site,
-                            "random_seed": seed,
-                            "n_bootstrap": config.n_bootstrap,
-                        },
-                    }
-                )
-
-        # Out-domain experiments
-        for train_site in config.sites:
-            for test_site in config.sites:
-                if train_site == test_site:
-                    continue
-
+        # In-domain experiments for non-ensemble models (only if requested)
+        if "in_domain" in config.experiment_types:
+            for site in config.sites:
                 for model_name in non_ensemble_models:
                     experiment_id = checkpoint_manager.create_experiment_id(
                         model_name=model_name,
-                        experiment_type="out_domain",
-                        train_site=train_site,
-                        test_site=test_site,
+                        experiment_type="in_domain",
+                        train_site=site,
+                        test_site=site,
                         random_seed=seed,
                     )
+
 
                     experiments.append(
                         {
                             "model_name": model_name,
-                            "train_site": train_site,
-                            "test_site": test_site,
-                            "experiment_type": "out_domain",
+                            "site": site,
+                            "experiment_type": "in_domain",
                             "data_ref": data_ref,
                             "experiment_metadata": {
                                 "experiment_id": experiment_id,
-                                "experiment_type": "out_domain",
+                                "experiment_type": "in_domain",
+                                "train_site": site,
+                                "test_site": site,
+                                "random_seed": seed,
+                                "n_bootstrap": config.n_bootstrap,
+                            },
+                        }
+                    )
+
+        # Out-domain experiments (only if requested)
+        if "out_domain" in config.experiment_types:
+            for train_site in config.sites:
+                for test_site in config.sites:
+                    if train_site == test_site:
+                        continue
+
+                    for model_name in non_ensemble_models:
+                        experiment_id = checkpoint_manager.create_experiment_id(
+                            model_name=model_name,
+                            experiment_type="out_domain",
+                            train_site=train_site,
+                            test_site=test_site,
+                            random_seed=seed,
+                        )
+
+                        experiments.append(
+                            {
+                                "model_name": model_name,
                                 "train_site": train_site,
                                 "test_site": test_site,
-                                "random_seed": seed,
-                                "n_bootstrap": config.n_bootstrap,
-                            },
-                        }
-                    )
+                                "experiment_type": "out_domain",
+                                "data_ref": data_ref,
+                                "experiment_metadata": {
+                                    "experiment_id": experiment_id,
+                                    "experiment_type": "out_domain",
+                                    "train_site": train_site,
+                                    "test_site": test_site,
+                                    "random_seed": seed,
+                                    "n_bootstrap": config.n_bootstrap,
+                                },
+                            }
+                        )
 
-        # Training size experiments
-        primary_site = config.sites[0] if config.sites else None
-        if primary_site:
-            for training_size in config.training_sizes:
-                for model_name in non_ensemble_models:
-                    experiment_id = checkpoint_manager.create_experiment_id(
-                        model_name=model_name,
-                        experiment_type="training_size",
-                        train_site=primary_site,
-                        test_site=primary_site,
-                        training_size=training_size,
-                        random_seed=seed,
-                    )
+        # Training size experiments (only if explicitly requested)
+        if "training_size" in config.experiment_types:
+            primary_site = config.sites[0] if config.sites else None
+            if primary_site:
+                for training_size in config.training_sizes:
+                    for model_name in non_ensemble_models:
+                        experiment_id = checkpoint_manager.create_experiment_id(
+                            model_name=model_name,
+                            experiment_type="training_size",
+                            train_site=primary_site,
+                            test_site=primary_site,
+                            training_size=training_size,
+                            random_seed=seed,
+                        )
 
-                    experiments.append(
-                        {
-                            "model_name": model_name,
-                            "site": primary_site,
-                            "training_size": training_size,
-                            "experiment_type": "training_size",
-                            "data_ref": data_ref,
-                            "experiment_metadata": {
-                                "experiment_id": experiment_id,
-                                "experiment_type": "training_size",
-                                "train_site": primary_site,
-                                "test_site": primary_site,
+                        experiments.append(
+                            {
+                                "model_name": model_name,
+                                "site": primary_site,
                                 "training_size": training_size,
-                                "random_seed": seed,
-                                "n_bootstrap": config.n_bootstrap,
-                            },
-                        }
-                    )
+                                "experiment_type": "training_size",
+                                "data_ref": data_ref,
+                                "experiment_metadata": {
+                                    "experiment_id": experiment_id,
+                                    "experiment_type": "training_size",
+                                    "train_site": primary_site,
+                                    "test_site": primary_site,
+                                    "training_size": training_size,
+                                    "random_seed": seed,
+                                    "n_bootstrap": config.n_bootstrap,
+                                },
+                            }
+                        )
 
     logger.info(f"Generated {len(experiments)} experiment configurations")
     return experiments
