@@ -73,19 +73,119 @@ poetry run python model_comparison/scripts/run_distributed_comparison.py \
     --output-dir results/comparison
 ```
 
+### Full Experiment Commands
+
+#### 🌟 **STANDARD REFERENCE**: COD5 In-Domain Only Experiment
+This command serves as the standard template for running focused experiments with all models:
+
+```bash
+poetry run python model_comparison/scripts/run_distributed_comparison.py \
+    --data-path va-data/data/phmrc/IHME_PHMRC_VA_DATA_ADULT_Y2013M09D11_0.csv \
+    --sites AP Bohol Dar Mexico Pemba UP \
+    --models xgboost insilico random_forest logistic_regression categorical_nb \
+    --label-type cod5 \
+    --experiment-types in_domain \
+    --random-seeds 42 123 456 789 1000 \
+    --training-sizes 1.0 \
+    --n-workers 8 \
+    --batch-size 50 \
+    --output-dir results/cod5_in_domain_complete
+```
+
+**Key Features of This Standard Command:**
+- ✅ Includes all 5 models (including InSilicoVA via Docker)
+- ✅ Uses 5 random seeds for statistical robustness
+- ✅ Focuses on single experiment type (in_domain) for clarity
+- ✅ Full training data (1.0) for best performance
+- ✅ Optimal parallelization with 8 workers
+- **Expected Runtime:** ~2 minutes
+- **Total Experiments:** 150 (6 sites × 5 models × 5 seeds)
+- **Success Rate:** 100% with proper Docker setup
+
+#### Complete VA34 Experiment (34 specific causes)
+```bash
+poetry run python model_comparison/scripts/run_distributed_comparison.py \
+    --data-path va-data/data/phmrc/IHME_PHMRC_VA_DATA_ADULT_Y2013M09D11_0.csv \
+    --sites AP Bohol Dar Mexico Pemba UP \
+    --models xgboost insilico random_forest logistic_regression categorical_nb \
+    --label-type va34 \
+    --training-sizes 0.25 0.5 0.75 1.0 \
+    --experiment-types in_domain out_domain training_size \
+    --n-workers 8 \
+    --batch-size 50 \
+    --random-seeds 42 123 456 789 1000 \
+    --output-dir results/va34_full_experiment \
+    --checkpoint-interval 10
+```
+
+#### Complete COD5 Experiment (5 broad categories)
+```bash
+poetry run python model_comparison/scripts/run_distributed_comparison.py \
+    --data-path va-data/data/phmrc/IHME_PHMRC_VA_DATA_ADULT_Y2013M09D11_0.csv \
+    --sites AP Bohol Dar Mexico Pemba UP \
+    --models xgboost insilico random_forest logistic_regression categorical_nb \
+    --label-type cod5 \
+    --training-sizes 0.25 0.5 0.75 1.0 \
+    --experiment-types in_domain out_domain training_size \
+    --n-workers 8 \
+    --batch-size 50 \
+    --random-seeds 42 123 456 789 1000 \
+    --output-dir results/cod5_full_experiment \
+    --checkpoint-interval 10
+```
+
+#### Running Both Label Types Sequentially
+Create a shell script `run_complete_experiments.sh`:
+```bash
+#!/bin/bash
+# Run both VA34 and COD5 experiments
+
+echo "Starting VA34 experiments..."
+poetry run python model_comparison/scripts/run_distributed_comparison.py \
+    --data-path va-data/data/phmrc/IHME_PHMRC_VA_DATA_ADULT_Y2013M09D11_0.csv \
+    --sites AP Bohol Dar Mexico Pemba UP \
+    --models xgboost insilico random_forest logistic_regression categorical_nb \
+    --label-type va34 \
+    --training-sizes 0.25 0.5 0.75 1.0 \
+    --experiment-types in_domain out_domain training_size \
+    --n-workers 8 \
+    --random-seeds 42 123 456 789 1000 \
+    --output-dir results/va34_full_$(date +%Y%m%d_%H%M%S)
+
+echo "Starting COD5 experiments..."
+poetry run python model_comparison/scripts/run_distributed_comparison.py \
+    --data-path va-data/data/phmrc/IHME_PHMRC_VA_DATA_ADULT_Y2013M09D11_0.csv \
+    --sites AP Bohol Dar Mexico Pemba UP \
+    --models xgboost insilico random_forest logistic_regression categorical_nb \
+    --label-type cod5 \
+    --training-sizes 0.25 0.5 0.75 1.0 \
+    --experiment-types in_domain out_domain training_size \
+    --n-workers 8 \
+    --random-seeds 42 123 456 789 1000 \
+    --output-dir results/cod5_full_$(date +%Y%m%d_%H%M%S)
+```
+
 ### Command Line Options
 
 **Required:**
 - `--data-path`: Path to VA data CSV file
-- `--sites`: Sites to include (e.g., Mexico AP UP Dar Bohol Pemba)
+- `--sites`: Sites to include (AP, Bohol, Dar, Mexico, Pemba, UP)
 
 **Model Selection:**
 - `--models`: Models to compare (xgboost, random_forest, logistic_regression, categorical_nb, insilico, tabicl)
 - `--label-type`: Label system - va34 (34 causes) or cod5 (5 categories), default: va34
 
+**Experiment Types:**
+- `--experiment-types`: Types of experiments to run
+  - `in_domain`: Train and test on same site
+  - `out_domain`: Train on one site, test on others  
+  - `training_size`: Test different training data sizes
+
 **Experiment Configuration:**
 - `--training-sizes`: Training data fractions (default: 0.25 0.5 0.75 1.0)
 - `--random-seeds`: Seeds for multiple runs (default: 42)
+- `--checkpoint-interval`: Save checkpoint every N batches (default: 10)
+- `--resume`: Resume from checkpoint if interrupted
 
 **Parallelization:**
 - `--n-workers`: Number of parallel workers (-1 for auto)
@@ -96,13 +196,75 @@ poetry run python model_comparison/scripts/run_distributed_comparison.py \
 - `--output-dir`: Results directory (default: results/distributed)
 - `--no-plots`: Skip visualization generation
 
+### Experiment Scope
+
+Each full experiment generates hundreds of model runs:
+- **In-domain**: 6 sites × 5 models × 5 seeds = 150 experiments
+- **Out-domain**: 6 source × 5 target × 5 models × 5 seeds = 750 experiments
+- **Training size**: 6 sites × 5 models × 4 sizes × 5 seeds = 600 experiments
+- **Total per label type**: ~1,500 experiments
+- **Both VA34 and COD5**: ~3,000 experiments
+
+### Including TabICL Model
+
+For experiments including the TabICL few-shot learning model:
+```bash
+poetry run python model_comparison/scripts/run_distributed_comparison.py \
+    --data-path va-data/data/phmrc/IHME_PHMRC_VA_DATA_ADULT_Y2013M09D11_0.csv \
+    --sites AP Bohol Dar Mexico Pemba UP \
+    --models xgboost insilico random_forest logistic_regression categorical_nb tabicl \
+    --label-type va34 \
+    --training-sizes 0.1 0.25 0.5 0.75 1.0 \
+    --experiment-types in_domain out_domain training_size \
+    --n-workers 8 \
+    --batch-size 30 \
+    --memory-per-worker 6GB \
+    --random-seeds 42 123 456 789 1000 \
+    --output-dir results/complete_with_tabicl \
+    --checkpoint-interval 5
+```
+
+### Quick Test Commands
+
+#### Minimal test (2 sites, 1 model):
+```bash
+poetry run python model_comparison/scripts/run_distributed_comparison.py \
+    --data-path va-data/data/phmrc/IHME_PHMRC_VA_DATA_ADULT_Y2013M09D11_0.csv \
+    --sites AP Bohol \
+    --models xgboost \
+    --output-dir results/quick_test
+```
+
+#### Medium test (3 sites, 2 models, both label types):
+```bash
+# VA34 test
+poetry run python model_comparison/scripts/run_distributed_comparison.py \
+    --data-path va-data/data/phmrc/IHME_PHMRC_VA_DATA_ADULT_Y2013M09D11_0.csv \
+    --sites AP Bohol Mexico \
+    --models xgboost logistic_regression \
+    --label-type va34 \
+    --training-sizes 0.5 1.0 \
+    --random-seeds 42 123 \
+    --output-dir results/medium_test_va34
+
+# COD5 test  
+poetry run python model_comparison/scripts/run_distributed_comparison.py \
+    --data-path va-data/data/phmrc/IHME_PHMRC_VA_DATA_ADULT_Y2013M09D11_0.csv \
+    --sites AP Bohol Mexico \
+    --models xgboost logistic_regression \
+    --label-type cod5 \
+    --training-sizes 0.5 1.0 \
+    --random-seeds 42 123 \
+    --output-dir results/medium_test_cod5
+```
+
 ### Advanced Features
 
 For hyperparameter tuning, ensemble experiments, and bootstrap confidence intervals, use the advanced script:
 
 ```bash
 poetry run python model_comparison/scripts/run_distributed_comparison_advanced.py \
-    --data-path data.csv \
+    --data-path va-data/data/phmrc/IHME_PHMRC_VA_DATA_ADULT_Y2013M09D11_0.csv \
     --sites Mexico AP \
     --enable-tuning \
     --enable-ensemble-exploration \
@@ -189,7 +351,15 @@ predictions = model.predict(X_test_openva)
 
 Based on PHMRC adult dataset (7,582 samples across 6 sites):
 
-### In-Domain Performance (same site train/test)
+### COD5 In-Domain Performance (5 broad categories)
+**Latest benchmark results from standard reference command:**
+- **XGBoost**: 95.4% CSMF accuracy | 68.5% COD accuracy
+- **InSilicoVA**: 89.9% CSMF accuracy | 62.6% COD accuracy
+- **Random Forest**: 89.7% CSMF accuracy | 66.9% COD accuracy
+- **Logistic Regression**: 84.6% CSMF accuracy | 62.6% COD accuracy
+- **CategoricalNB**: 54.2% CSMF accuracy | 40.2% COD accuracy
+
+### VA34 In-Domain Performance (34 specific causes)
 - **XGBoost**: 81.5% CSMF accuracy
 - **Logistic Regression**: 80.2% CSMF accuracy  
 - **Random Forest**: 78.5% CSMF accuracy

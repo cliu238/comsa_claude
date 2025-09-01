@@ -41,7 +41,7 @@ from model_comparison.experiments.experiment_config import ExperimentConfig, Tun
 from model_comparison.orchestration.config import ParallelConfig
 from model_comparison.orchestration.prefect_flows import (
     cleanup_ray_resources,
-    va34_comparison_flow,
+    va_comparison_flow,
 )
 
 logger = get_logger(__name__, component="orchestration")
@@ -383,7 +383,7 @@ async def main():
     try:
         # Run the flow
         logger.info("Starting Prefect flow execution")
-        results = await va34_comparison_flow(experiment_config, parallel_config)
+        results = await va_comparison_flow(experiment_config, parallel_config)
 
         # Summary statistics
         logger.info("\n" + "=" * 50)
