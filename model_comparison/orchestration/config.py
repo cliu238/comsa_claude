@@ -167,6 +167,9 @@ class ExperimentResult(BaseModel):
     training_size: Optional[float] = Field(
         default=1.0, description="Fraction of training data used"
     )
+    random_seed: Optional[int] = Field(
+        default=None, description="Random seed used for the experiment"
+    )
 
     # Metrics
     csmf_accuracy: float = Field(..., description="CSMF accuracy")
@@ -202,6 +205,15 @@ class ExperimentResult(BaseModel):
         # Transform field names to match visualization expectations
         data["model"] = data.pop("model_name")
         data["training_fraction"] = data.pop("training_size")
+        
+        # Extract seed from experiment_id if not already set
+        if data.get("random_seed") is None:
+            experiment_id = data.get("experiment_id", "")
+            if "_seed" in experiment_id:
+                import re
+                seed_match = re.search(r'_seed(\d+)', experiment_id)
+                if seed_match:
+                    data["random_seed"] = int(seed_match.group(1))
         
         # Convert CI lists to separate lower/upper fields
         csmf_ci = data.get("csmf_accuracy_ci")

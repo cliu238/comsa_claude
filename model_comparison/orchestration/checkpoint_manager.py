@@ -201,6 +201,7 @@ class CheckpointManager:
         train_site: str,
         test_site: str,
         training_size: float = 1.0,
+        random_seed: int = None,
     ) -> str:
         """Create unique experiment ID.
 
@@ -210,6 +211,7 @@ class CheckpointManager:
             train_site: Training site
             test_site: Test site
             training_size: Training data fraction
+            random_seed: Random seed for reproducibility
 
         Returns:
             Unique experiment identifier
@@ -221,6 +223,11 @@ class CheckpointManager:
             test_site,
             f"size{training_size}",
         ]
+        
+        # Add random seed if provided
+        if random_seed is not None:
+            components.append(f"seed{random_seed}")
+            
         return "_".join(components)
 
     def filter_completed_experiments(

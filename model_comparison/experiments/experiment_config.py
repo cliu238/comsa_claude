@@ -159,7 +159,7 @@ class ExperimentConfig(BaseModel):
 
     # Experiment settings
     n_bootstrap: int = Field(default=100, description="Bootstrap iterations")
-    random_seed: int = Field(default=42, description="Random seed")
+    random_seeds: List[int] = Field(default=[42], description="Random seeds for multi-seed experiments")
     n_jobs: int = Field(default=-1, description="Parallel jobs")
 
     # Output configuration

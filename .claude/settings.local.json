@@ -90,7 +90,9 @@
       "Bash(gh auth:*)",
       "WebSearch",
       "WebFetch(domain:cran.r-project.org)",
-      "WebFetch(domain:rdrr.io)"
+      "WebFetch(domain:rdrr.io)",
+      "Read(/etc/**)",
+      "Read(/var/log/**)"
     ],
     "deny": []
   },

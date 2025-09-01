@@ -137,126 +137,148 @@ class ParallelSiteComparisonExperiment(SiteComparisonExperiment):
         """
         experiments = []
 
-        # Prepare data splits for all sites
-        site_data_splits = self._prepare_all_site_data(data)
+        # Generate experiments for each random seed
+        for seed in self.config.random_seeds:
+            logger.info(f"Generating experiments for random seed {seed}")
+            
+            # Prepare data splits for all sites with this seed
+            site_data_splits = self._prepare_all_site_data(data, random_seed=seed)
 
-        # In-domain experiments
-        for site, splits in site_data_splits.items():
-            if splits is None:
-                continue
-
-            for model_name in self.config.models:
-                experiment_id = self.checkpoint_manager.create_experiment_id(
-                    model_name=model_name,
-                    experiment_type="in_domain",
-                    train_site=site,
-                    test_site=site,
-                )
-
-                experiments.append(
-                    {
-                        "model_name": model_name,
-                        "train_data": ray.put(splits["train_data"]),
-                        "test_data": ray.put(splits["test_data"]),
-                        "experiment_metadata": {
-                            "experiment_id": experiment_id,
-                            "experiment_type": "in_domain",
-                            "train_site": site,
-                            "test_site": site,
-                        },
-                        "n_bootstrap": self.config.n_bootstrap,
-                    }
-                )
-
-        # Out-domain experiments
-        for train_site, train_splits in site_data_splits.items():
-            if train_splits is None:
-                continue
-
-            for test_site, test_splits in site_data_splits.items():
-                if test_splits is None or train_site == test_site:
+            # In-domain experiments
+            for site, splits in site_data_splits.items():
+                if splits is None:
                     continue
 
                 for model_name in self.config.models:
                     experiment_id = self.checkpoint_manager.create_experiment_id(
                         model_name=model_name,
-                        experiment_type="out_domain",
-                        train_site=train_site,
-                        test_site=test_site,
+                        experiment_type="in_domain",
+                        train_site=site,
+                        test_site=site,
+                        random_seed=seed,
                     )
 
                     experiments.append(
                         {
                             "model_name": model_name,
-                            "train_data": ray.put(train_splits["train_data"]),
-                            "test_data": ray.put(test_splits["test_data"]),
+                            "train_data": ray.put(splits["train_data"]),
+                            "test_data": ray.put(splits["test_data"]),
                             "experiment_metadata": {
                                 "experiment_id": experiment_id,
-                                "experiment_type": "out_domain",
-                                "train_site": train_site,
-                                "test_site": test_site,
+                                "experiment_type": "in_domain",
+                                "train_site": site,
+                                "test_site": site,
+                                "random_seed": seed,
                             },
                             "n_bootstrap": self.config.n_bootstrap,
                         }
                     )
 
-        # Training size experiments
-        if self.config.sites:
-            primary_site = self.config.sites[0]
-            if primary_site in site_data_splits and site_data_splits[primary_site]:
-                base_splits = site_data_splits[primary_site]
+            # Out-domain experiments
+            for train_site, train_splits in site_data_splits.items():
+                if train_splits is None:
+                    continue
 
-                for training_size in self.config.training_sizes:
-                    # Subsample training data
-                    X_train_full, y_train_full = base_splits["train_data"]
-                    n_samples = int(len(X_train_full) * training_size)
-
-                    if n_samples < 10:  # Skip if too few samples
+                for test_site, test_splits in site_data_splits.items():
+                    if test_splits is None or train_site == test_site:
                         continue
-
-                    X_train_subset = X_train_full.iloc[:n_samples]
-                    y_train_subset = y_train_full.iloc[:n_samples]
 
                     for model_name in self.config.models:
                         experiment_id = self.checkpoint_manager.create_experiment_id(
                             model_name=model_name,
-                            experiment_type="training_size",
-                            train_site=primary_site,
-                            test_site=primary_site,
-                            training_size=training_size,
+                            experiment_type="out_domain",
+                            train_site=train_site,
+                            test_site=test_site,
+                            random_seed=seed,
                         )
 
                         experiments.append(
                             {
                                 "model_name": model_name,
-                                "train_data": ray.put((X_train_subset, y_train_subset)),
-                                "test_data": ray.put(base_splits["test_data"]),
+                                "train_data": ray.put(train_splits["train_data"]),
+                                "test_data": ray.put(test_splits["test_data"]),
                                 "experiment_metadata": {
                                     "experiment_id": experiment_id,
-                                    "experiment_type": "training_size",
-                                    "train_site": primary_site,
-                                    "test_site": primary_site,
-                                    "training_size": training_size,
+                                    "experiment_type": "out_domain",
+                                    "train_site": train_site,
+                                    "test_site": test_site,
+                                    "random_seed": seed,
                                 },
                                 "n_bootstrap": self.config.n_bootstrap,
                             }
                         )
 
+            # Training size experiments (skip if only using full training size)
+            if (self.config.sites and 
+                len(self.config.training_sizes) > 1 or 
+                self.config.training_sizes != [1.0]):
+                
+                primary_site = self.config.sites[0]
+                if primary_site in site_data_splits and site_data_splits[primary_site]:
+                    base_splits = site_data_splits[primary_site]
+
+                    for training_size in self.config.training_sizes:
+                        # Skip full size since it's already covered by in-domain
+                        if training_size == 1.0:
+                            continue
+                            
+                        # Subsample training data
+                        X_train_full, y_train_full = base_splits["train_data"]
+                        n_samples = int(len(X_train_full) * training_size)
+
+                        if n_samples < 10:  # Skip if too few samples
+                            continue
+
+                        X_train_subset = X_train_full.iloc[:n_samples]
+                        y_train_subset = y_train_full.iloc[:n_samples]
+
+                        for model_name in self.config.models:
+                            experiment_id = self.checkpoint_manager.create_experiment_id(
+                                model_name=model_name,
+                                experiment_type="training_size",
+                                train_site=primary_site,
+                                test_site=primary_site,
+                                training_size=training_size,
+                                random_seed=seed,
+                            )
+
+                            experiments.append(
+                                {
+                                    "model_name": model_name,
+                                    "train_data": ray.put((X_train_subset, y_train_subset)),
+                                    "test_data": ray.put(base_splits["test_data"]),
+                                    "experiment_metadata": {
+                                        "experiment_id": experiment_id,
+                                        "experiment_type": "training_size",
+                                        "train_site": primary_site,
+                                        "test_site": primary_site,
+                                        "random_seed": seed,
+                                        "training_size": training_size,
+                                    },
+                                    "n_bootstrap": self.config.n_bootstrap,
+                                }
+                            )
+
         logger.info(f"Generated {len(experiments)} experiment configurations")
         return experiments
 
     def _prepare_all_site_data(
-        self, data: pd.DataFrame
+        self, data: pd.DataFrame, random_seed: int = None
     ) -> Dict[str, Optional[Dict[str, Tuple]]]:
         """Prepare train/test splits for all sites.
 
         Args:
             data: Full dataset
+            random_seed: Random seed for splitting (uses config default if None)
 
         Returns:
             Dictionary mapping site to data splits
         """
         site_splits = {}
+        
+        # Use provided seed or default from config
+        if random_seed is None:
+            random_seed = self.config.random_seeds[0]  # Use first seed as default
 
         for site in self.config.sites:
             site_data = data[data["site"] == site]
@@ -275,11 +297,11 @@ class ParallelSiteComparisonExperiment(SiteComparisonExperiment):
             # Try stratified split, fall back to random if necessary
             try:
                 X_train, X_test, y_train, y_test = train_test_split(
-                    X, y, test_size=0.25, random_state=self.config.random_seed, stratify=y
+                    X, y, test_size=0.25, random_state=random_seed, stratify=y
                 )
             except ValueError:
                 X_train, X_test, y_train, y_test = train_test_split(
-                    X, y, test_size=0.25, random_state=self.config.random_seed
+                    X, y, test_size=0.25, random_state=random_seed
                 )
 
             site_splits[site] = {

@@ -246,7 +246,11 @@ def parse_arguments():
     
     # Other arguments
     parser.add_argument(
-        "--random-seed", type=int, default=42, help="Random seed for reproducibility"
+        "--random-seeds", 
+        nargs="+", 
+        type=int, 
+        default=[42], 
+        help="Random seeds for multi-seed experiments (space-separated)"
     )
     parser.add_argument(
         "--resume",
@@ -307,7 +311,7 @@ async def main():
         models=args.models,
         training_sizes=args.training_sizes,
         n_bootstrap=args.n_bootstrap,
-        random_seed=args.random_seed,
+        random_seeds=args.random_seeds,
         output_dir=args.output_dir,
         generate_plots=not args.no_plots,
         tuning=tuning_config,
