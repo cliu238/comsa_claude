@@ -557,10 +557,13 @@ def batch_experiments(experiments: List[Dict], batch_size: int) -> List[List[Dic
     task_runner=ConcurrentTaskRunner(max_workers=10),
     persist_result=True,
 )
-async def va34_comparison_flow(
+async def va_comparison_flow(
     config: ExperimentConfig, parallel_config: ParallelConfig
 ) -> pd.DataFrame:
     """Main Prefect flow for VA comparison experiments.
+    
+    This flow supports multiple label types (va34, cod5, etc.) configured
+    via the ExperimentConfig.label_type parameter.
 
     Args:
         config: Experiment configuration
@@ -597,48 +600,72 @@ async def va34_comparison_flow(
     from baseline.data.data_loader_preprocessor import VADataProcessor
     from baseline.config.data_config import DataConfig
     
-    # Create data config for loading
-    data_config = DataConfig(
-        data_path=config.data_path,
-        output_dir=config.output_dir,
-        openva_encoding=False,  # Load numeric first for ML models
-        stratify_by_site=False,
-        label_column=config.label_type  # Use configured label type instead of hardcoded va34
-    )
+    # Determine which data formats are needed based on models
+    needs_numeric = any(m not in ['insilico'] for m in config.models)
+    needs_openva = 'insilico' in config.models or 'ensemble' in config.models
     
-    processor = VADataProcessor(data_config)
-    data = processor.load_and_process()
+    logger.info(f"Data loading requirements - Numeric: {needs_numeric}, OpenVA: {needs_openva}")
     
-    # Also load OpenVA encoded data for InSilico
-    data_config_openva = DataConfig(
-        data_path=config.data_path,
-        output_dir=config.output_dir,
-        openva_encoding=True,  # OpenVA format for InSilico
-        stratify_by_site=False,
-        label_column=config.label_type  # Use configured label type instead of hardcoded va34
-    )
-    processor_openva = VADataProcessor(data_config_openva)
-    data_openva = processor_openva.load_and_process()
-
-    # Filter to specified sites
-    if config.sites:
-        data = data[data["site"].isin(config.sites)]
-        data_openva = data_openva[data_openva["site"].isin(config.sites)]
-
-    # Handle label column - ensure all models use "cause" as the label column
-    # This standardization is critical for consistent model comparison
-    if config.label_type in data.columns and "cause" not in data.columns:
-        data["cause"] = data[config.label_type].astype(str)
-        logger.info(f"Using {config.label_type} as cause column")
-    if config.label_type in data_openva.columns and "cause" not in data_openva.columns:
-        data_openva["cause"] = data_openva[config.label_type].astype(str)
-
-    logger.info(f"Loaded ML data with shape: {data.shape}")
-    logger.info(f"Loaded OpenVA data with shape: {data_openva.shape}")
-
-    # Put both datasets in Ray object store
-    data_ref = ray.put(data)
-    data_openva_ref = ray.put(data_openva)
+    data = None
+    data_openva = None
+    data_ref = None
+    data_openva_ref = None
+    
+    # Load numeric format if needed for ML models
+    if needs_numeric:
+        logger.info("Loading numeric format data for ML models")
+        data_config = DataConfig(
+            data_path=config.data_path,
+            output_dir=config.output_dir,
+            openva_encoding=False,  # Numeric format for ML models
+            stratify_by_site=False,
+            label_column=config.label_type
+        )
+        
+        processor = VADataProcessor(data_config)
+        data = processor.load_and_process()
+        
+        # Filter to specified sites
+        if config.sites:
+            data = data[data["site"].isin(config.sites)]
+        
+        # Handle label column
+        if config.label_type in data.columns and "cause" not in data.columns:
+            data["cause"] = data[config.label_type].astype(str)
+            logger.info(f"Using {config.label_type} as cause column for numeric data")
+        
+        logger.info(f"Loaded numeric data with shape: {data.shape}")
+        data_ref = ray.put(data)
+    
+    # Load OpenVA format if needed for InSilico or ensemble
+    if needs_openva:
+        logger.info("Loading OpenVA format data for InSilicoVA")
+        data_config_openva = DataConfig(
+            data_path=config.data_path,
+            output_dir=config.output_dir,
+            openva_encoding=True,  # OpenVA format for InSilico
+            stratify_by_site=False,
+            label_column=config.label_type
+        )
+        
+        processor_openva = VADataProcessor(data_config_openva)
+        data_openva = processor_openva.load_and_process()
+        
+        # Filter to specified sites
+        if config.sites:
+            data_openva = data_openva[data_openva["site"].isin(config.sites)]
+        
+        # Handle label column
+        if config.label_type in data_openva.columns and "cause" not in data_openva.columns:
+            data_openva["cause"] = data_openva[config.label_type].astype(str)
+            logger.info(f"Using {config.label_type} as cause column for OpenVA data")
+        
+        logger.info(f"Loaded OpenVA data with shape: {data_openva.shape}")
+        data_openva_ref = ray.put(data_openva)
+    
+    # Ensure at least one format was loaded
+    if data is None and data_openva is None:
+        raise ValueError("No data loaded - check model configuration")
     
     # Generate experiment configurations
     experiments = generate_experiment_configs(config, data_ref, checkpoint_manager)
@@ -653,8 +680,13 @@ async def va34_comparison_flow(
         existing_results = checkpoint_manager.load_partial_results(checkpoint)
         start_time -= checkpoint.elapsed_seconds  # Adjust for previous run time
 
-    # Prepare data for experiments
-    experiments = prepare_experiment_data(experiments, data, config, data_openva_ref)
+    # Prepare data for experiments (handle None data gracefully)
+    # Use whichever data format is available for site extraction
+    base_data = data if data is not None else (ray.get(data_openva_ref) if data_openva_ref else None)
+    if base_data is None:
+        raise ValueError("No data available for experiment preparation")
+    
+    experiments = prepare_experiment_data(experiments, base_data, config, data_openva_ref)
 
     # Initialize progress tracking
     progress_actor = ProgressReporter.remote(len(experiments))

@@ -79,7 +79,7 @@ def train_and_evaluate_model(
                     X_train, _, y_train, _ = train_test_split(
                         X_train, y_train, 
                         train_size=training_size, 
-                        random_state=42,  # Fixed seed for reproducibility
+                        random_state=experiment_metadata.get("random_seed", 42),
                         stratify=y_train
                     )
                     logger.info(
@@ -95,7 +95,7 @@ def train_and_evaluate_model(
                     X_train, _, y_train, _ = train_test_split(
                         X_train, y_train, 
                         train_size=training_size, 
-                        random_state=42
+                        random_state=experiment_metadata.get("random_seed", 42)
                     )
             else:
                 # Use random sampling when stratification isn't possible
@@ -108,7 +108,7 @@ def train_and_evaluate_model(
                 X_train, _, y_train, _ = train_test_split(
                     X_train, y_train, 
                     train_size=training_size, 
-                    random_state=42
+                    random_state=experiment_metadata.get("random_seed", 42)
                 )
 
         # Initialize model
@@ -136,7 +136,7 @@ def train_and_evaluate_model(
                 weight_optimization=ensemble_metadata.get("weight_optimization", "none"),
                 estimators=ensemble_metadata.get("estimators", []),
                 min_diversity=ensemble_metadata.get("min_diversity", 0.0),
-                random_seed=42,
+                random_seed=experiment_metadata.get("random_seed", 42),
             )
             
             model = DuckVotingEnsemble(config=ensemble_config)
@@ -234,8 +234,8 @@ def train_and_evaluate_model(
             random_seed=experiment_metadata.get("random_seed"),
             csmf_accuracy=metrics["csmf_accuracy"],
             cod_accuracy=metrics["cod_accuracy"],
-            csmf_accuracy_ci=metrics.get("csmf_accuracy_ci") if isinstance(metrics.get("csmf_accuracy_ci"), list) else None,
-            cod_accuracy_ci=metrics.get("cod_accuracy_ci") if isinstance(metrics.get("cod_accuracy_ci"), list) else None,
+            csmf_accuracy_ci=metrics.get("csmf_accuracy_ci"),
+            cod_accuracy_ci=metrics.get("cod_accuracy_ci"),
             n_train=len(y_train),
             n_test=len(y_test),
             execution_time_seconds=time.time() - start_time,
@@ -390,7 +390,7 @@ def tune_and_train_model(
                     X_train, _, y_train, _ = train_test_split(
                         X_train, y_train, 
                         train_size=training_size, 
-                        random_state=42,
+                        random_state=experiment_metadata.get("random_seed", 42),
                         stratify=y_train
                     )
                     logger.info(
@@ -406,7 +406,7 @@ def tune_and_train_model(
                     X_train, _, y_train, _ = train_test_split(
                         X_train, y_train, 
                         train_size=training_size, 
-                        random_state=42
+                        random_state=experiment_metadata.get("random_seed", 42)
                     )
             else:
                 # Use random sampling when stratification isn't possible
@@ -419,7 +419,7 @@ def tune_and_train_model(
                 X_train, _, y_train, _ = train_test_split(
                     X_train, y_train, 
                     train_size=training_size, 
-                    random_state=42
+                    random_state=experiment_metadata.get("random_seed", 42)
                 )
         
         # Initialize model with default or tuned parameters
@@ -525,7 +525,7 @@ def tune_and_train_model(
                         X_tune, _, y_tune, _ = train_test_split(
                             X_train_filtered, y_train_filtered,
                             train_size=min(tuning_data_size, len(X_train_filtered)),
-                            random_state=42,
+                            random_state=experiment_metadata.get("random_seed", 42),
                             stratify=y_train_filtered
                         )
                         logger.info(f"Using {len(X_tune)} samples for tuning with {len(y_tune.unique())} classes")
@@ -535,7 +535,7 @@ def tune_and_train_model(
                         X_tune, _, y_tune, _ = train_test_split(
                             X_train_filtered, y_train_filtered,
                             train_size=min(tuning_data_size, len(X_train_filtered)),
-                            random_state=42
+                            random_state=experiment_metadata.get("random_seed", 42)
                         )
                 else:
                     # Check if we need to filter rare classes even with full data
@@ -682,8 +682,8 @@ def tune_and_train_model(
             random_seed=experiment_metadata.get("random_seed"),
             csmf_accuracy=metrics["csmf_accuracy"],
             cod_accuracy=metrics["cod_accuracy"],
-            csmf_accuracy_ci=metrics.get("csmf_accuracy_ci") if isinstance(metrics.get("csmf_accuracy_ci"), list) else None,
-            cod_accuracy_ci=metrics.get("cod_accuracy_ci") if isinstance(metrics.get("cod_accuracy_ci"), list) else None,
+            csmf_accuracy_ci=metrics.get("csmf_accuracy_ci"),
+            cod_accuracy_ci=metrics.get("cod_accuracy_ci"),
             n_train=len(y_train),
             n_test=len(y_test),
             execution_time_seconds=time.time() - start_time,
@@ -753,23 +753,23 @@ def prepare_data_for_site(
         if len(site_data) < 50:  # Skip sites with too little data
             return None
 
-        # Drop label columns - must match VADataProcessor._get_label_equivalent_columns()
+        # Drop label columns using centralized constant to ensure consistency
         # This ensures no label-equivalent columns leak into features
-        label_columns = [
-            "cause",  # Primary label column used by all models
-            "site",  # Site information (used for stratification, not features)
-            "module",  # Module type
-            "gs_code34", "gs_text34", "va34",  # 34-cause classification
-            "gs_code46", "gs_text46", "va46",  # 46-cause classification  
-            "gs_code55", "gs_text55", "va55",  # 55-cause classification
-            "gs_comorbid1", "gs_comorbid2",  # Comorbidity information
-            "gs_level",  # Gold standard level
-            "cod5",  # 5-cause grouping
-            "newid"  # ID column
-        ]
-        columns_to_drop = [col for col in label_columns if col in site_data.columns]
+        from baseline.constants import get_label_columns_to_drop
+        
+        # Get columns to drop - DO NOT keep 'cause' in X (it's the target!)
+        # The 'cause' column must be dropped from features but extracted for y
+        columns_to_drop = get_label_columns_to_drop(
+            site_data.columns.tolist(), 
+            keep_target=None  # Drop ALL label columns from X, including 'cause'
+        )
+        
+        # CRITICAL: Also add 'cause' to the drop list since it's the target
+        if "cause" in site_data.columns and "cause" not in columns_to_drop:
+            columns_to_drop.append("cause")
+        
         X = site_data.drop(columns=columns_to_drop)
-        y = site_data["cause"]  # All models use "cause" as the label
+        y = site_data["cause"]  # Extract y BEFORE dropping (pandas doesn't modify in-place)
         
         # Log feature column count for consistency validation
         logger = get_logger(__name__, component="orchestration", console=False)

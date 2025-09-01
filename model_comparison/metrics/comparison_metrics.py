@@ -40,14 +40,14 @@ def calculate_metrics(
 
         metrics = {
             "cod_accuracy": cod_accuracy,
-            "cod_accuracy_ci": list(cod_ci),  # List format expected by ray_tasks.py
+            "cod_accuracy_ci": list(cod_ci) if cod_ci != (None, None) else None,
             "csmf_accuracy": csmf_accuracy,
-            "csmf_accuracy_ci": list(csmf_ci),  # List format expected by ray_tasks.py
+            "csmf_accuracy_ci": list(csmf_ci) if csmf_ci != (None, None) else None,
             # Backward compatibility: Keep old format
-            "cod_accuracy_ci_lower": cod_ci[0],
-            "cod_accuracy_ci_upper": cod_ci[1],
-            "csmf_accuracy_ci_lower": csmf_ci[0],
-            "csmf_accuracy_ci_upper": csmf_ci[1],
+            "cod_accuracy_ci_lower": cod_ci[0] if cod_ci != (None, None) else None,
+            "cod_accuracy_ci_upper": cod_ci[1] if cod_ci != (None, None) else None,
+            "csmf_accuracy_ci_lower": csmf_ci[0] if csmf_ci != (None, None) else None,
+            "csmf_accuracy_ci_upper": csmf_ci[1] if csmf_ci != (None, None) else None,
         }
     else:
         # No bootstrap requested
@@ -162,7 +162,15 @@ def bootstrap_metric(
             continue
 
     if not scores:
-        return (0.0, 0.0)
+        # Log warning when all bootstrap iterations fail
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.warning(
+            f"All {n_bootstrap} bootstrap iterations failed for {metric_func.__name__}. "
+            f"This may indicate insufficient data or a metric calculation issue. "
+            f"Returning (None, None) to indicate failure."
+        )
+        return (None, None)
 
     # Calculate confidence intervals
     alpha = 1 - confidence

@@ -17,6 +17,7 @@ import va_data.phmrc_plugins  # noqa: F401 # Ensures transform registration
 from va_data.phmrc_data import PHMRCData
 
 from baseline.config.data_config import DataConfig
+from baseline.constants import LABEL_EQUIVALENT_COLUMNS, get_label_columns_to_drop
 
 logger = logging.getLogger(__name__)
 
@@ -117,24 +118,17 @@ class VADataProcessor:
     def _get_label_equivalent_columns(self, exclude_current_target: bool = True) -> list[str]:
         """Get all columns that contain cause-of-death information.
         
+        Uses the centralized LABEL_EQUIVALENT_COLUMNS constant to ensure
+        consistency across all data processing functions.
+        
         Args:
             exclude_current_target: Whether to exclude the current target column from the list
         
         Returns:
             List of column names that must be excluded from features to prevent data leakage.
         """
-        # All label-equivalent columns
-        all_label_columns = [
-            "site",  # Site information (kept for stratification)
-            "module",  # Module type
-            "gs_code34", "gs_text34", "va34",  # 34-cause classification
-            "gs_code46", "gs_text46", "va46",  # 46-cause classification  
-            "gs_code55", "gs_text55", "va55",  # 55-cause classification
-            "gs_comorbid1", "gs_comorbid2",  # Comorbidity information
-            "gs_level",  # Gold standard level
-            "cod5",  # 5-cause grouping
-            "newid"  # ID column
-        ]
+        # Use the centralized constant - ensures consistency across the pipeline
+        all_label_columns = list(LABEL_EQUIVALENT_COLUMNS)
         
         # If requested, keep the current target column for splitting/processing
         if exclude_current_target and hasattr(self, 'config') and self.config.label_column:
