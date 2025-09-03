@@ -35,3 +35,8 @@ hyperparameter_analysis_report.md
 
 # Test integration scripts
 **/test_tuning_integration.py
+# Claude Code PM local files
+.claude/epics/
+.claude/prds/
+.claude/context/
+.claude/settings.local.json
