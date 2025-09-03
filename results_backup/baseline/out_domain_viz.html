@@ -1,0 +1,1073 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Out-of-Domain COD Performance Analysis</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.21/lodash.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .dashboard {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+        
+        h1 {
+            color: #2d3748;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+            text-align: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #718096;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+        
+        .upload-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            text-align: center;
+            color: white;
+        }
+        
+        .file-input-wrapper {
+            position: relative;
+            display: inline-block;
+            cursor: pointer;
+            margin: 20px 0;
+        }
+        
+        .file-input-wrapper input[type=file] {
+            position: absolute;
+            left: -9999px;
+        }
+        
+        .file-input-label {
+            display: inline-block;
+            padding: 12px 30px;
+            background: white;
+            color: #667eea;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .file-input-label:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+        
+        .upload-info {
+            margin-top: 15px;
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+        
+        .metrics-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        
+        .metric-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 15px;
+            padding: 20px;
+            color: white;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+        
+        .metric-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .metric-value {
+            font-size: 2em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .metric-label {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+        
+        .visualization-section {
+            margin-bottom: 40px;
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            display: none;
+        }
+        
+        .visualization-section.active {
+            display: block;
+        }
+        
+        h2 {
+            color: #2d3748;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 10px;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        label {
+            color: #4a5568;
+            font-weight: 500;
+        }
+        
+        select, button {
+            padding: 8px 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            background: white;
+            color: #2d3748;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        select:hover, button:hover {
+            border-color: #667eea;
+        }
+        
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            font-weight: 500;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+        
+        .chart-container {
+            position: relative;
+            margin: 20px 0;
+        }
+        
+        .tooltip {
+            position: absolute;
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 14px;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: 1000;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #718096;
+        }
+        
+        .error {
+            background: #fed7d7;
+            color: #c53030;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        
+        .success {
+            background: #c6f6d5;
+            color: #22543d;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <h1>Out-of-Domain COD Performance Analysis</h1>
+        <div class="subtitle">Cross-Site Generalization Performance Analysis</div>
+        
+        <div class="upload-section">
+            <h2 style="color: white; border: none;">Upload Your Data</h2>
+            <div class="file-input-wrapper">
+                <input type="file" id="csvFile" accept=".csv">
+                <label for="csvFile" class="file-input-label">
+                    📊 Choose CSV File
+                </label>
+            </div>
+            <div class="upload-info">
+                Upload your cod5_out_domain.csv file (1500 rows × 23 columns)<br>
+                The file should contain experiment results with models, sites, and accuracy metrics
+            </div>
+            <div id="uploadStatus"></div>
+        </div>
+        
+        <div id="metricsContainer" class="metrics-row"></div>
+        
+        <div class="visualization-section" id="modelComparisonSection">
+            <h2>1. Model Performance Comparison</h2>
+            <div class="controls">
+                <div class="control-group">
+                    <label>Metric:</label>
+                    <select id="metricSelect">
+                        <option value="cod">COD Accuracy</option>
+                        <option value="csmf">CSMF Accuracy</option>
+                    </select>
+                </div>
+            </div>
+            <div id="modelComparison" class="chart-container"></div>
+        </div>
+        
+        <div class="visualization-section" id="heatmapSection">
+            <h2>2. Train-Test Site Performance Heatmap</h2>
+            <div class="controls">
+                <div class="control-group">
+                    <label>Model:</label>
+                    <select id="modelSelect">
+                        <option value="all">All Models (Average)</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label>Metric:</label>
+                    <select id="heatmapMetric">
+                        <option value="cod">COD Accuracy</option>
+                        <option value="csmf">CSMF Accuracy</option>
+                    </select>
+                </div>
+            </div>
+            <div id="heatmap" class="chart-container"></div>
+        </div>
+        
+        <div class="visualization-section" id="distributionSection">
+            <h2>3. Performance Distribution Across Random Seeds</h2>
+            <div class="controls">
+                <div class="control-group">
+                    <label>View:</label>
+                    <select id="distributionView">
+                        <option value="models">By Model</option>
+                        <option value="sites">By Test Site</option>
+                    </select>
+                </div>
+            </div>
+            <div id="distribution" class="chart-container"></div>
+        </div>
+        
+        <div class="visualization-section" id="siteAnalysisSection">
+            <h2>4. Site Transferability Analysis</h2>
+            <div id="siteAnalysis" class="chart-container"></div>
+        </div>
+    </div>
+    
+    <div class="tooltip" id="tooltip"></div>
+
+    <script>
+        let rawData = null;
+        let aggregatedData = null;
+        
+        // File upload handler
+        document.getElementById('csvFile').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    try {
+                        const csvContent = event.target.result;
+                        processCSV(csvContent);
+                    } catch (error) {
+                        document.getElementById('uploadStatus').innerHTML = 
+                            `<div class="error">Error reading file: ${error.message}</div>`;
+                    }
+                };
+                reader.readAsText(file);
+            }
+        });
+        
+        function processCSV(csvContent) {
+            const parsed = Papa.parse(csvContent, {
+                header: true,
+                dynamicTyping: true,
+                skipEmptyLines: true
+            });
+            
+            // Clean headers
+            rawData = parsed.data.map(row => {
+                const cleanRow = {};
+                Object.keys(row).forEach(key => {
+                    cleanRow[key.trim()] = row[key];
+                });
+                return cleanRow;
+            });
+            
+            // Validate data
+            if (rawData.length === 0) {
+                throw new Error('No data found in CSV');
+            }
+            
+            const requiredColumns = ['model', 'train_site', 'test_site', 'csmf_accuracy', 'cod_accuracy', 'random_seed'];
+            const missingColumns = requiredColumns.filter(col => !(col in rawData[0]));
+            if (missingColumns.length > 0) {
+                throw new Error(`Missing required columns: ${missingColumns.join(', ')}`);
+            }
+            
+            // Aggregate data
+            aggregateData();
+            
+            // Show success message
+            document.getElementById('uploadStatus').innerHTML = 
+                `<div class="success">✓ Successfully loaded ${rawData.length} experiments</div>`;
+            
+            // Show visualizations
+            document.querySelectorAll('.visualization-section').forEach(section => {
+                section.classList.add('active');
+            });
+            
+            // Render dashboard
+            renderDashboard();
+        }
+        
+        function aggregateData() {
+            aggregatedData = [];
+            const grouped = _.groupBy(rawData, d => `${d.model}|${d.train_site}|${d.test_site}`);
+            
+            Object.keys(grouped).forEach(key => {
+                const [model, train_site, test_site] = key.split('|');
+                const experiments = grouped[key];
+                
+                const csmf_accuracies = experiments.map(e => e.csmf_accuracy).filter(v => v !== null && !isNaN(v));
+                const cod_accuracies = experiments.map(e => e.cod_accuracy).filter(v => v !== null && !isNaN(v));
+                
+                if (csmf_accuracies.length > 0 && cod_accuracies.length > 0) {
+                    aggregatedData.push({
+                        model,
+                        train_site,
+                        test_site,
+                        csmf_mean: _.mean(csmf_accuracies),
+                        csmf_std: csmf_accuracies.length > 1 ? 
+                            Math.sqrt(_.sum(csmf_accuracies.map(v => Math.pow(v - _.mean(csmf_accuracies), 2))) / (csmf_accuracies.length - 1)) : 0,
+                        cod_mean: _.mean(cod_accuracies),
+                        cod_std: cod_accuracies.length > 1 ?
+                            Math.sqrt(_.sum(cod_accuracies.map(v => Math.pow(v - _.mean(cod_accuracies), 2))) / (cod_accuracies.length - 1)) : 0,
+                        csmf_values: csmf_accuracies,
+                        cod_values: cod_accuracies,
+                        n: experiments.length
+                    });
+                }
+            });
+            
+            // Update model select options
+            const models = _.uniq(rawData.map(d => d.model));
+            const modelSelect = document.getElementById('modelSelect');
+            modelSelect.innerHTML = '<option value="all">All Models (Average)</option>';
+            models.forEach(model => {
+                modelSelect.innerHTML += `<option value="${model}">${model}</option>`;
+            });
+        }
+        
+        function renderDashboard() {
+            renderMetrics();
+            renderModelComparison();
+            renderHeatmap();
+            renderDistribution();
+            renderSiteAnalysis();
+            
+            // Add event listeners
+            document.getElementById('metricSelect').addEventListener('change', renderModelComparison);
+            document.getElementById('modelSelect').addEventListener('change', renderHeatmap);
+            document.getElementById('heatmapMetric').addEventListener('change', renderHeatmap);
+            document.getElementById('distributionView').addEventListener('change', renderDistribution);
+        }
+        
+        function renderMetrics() {
+            const metrics = [
+                { label: 'Total Experiments', value: rawData.length },
+                { label: 'Models Tested', value: _.uniq(rawData.map(d => d.model)).length },
+                { label: 'Sites Involved', value: _.uniq(rawData.map(d => d.train_site)).length },
+                { label: 'Random Seeds', value: _.uniq(rawData.map(d => d.random_seed)).length }
+            ];
+            
+            const metricsHtml = metrics.map(m => `
+                <div class="metric-card">
+                    <div class="metric-value">${m.value.toLocaleString()}</div>
+                    <div class="metric-label">${m.label}</div>
+                </div>
+            `).join('');
+            
+            document.getElementById('metricsContainer').innerHTML = metricsHtml;
+        }
+        
+        function renderModelComparison() {
+            const metric = document.getElementById('metricSelect').value;
+            const container = d3.select('#modelComparison');
+            container.selectAll('*').remove();
+            
+            const modelData = d3.groups(aggregatedData, d => d.model)
+                .map(([model, values]) => ({
+                    model,
+                    mean: d3.mean(values, d => d[`${metric}_mean`]),
+                    std: Math.sqrt(d3.mean(values, d => d[`${metric}_std`] * d[`${metric}_std`])),
+                    values: values.flatMap(v => v[`${metric}_values`])
+                }))
+                .sort((a, b) => b.mean - a.mean);
+            
+            const margin = {top: 20, right: 30, bottom: 80, left: 70};
+            const width = Math.min(800, container.node().getBoundingClientRect().width) - margin.left - margin.right;
+            const height = 400 - margin.top - margin.bottom;
+            
+            const svg = container.append('svg')
+                .attr('width', width + margin.left + margin.right)
+                .attr('height', height + margin.top + margin.bottom);
+            
+            const g = svg.append('g')
+                .attr('transform', `translate(${margin.left},${margin.top})`);
+            
+            const x = d3.scaleBand()
+                .domain(modelData.map(d => d.model))
+                .range([0, width])
+                .padding(0.3);
+            
+            const y = d3.scaleLinear()
+                .domain([0, d3.max(modelData, d => d.mean + d.std) * 1.1])
+                .range([height, 0]);
+            
+            const color = d3.scaleOrdinal()
+                .domain(modelData.map(d => d.model))
+                .range(['#667eea', '#764ba2', '#f59e0b', '#10b981', '#ef4444']);
+            
+            // Add gridlines
+            g.append('g')
+                .attr('class', 'grid')
+                .attr('opacity', 0.3)
+                .call(d3.axisLeft(y)
+                    .tickSize(-width)
+                    .tickFormat('')
+                );
+            
+            // Add bars
+            g.selectAll('.bar')
+                .data(modelData)
+                .enter().append('rect')
+                .attr('class', 'bar')
+                .attr('x', d => x(d.model))
+                .attr('y', height)
+                .attr('width', x.bandwidth())
+                .attr('height', 0)
+                .attr('fill', d => color(d.model))
+                .attr('opacity', 0.8)
+                .transition()
+                .duration(1000)
+                .attr('y', d => y(d.mean))
+                .attr('height', d => height - y(d.mean));
+            
+            // Add interactive hover
+            g.selectAll('.bar')
+                .on('mouseover', function(event, d) {
+                    const tooltip = document.getElementById('tooltip');
+                    tooltip.style.opacity = 1;
+                    tooltip.style.left = (event.pageX + 10) + 'px';
+                    tooltip.style.top = (event.pageY - 10) + 'px';
+                    tooltip.innerHTML = `
+                        <strong>${d.model}</strong><br>
+                        Mean ${metric.toUpperCase()}: ${(d.mean * 100).toFixed(1)}%<br>
+                        Std Dev: ±${(d.std * 100).toFixed(1)}%<br>
+                        Samples: ${d.values.length}
+                    `;
+                })
+                .on('mouseout', function() {
+                    document.getElementById('tooltip').style.opacity = 0;
+                });
+            
+            // Add error bars
+            setTimeout(() => {
+                g.selectAll('.error-bar')
+                    .data(modelData)
+                    .enter().append('line')
+                    .attr('class', 'error-bar')
+                    .attr('x1', d => x(d.model) + x.bandwidth() / 2)
+                    .attr('x2', d => x(d.model) + x.bandwidth() / 2)
+                    .attr('y1', d => y(d.mean - d.std))
+                    .attr('y2', d => y(d.mean + d.std))
+                    .attr('stroke', 'black')
+                    .attr('stroke-width', 2);
+                
+                // Add error bar caps
+                [-1, 1].forEach(direction => {
+                    g.selectAll(`.error-cap-${direction}`)
+                        .data(modelData)
+                        .enter().append('line')
+                        .attr('x1', d => x(d.model) + x.bandwidth() / 2 - 5)
+                        .attr('x2', d => x(d.model) + x.bandwidth() / 2 + 5)
+                        .attr('y1', d => y(d.mean + direction * d.std))
+                        .attr('y2', d => y(d.mean + direction * d.std))
+                        .attr('stroke', 'black')
+                        .attr('stroke-width', 2);
+                });
+            }, 1000);
+            
+            // Add axes
+            g.append('g')
+                .attr('transform', `translate(0,${height})`)
+                .call(d3.axisBottom(x))
+                .selectAll('text')
+                .style('text-anchor', 'end')
+                .attr('dx', '-.8em')
+                .attr('dy', '.15em')
+                .attr('transform', 'rotate(-45)');
+            
+            g.append('g')
+                .call(d3.axisLeft(y).tickFormat(d => `${(d * 100).toFixed(0)}%`));
+            
+            // Add axis labels
+            g.append('text')
+                .attr('transform', 'rotate(-90)')
+                .attr('y', 0 - margin.left)
+                .attr('x', 0 - (height / 2))
+                .attr('dy', '1em')
+                .style('text-anchor', 'middle')
+                .text(`${metric.toUpperCase()} Accuracy`);
+        }
+        
+        function renderHeatmap() {
+            const selectedModel = document.getElementById('modelSelect').value;
+            const metric = document.getElementById('heatmapMetric').value;
+            const container = d3.select('#heatmap');
+            container.selectAll('*').remove();
+            
+            let heatmapData;
+            if (selectedModel === 'all') {
+                const grouped = _.groupBy(aggregatedData, d => `${d.train_site}|${d.test_site}`);
+                heatmapData = Object.keys(grouped).map(key => {
+                    const [train_site, test_site] = key.split('|');
+                    const values = grouped[key];
+                    return {
+                        train_site,
+                        test_site,
+                        value: d3.mean(values, d => d[`${metric}_mean`])
+                    };
+                });
+            } else {
+                heatmapData = aggregatedData
+                    .filter(d => d.model === selectedModel)
+                    .map(d => ({
+                        train_site: d.train_site,
+                        test_site: d.test_site,
+                        value: d[`${metric}_mean`]
+                    }));
+            }
+            
+            const sites = _.uniq([...rawData.map(d => d.train_site), ...rawData.map(d => d.test_site)]).sort();
+            const margin = {top: 30, right: 30, bottom: 100, left: 100};
+            const cellSize = 80;
+            const width = cellSize * sites.length;
+            const height = cellSize * sites.length;
+            
+            const svg = container.append('svg')
+                .attr('width', width + margin.left + margin.right)
+                .attr('height', height + margin.top + margin.bottom);
+            
+            const g = svg.append('g')
+                .attr('transform', `translate(${margin.left},${margin.top})`);
+            
+            const x = d3.scaleBand()
+                .domain(sites)
+                .range([0, width])
+                .padding(0.05);
+            
+            const y = d3.scaleBand()
+                .domain(sites)
+                .range([0, height])
+                .padding(0.05);
+            
+            const colorScale = d3.scaleSequential(d3.interpolateViridis)
+                .domain([0, d3.max(heatmapData, d => d.value)]);
+            
+            // Create cells with animation
+            g.selectAll('.cell')
+                .data(heatmapData)
+                .enter().append('rect')
+                .attr('x', d => x(d.test_site))
+                .attr('y', d => y(d.train_site))
+                .attr('width', x.bandwidth())
+                .attr('height', y.bandwidth())
+                .attr('fill', 'white')
+                .transition()
+                .duration(1000)
+                .attr('fill', d => colorScale(d.value));
+            
+            // Add interaction
+            g.selectAll('.cell')
+                .on('mouseover', function(event, d) {
+                    d3.select(this).attr('stroke', 'black').attr('stroke-width', 2);
+                    const tooltip = document.getElementById('tooltip');
+                    tooltip.style.opacity = 1;
+                    tooltip.style.left = (event.pageX + 10) + 'px';
+                    tooltip.style.top = (event.pageY - 10) + 'px';
+                    tooltip.innerHTML = `
+                        <strong>Train → Test</strong><br>
+                        ${d.train_site} → ${d.test_site}<br>
+                        ${metric.toUpperCase()}: ${(d.value * 100).toFixed(1)}%
+                    `;
+                })
+                .on('mouseout', function() {
+                    d3.select(this).attr('stroke', 'none');
+                    document.getElementById('tooltip').style.opacity = 0;
+                });
+            
+            // Add text labels
+            g.selectAll('.text')
+                .data(heatmapData)
+                .enter().append('text')
+                .attr('x', d => x(d.test_site) + x.bandwidth() / 2)
+                .attr('y', d => y(d.train_site) + y.bandwidth() / 2)
+                .attr('text-anchor', 'middle')
+                .attr('dy', '.35em')
+                .text(d => (d.value * 100).toFixed(0))
+                .style('fill', d => d.value > 0.5 ? 'white' : 'black')
+                .style('font-size', '12px')
+                .style('font-weight', 'bold')
+                .style('pointer-events', 'none');
+            
+            // Add axes
+            g.append('g')
+                .attr('transform', `translate(0,${height})`)
+                .call(d3.axisBottom(x))
+                .selectAll('text')
+                .style('text-anchor', 'end')
+                .attr('dx', '-.8em')
+                .attr('dy', '.15em')
+                .attr('transform', 'rotate(-45)');
+            
+            g.append('g')
+                .call(d3.axisLeft(y));
+            
+            // Add axis labels
+            g.append('text')
+                .attr('transform', `translate(${width/2}, ${height + 70})`)
+                .style('text-anchor', 'middle')
+                .style('font-weight', 'bold')
+                .text('Test Site');
+            
+            g.append('text')
+                .attr('transform', 'rotate(-90)')
+                .attr('y', -70)
+                .attr('x', -height/2)
+                .style('text-anchor', 'middle')
+                .style('font-weight', 'bold')
+                .text('Training Site');
+            
+            // Add color legend
+            const legendWidth = 200;
+            const legendHeight = 20;
+            
+            const legendScale = d3.scaleLinear()
+                .domain([0, d3.max(heatmapData, d => d.value)])
+                .range([0, legendWidth]);
+            
+            const legend = svg.append('g')
+                .attr('transform', `translate(${margin.left + width - legendWidth}, ${margin.top - 30})`);
+            
+            const legendAxis = d3.axisTop(legendScale)
+                .ticks(5)
+                .tickFormat(d => `${(d * 100).toFixed(0)}%`);
+            
+            legend.append('g').call(legendAxis);
+            
+            const gradientId = 'gradient-' + Math.random();
+            const gradient = svg.append('defs')
+                .append('linearGradient')
+                .attr('id', gradientId);
+            
+            const nStops = 10;
+            d3.range(nStops).forEach(i => {
+                gradient.append('stop')
+                    .attr('offset', `${i / (nStops - 1) * 100}%`)
+                    .attr('stop-color', colorScale(i / (nStops - 1) * d3.max(heatmapData, d => d.value)));
+            });
+            
+            legend.append('rect')
+                .attr('x', 0)
+                .attr('y', 0)
+                .attr('width', legendWidth)
+                .attr('height', legendHeight)
+                .style('fill', `url(#${gradientId})`);
+        }
+        
+        function renderDistribution() {
+            const view = document.getElementById('distributionView').value;
+            const container = d3.select('#distribution');
+            container.selectAll('*').remove();
+            
+            let boxData;
+            if (view === 'models') {
+                boxData = d3.groups(rawData, d => d.model)
+                    .map(([key, values]) => ({
+                        key,
+                        cod_values: values.map(v => v.cod_accuracy).filter(v => v !== null && !isNaN(v)),
+                        csmf_values: values.map(v => v.csmf_accuracy).filter(v => v !== null && !isNaN(v))
+                    }));
+            } else {
+                boxData = d3.groups(rawData, d => d.test_site)
+                    .map(([key, values]) => ({
+                        key,
+                        cod_values: values.map(v => v.cod_accuracy).filter(v => v !== null && !isNaN(v)),
+                        csmf_values: values.map(v => v.csmf_accuracy).filter(v => v !== null && !isNaN(v))
+                    }));
+            }
+            
+            const margin = {top: 20, right: 30, bottom: 80, left: 70};
+            const width = Math.min(900, container.node().getBoundingClientRect().width) - margin.left - margin.right;
+            const height = 400 - margin.top - margin.bottom;
+            
+            const svg = container.append('svg')
+                .attr('width', width + margin.left + margin.right)
+                .attr('height', height + margin.top + margin.bottom);
+            
+            const g = svg.append('g')
+                .attr('transform', `translate(${margin.left},${margin.top})`);
+            
+            const x = d3.scaleBand()
+                .domain(boxData.map(d => d.key))
+                .range([0, width])
+                .padding(0.3);
+            
+            const y = d3.scaleLinear()
+                .domain([0, 1])
+                .range([height, 0]);
+            
+            const color = d3.scaleOrdinal(d3.schemeSet2);
+            
+            // Draw violin plots (simplified as box plots)
+            boxData.forEach((d, i) => {
+                const values = d.cod_values.sort(d3.ascending);
+                if (values.length === 0) return;
+                
+                const q1 = d3.quantile(values, 0.25);
+                const median = d3.quantile(values, 0.5);
+                const q3 = d3.quantile(values, 0.75);
+                const iqr = q3 - q1;
+                const min = Math.max(d3.min(values), q1 - 1.5 * iqr);
+                const max = Math.min(d3.max(values), q3 + 1.5 * iqr);
+                
+                const boxWidth = x.bandwidth() * 0.6;
+                const boxX = x(d.key) + (x.bandwidth() - boxWidth) / 2;
+                
+                // Box with animation
+                const box = g.append('rect')
+                    .attr('x', boxX)
+                    .attr('y', y(q3))
+                    .attr('width', boxWidth)
+                    .attr('height', 0)
+                    .attr('fill', color(d.key))
+                    .attr('opacity', 0.7)
+                    .attr('stroke', 'black')
+                    .transition()
+                    .duration(500)
+                    .delay(i * 100)
+                    .attr('height', y(q1) - y(q3));
+                
+                // Median line
+                setTimeout(() => {
+                    g.append('line')
+                        .attr('x1', boxX)
+                        .attr('x2', boxX + boxWidth)
+                        .attr('y1', y(median))
+                        .attr('y2', y(median))
+                        .attr('stroke', 'black')
+                        .attr('stroke-width', 2);
+                }, 500 + i * 100);
+                
+                // Whiskers
+                setTimeout(() => {
+                    g.append('line')
+                        .attr('x1', x(d.key) + x.bandwidth() / 2)
+                        .attr('x2', x(d.key) + x.bandwidth() / 2)
+                        .attr('y1', y(min))
+                        .attr('y2', y(q1))
+                        .attr('stroke', 'black');
+                    
+                    g.append('line')
+                        .attr('x1', x(d.key) + x.bandwidth() / 2)
+                        .attr('x2', x(d.key) + x.bandwidth() / 2)
+                        .attr('y1', y(q3))
+                        .attr('y2', y(max))
+                        .attr('stroke', 'black');
+                    
+                    // Whisker caps
+                    [min, max].forEach(val => {
+                        g.append('line')
+                            .attr('x1', boxX + boxWidth * 0.25)
+                            .attr('x2', boxX + boxWidth * 0.75)
+                            .attr('y1', y(val))
+                            .attr('y2', y(val))
+                            .attr('stroke', 'black');
+                    });
+                    
+                    // Outliers
+                    const outliers = values.filter(v => v < min || v > max);
+                    g.selectAll(`.outlier-${i}`)
+                        .data(outliers)
+                        .enter().append('circle')
+                        .attr('cx', x(d.key) + x.bandwidth() / 2)
+                        .attr('cy', v => y(v))
+                        .attr('r', 3)
+                        .attr('fill', 'none')
+                        .attr('stroke', 'black');
+                }, 600 + i * 100);
+            });
+            
+            // Add hover interaction
+            boxData.forEach(d => {
+                const boxWidth = x.bandwidth() * 0.6;
+                const boxX = x(d.key) + (x.bandwidth() - boxWidth) / 2;
+                
+                g.append('rect')
+                    .attr('x', boxX)
+                    .attr('y', 0)
+                    .attr('width', boxWidth)
+                    .attr('height', height)
+                    .attr('fill', 'transparent')
+                    .on('mouseover', function(event) {
+                        const values = d.cod_values;
+                        const tooltip = document.getElementById('tooltip');
+                        tooltip.style.opacity = 1;
+                        tooltip.style.left = (event.pageX + 10) + 'px';
+                        tooltip.style.top = (event.pageY - 10) + 'px';
+                        tooltip.innerHTML = `
+                            <strong>${d.key}</strong><br>
+                            Mean: ${(d3.mean(values) * 100).toFixed(1)}%<br>
+                            Median: ${(d3.median(values) * 100).toFixed(1)}%<br>
+                            Q1: ${(d3.quantile(values, 0.25) * 100).toFixed(1)}%<br>
+                            Q3: ${(d3.quantile(values, 0.75) * 100).toFixed(1)}%<br>
+                            n = ${values.length}
+                        `;
+                    })
+                    .on('mouseout', function() {
+                        document.getElementById('tooltip').style.opacity = 0;
+                    });
+            });
+            
+            // Add axes
+            g.append('g')
+                .attr('transform', `translate(0,${height})`)
+                .call(d3.axisBottom(x))
+                .selectAll('text')
+                .style('text-anchor', 'end')
+                .attr('dx', '-.8em')
+                .attr('dy', '.15em')
+                .attr('transform', 'rotate(-45)');
+            
+            g.append('g')
+                .call(d3.axisLeft(y).tickFormat(d => `${(d * 100).toFixed(0)}%`));
+            
+            // Add axis labels
+            g.append('text')
+                .attr('transform', 'rotate(-90)')
+                .attr('y', 0 - margin.left)
+                .attr('x', 0 - (height / 2))
+                .attr('dy', '1em')
+                .style('text-anchor', 'middle')
+                .text('COD Accuracy');
+            
+            g.append('text')
+                .attr('transform', `translate(${width/2}, ${height + 60})`)
+                .style('text-anchor', 'middle')
+                .text(view === 'models' ? 'Model' : 'Test Site');
+        }
+        
+        function renderSiteAnalysis() {
+            const container = d3.select('#siteAnalysis');
+            container.selectAll('*').remove();
+            
+            const sites = _.uniq([...rawData.map(d => d.train_site), ...rawData.map(d => d.test_site)]);
+            
+            const siteScores = sites.map(site => {
+                const asTraining = aggregatedData.filter(d => d.train_site === site);
+                const asTesting = aggregatedData.filter(d => d.test_site === site);
+                
+                return {
+                    site,
+                    trainScore: d3.mean(asTraining, d => d.cod_mean) || 0,
+                    testScore: d3.mean(asTesting, d => d.cod_mean) || 0
+                };
+            }).filter(d => d.trainScore > 0 && d.testScore > 0);
+            
+            const margin = {top: 20, right: 120, bottom: 80, left: 70};
+            const width = Math.min(800, container.node().getBoundingClientRect().width) - margin.left - margin.right;
+            const height = 500 - margin.top - margin.bottom;
+            
+            const svg = container.append('svg')
+                .attr('width', width + margin.left + margin.right)
+                .attr('height', height + margin.top + margin.bottom);
+            
+            const g = svg.append('g')
+                .attr('transform', `translate(${margin.left},${margin.top})`);
+            
+            const x = d3.scaleLinear()
+                .domain([
+                    d3.min(siteScores, d => Math.min(d.trainScore, d.testScore)) * 0.9,
+                    d3.max(siteScores, d => Math.max(d.trainScore, d.testScore)) * 1.1
+                ])
+                .range([0, width]);
+            
+            const y = d3.scaleLinear()
+                .domain([
+                    d3.min(siteScores, d => Math.min(d.trainScore, d.testScore)) * 0.9,
+                    d3.max(siteScores, d => Math.max(d.trainScore, d.testScore)) * 1.1
+                ])
+                .range([height, 0]);
+            
+            const color = d3.scaleOrdinal(d3.schemeCategory10);
+            
+            // Add diagonal reference line
+            g.append('line')
+                .attr('x1', x(x.domain()[0]))
+                .attr('y1', y(y.domain()[0]))
+                .attr('x2', x(x.domain()[1]))
+                .attr('y2', y(y.domain()[1]))
+                .attr('stroke', '#ccc')
+                .attr('stroke-dasharray', '5,5')
+                .attr('stroke-width', 2);
+            
+            // Add points with animation
+            g.selectAll('.point')
+                .data(siteScores)
+                .enter().append('circle')
+                .attr('cx', d => x(d.trainScore))
+                .attr('cy', d => y(d.testScore))
+                .attr('r', 0)
+                .attr('fill', d => color(d.site))
+                .attr('opacity', 0.8)
+                .attr('stroke', 'white')
+                .attr('stroke-width', 2)
+                .transition()
+                .duration(1000)
+                .delay((d, i) => i * 100)
+                .attr('r', 10);
+            
+            // Add hover interaction
+            g.selectAll('.point')
+                .on('mouseover', function(event, d) {
+                    d3.select(this).attr('r', 15);
+                    const tooltip = document.getElementById('tooltip');
+                    tooltip.style.opacity = 1;
+                    tooltip.style.left = (event.pageX + 10) + 'px';
+                    tooltip.style.top = (event.pageY - 10) + 'px';
+                    tooltip.innerHTML = `
+                        <strong>${d.site}</strong><br>
+                        As Training Site: ${(d.trainScore * 100).toFixed(1)}%<br>
+                        As Test Site: ${(d.testScore * 100).toFixed(1)}%<br>
+                        ${d.trainScore > d.testScore ? 
+                            'Better for training than testing' : 
+                            'Easier to predict than to train from'}
+                    `;
+                })
+                .on('mouseout', function(event, d) {
+                    d3.select(this).attr('r', 10);
+                    document.getElementById('tooltip').style.opacity = 0;
+                });
+            
+            // Add labels
+            g.selectAll('.label')
+                .data(siteScores)
+                .enter().append('text')
+                .attr('x', d => x(d.trainScore) + 12)
+                .attr('y', d => y(d.testScore) + 4)
+                .text(d => d.site)
+                .style('font-size', '12px')
+                .style('font-weight', 'bold')
+                .attr('opacity', 0)
+                .transition()
+                .duration(1000)
+                .delay((d, i) => i * 100 + 500)
+                .attr('opacity', 1);
+            
+            // Add axes
+            g.append('g')
+                .attr('transform', `translate(0,${height})`)
+                .call(d3.axisBottom(x).tickFormat(d => `${(d * 100).toFixed(0)}%`));
+            
+            g.append('g')
+                .call(d3.axisLeft(y).tickFormat(d => `${(d * 100).toFixed(0)}%`));
+            
+            // Add axis labels
+            g.append('text')
+                .attr('transform', `translate(${width/2}, ${height + 60})`)
+                .style('text-anchor', 'middle')
+                .style('font-weight', 'bold')
+                .text('Performance as Training Site (avg COD accuracy)');
+            
+            g.append('text')
+                .attr('transform', 'rotate(-90)')
+                .attr('y', 0 - margin.left)
+                .attr('x', 0 - (height / 2))
+                .attr('dy', '1em')
+                .style('text-anchor', 'middle')
+                .style('font-weight', 'bold')
+                .text('Performance as Test Site (avg COD accuracy)');
+            
+            // Add interpretation note
+            container.append('div')
+                .style('margin-top', '20px')
+                .style('padding', '15px')
+                .style('background', 'linear-gradient(135deg, #f0f4ff 0%, #f5f0ff 100%)')
+                .style('border-radius', '8px')
+                .style('border-left', '4px solid #667eea')
+                .html(`
+                    <strong style="color: #667eea;">📊 Interpretation Guide:</strong><br>
+                    <span style="color: #4a5568;">
+                    • Points <strong>above the diagonal</strong> = Sites easier to predict than they are useful for training<br>
+                    • Points <strong>below the diagonal</strong> = Sites that provide better training data than they are easy to predict<br>
+                    • Points <strong>on the diagonal</strong> = Balanced sites with similar training and testing difficulty
+                    </span>
+                `);
+        }
+    </script>
+</body>
+</html>

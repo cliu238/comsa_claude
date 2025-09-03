@@ -92,9 +92,12 @@
       "WebFetch(domain:cran.r-project.org)",
       "WebFetch(domain:rdrr.io)",
       "Read(/etc/**)",
-      "Read(/var/log/**)"
+      "Read(/var/log/**)",
+      "Bash(git log:*)",
+      "Bash(__NEW_LINE__ echo \"\")",
+      "Bash(jobs:*)"
     ],
     "deny": []
   },
-  "outputStyle": "default"
+  "outputStyle": "Explanatory"
 }
