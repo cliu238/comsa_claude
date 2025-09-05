@@ -216,12 +216,15 @@ def prepare_experiment_data(data: pd.DataFrame, sites: List[str]) -> Dict[str, p
     return site_data
 
 
-def add_subpop_column(data: pd.DataFrame) -> pd.DataFrame:
+def add_subpop_column(data: pd.DataFrame, source_sites: List[str] = None, target_site: str = None) -> pd.DataFrame:
     """
-    Add subpopulation column based on site.
+    Add subpopulation column for transfer learning.
+    Maps source sites to '1' and target site to '2' for InSilicoVA.
     
     Args:
         data: DataFrame with site column
+        source_sites: List of source site names (optional, inferred if not provided)
+        target_site: Target site name (optional, inferred if not provided)
         
     Returns:
         DataFrame with added subpop column
@@ -231,8 +234,42 @@ def add_subpop_column(data: pd.DataFrame) -> pd.DataFrame:
     if 'site' not in data_with_subpop.columns:
         raise ValueError("Data must have 'site' column to add subpopulation")
     
-    data_with_subpop['subpop'] = data_with_subpop['site']
-    logging.debug(f"Added subpop column with {data_with_subpop['subpop'].nunique()} unique values")
+    # If sites not provided, infer from data
+    unique_sites = data_with_subpop['site'].unique()
+    if source_sites is None or target_site is None:
+        # Assume the site with most samples is source, others are target
+        site_counts = data_with_subpop['site'].value_counts()
+        if len(unique_sites) > 1:
+            # Multiple sites: label based on frequency
+            # This is a heuristic - the calling code should specify explicitly
+            target_site = site_counts.index[-1]  # Least frequent as target
+            source_sites = [s for s in unique_sites if s != target_site]
+        else:
+            # Single site: all labeled as '1'
+            data_with_subpop['subpop'] = '1'
+            logging.debug(f"Single site detected, all samples labeled as subpop '1'")
+            return data_with_subpop
+    
+    # Map sites to subpopulation codes for transfer learning
+    # Source sites -> '1', Target site -> '2'
+    subpop_map = {}
+    if source_sites:
+        for site in source_sites:
+            subpop_map[site] = '1'  # Source population
+    if target_site:
+        subpop_map[target_site] = '2'  # Target population
+    
+    data_with_subpop['subpop'] = data_with_subpop['site'].map(subpop_map)
+    
+    # Verify mapping worked
+    if data_with_subpop['subpop'].isna().any():
+        unmapped_sites = data_with_subpop[data_with_subpop['subpop'].isna()]['site'].unique()
+        logging.warning(f"Some sites not mapped to subpopulation: {unmapped_sites}")
+        # Default unmapped to '1' (source)
+        data_with_subpop['subpop'].fillna('1', inplace=True)
+    
+    subpop_counts = data_with_subpop['subpop'].value_counts()
+    logging.debug(f"Added subpop column: {dict(subpop_counts)}")
     
     return data_with_subpop
 
@@ -368,7 +405,11 @@ def calculate_cod_accuracy(true_labels: pd.Series, pred_labels: pd.Series) -> fl
     if len(true_labels) != len(pred_labels):
         raise ValueError("Label arrays must have same length")
     
-    correct = (true_labels == pred_labels).sum()
+    # Convert both to strings for consistent comparison
+    true_str = true_labels.astype(str)
+    pred_str = pred_labels.astype(str)
+    
+    correct = (true_str == pred_str).sum()
     total = len(true_labels)
     return correct / total
 
@@ -384,9 +425,13 @@ def calculate_csmf_accuracy(true_labels: pd.Series, pred_labels: pd.Series) -> f
     Returns:
         CSMF accuracy score between 0 and 1
     """
+    # Convert both to strings for consistent comparison
+    true_str = true_labels.astype(str)
+    pred_str = pred_labels.astype(str)
+    
     # Get cause distributions
-    true_dist = true_labels.value_counts(normalize=True)
-    pred_dist = pred_labels.value_counts(normalize=True)
+    true_dist = true_str.value_counts(normalize=True)
+    pred_dist = pred_str.value_counts(normalize=True)
     
     # Align distributions
     all_causes = set(true_dist.index) | set(pred_dist.index)
@@ -475,7 +520,9 @@ def run_site_pair_experiment(
         
         # Run treatment (with subpop)
         logging.info(f"  Running treatment (with subpop) for {target_site}...")
-        train_treatment = add_subpop_column(train_data)
+        # Get source sites from the data
+        source_sites_in_data = [s for s in train_data['site'].unique() if s != target_site]
+        train_treatment = add_subpop_column(train_data, source_sites=source_sites_in_data, target_site=target_site)
         test_treatment = test_data.copy()  # Test data doesn't need subpop
         
         treatment_metrics = train_and_evaluate(
