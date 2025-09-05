@@ -45,6 +45,7 @@ class InSilicoVAModel(BaseEstimator):
         self.train_data: Optional[pd.DataFrame] = None
         self._unique_causes: Optional[list[str]] = None
         self._feature_columns: Optional[list[str]] = None
+        self._subpop_labels: Optional[pd.Series] = None
         
         # Validate Docker availability on initialization
         docker_result = self.validator.validate_docker_availability()
@@ -54,12 +55,14 @@ class InSilicoVAModel(BaseEstimator):
                 "Model may not work properly."
             )
     
-    def fit(self, X: pd.DataFrame, y: pd.Series) -> "InSilicoVAModel":
+    def fit(self, X: pd.DataFrame, y: pd.Series, 
+            subpop_labels: Optional[pd.Series] = None) -> "InSilicoVAModel":
         """Fit the model using training data.
         
         Args:
             X: Feature DataFrame with VA symptoms
             y: Target Series with cause of death labels
+            subpop_labels: Optional Series with subpopulation labels for InSilicoVA
             
         Returns:
             Self for method chaining
@@ -83,6 +86,26 @@ class InSilicoVAModel(BaseEstimator):
         # Store training data for Docker execution
         self.train_data = X.copy()
         self.train_data[self.config.cause_column] = y.astype(str)
+        
+        # Handle subpopulation labels if provided
+        if subpop_labels is not None:
+            # Check for 'subpop' column in X first (from VADataSplitter)
+            if 'subpop' in X.columns:
+                self._subpop_labels = X['subpop'].astype(str)
+                self.logger.info(f"Using subpopulation labels from data column: "
+                               f"{self._subpop_labels.value_counts().to_dict()}")
+            else:
+                self._subpop_labels = subpop_labels.astype(str)
+                self.logger.info(f"Using provided subpopulation labels: "
+                               f"{self._subpop_labels.value_counts().to_dict()}")
+        elif 'subpop' in X.columns:
+            # Auto-detect subpop column from data
+            self._subpop_labels = X['subpop'].astype(str)
+            self.logger.info(f"Auto-detected subpopulation labels: "
+                           f"{self._subpop_labels.value_counts().to_dict()}")
+        else:
+            self._subpop_labels = None
+        
         self._unique_causes = sorted(y.astype(str).unique())
         self._feature_columns = X.columns.tolist()
         self.is_fitted = True
@@ -248,6 +271,17 @@ class InSilicoVAModel(BaseEstimator):
         test_data_clean = test_data.fillna("")
         test_data_clean.to_csv(test_file, index=False)
         
+        # Save subpopulation labels if available
+        if self._subpop_labels is not None:
+            subpop_file = os.path.join(temp_dir, "subpop_labels.csv")
+            # Save as DataFrame with ID column for R
+            subpop_df = pd.DataFrame({
+                'ID': range(1, len(self._subpop_labels) + 1),
+                'subpop': self._subpop_labels.values
+            })
+            subpop_df.to_csv(subpop_file, index=False)
+            self.logger.info(f"Saved subpopulation labels: {subpop_df['subpop'].value_counts().to_dict()}")
+        
         # Generate R script
         r_script = self._generate_r_script()
         r_script_path = os.path.join(temp_dir, "run_insilico.R")
@@ -387,6 +421,50 @@ class InSilicoVAModel(BaseEstimator):
         """
         params = self.config.get_r_script_params()
         
+        # Check if we have subpopulation labels
+        subpop_code = ""
+        if self._subpop_labels is not None:
+            subpop_code = """
+# Read subpopulation labels
+subpop_data <- read.csv("/data/subpop_labels.csv", stringsAsFactors = FALSE)
+subpop_labels <- as.character(subpop_data$subpop)
+cat("Loaded subpopulation labels:", unique(subpop_labels), "\\n")
+cat("Subpop label counts:", table(subpop_labels), "\\n")
+"""
+        
+        # Generate codeVA call with optional sub.pop parameter
+        if self._subpop_labels is not None:
+            codeva_call = f"""
+    results <- codeVA(
+        data = test_data,
+        data.type = "customize",
+        model = "InSilicoVA",
+        data.train = train_data,
+        causes.train = "{params['cause_column']}",
+        phmrc.type = "{params['phmrc_type']}",
+        jump.scale = {params['jump_scale']},
+        convert.type = "{params['convert_type']}",
+        Nsim = {params['nsim']},
+        auto.length = {params['auto_length']},
+        seed = {params['random_seed']},
+        sub.pop = subpop_labels
+    )"""
+        else:
+            codeva_call = f"""
+    results <- codeVA(
+        data = test_data,
+        data.type = "customize",
+        model = "InSilicoVA",
+        data.train = train_data,
+        causes.train = "{params['cause_column']}",
+        phmrc.type = "{params['phmrc_type']}",
+        jump.scale = {params['jump_scale']},
+        convert.type = "{params['convert_type']}",
+        Nsim = {params['nsim']},
+        auto.length = {params['auto_length']},
+        seed = {params['random_seed']}
+    )"""
+        
         r_script = f"""
 # InSilicoVA R Script
 library(openVA)
@@ -409,22 +487,10 @@ test_data[is.na(test_data)] <- ""
 # Convert all columns to character
 train_data[] <- lapply(train_data, as.character)
 test_data[] <- lapply(test_data, as.character)
-
+{subpop_code}
 # Run InSilicoVA
 tryCatch({{
-    results <- codeVA(
-        data = test_data,
-        data.type = "customize",
-        model = "InSilicoVA",
-        data.train = train_data,
-        causes.train = "{params['cause_column']}",
-        phmrc.type = "{params['phmrc_type']}",
-        jump.scale = {params['jump_scale']},
-        convert.type = "{params['convert_type']}",
-        Nsim = {params['nsim']},
-        auto.length = {params['auto_length']},
-        seed = {params['random_seed']}
-    )
+{codeva_call}
     
     # Save individual probabilities
     if (!is.null(results) && !is.null(results$indiv.prob)) {{

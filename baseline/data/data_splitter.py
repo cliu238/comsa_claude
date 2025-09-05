@@ -71,11 +71,14 @@ class VADataSplitter:
         splits_path.mkdir(parents=True, exist_ok=True)
         self.logger.info(f"Split output directory created: {splits_path}")
     
-    def split_data(self, data: pd.DataFrame) -> SplitResult:
+    def split_data(self, data: pd.DataFrame, source_site: Optional[str] = None,
+                  target_site: Optional[str] = None) -> SplitResult:
         """Split data according to the configured strategy.
         
         Args:
             data: Input DataFrame to split
+            source_site: Source site for subpopulation split (optional)
+            target_site: Target site for subpopulation split (optional)
             
         Returns:
             SplitResult containing train/test data and metadata
@@ -96,6 +99,10 @@ class VADataSplitter:
             result = self._cross_site_split(data)
         elif self.config.split_strategy == "stratified_site":
             result = self._stratified_site_split(data)
+        elif self.config.split_strategy == "subpopulation":
+            if not source_site or not target_site:
+                raise ValueError("subpopulation split requires source_site and target_site")
+            result = self._subpopulation_split(data, source_site, target_site)
         else:
             raise ValueError(f"Unknown split strategy: {self.config.split_strategy}")
         
@@ -217,6 +224,72 @@ class VADataSplitter:
                 "total_sites": len(available_sites)
             }
         )
+        
+        return SplitResult(train=train_data, test=test_data, metadata=metadata)
+    
+    def _subpopulation_split(self, data: pd.DataFrame, source_site: str, target_site: str, 
+                            target_fraction: float = 0.5) -> SplitResult:
+        """Perform subpopulation split for transfer learning experiments.
+        
+        Creates training data with 100% of source site and a fraction of target site.
+        Adds subpopulation labels for InSilicoVA: '1' for source, '2' for target.
+        
+        Args:
+            data: Input DataFrame with site information
+            source_site: Site to use as source (100% included)
+            target_site: Site to use as target (fraction included)
+            target_fraction: Fraction of target site to include (default 0.5)
+            
+        Returns:
+            SplitResult with subpopulation labels added to training data
+        """
+        self.logger.info(f"Performing subpopulation split: source={source_site}, "
+                        f"target={target_site}, target_fraction={target_fraction}")
+        
+        # Validate sites exist
+        available_sites = self.split_validator.get_available_sites(data)
+        if source_site not in available_sites:
+            raise ValueError(f"Source site '{source_site}' not found in data")
+        if target_site not in available_sites:
+            raise ValueError(f"Target site '{target_site}' not found in data")
+        
+        # Get source data (100%)
+        source_data = data[data[self.config.site_column] == source_site].copy()
+        source_data['subpop'] = '1'  # Character format for R compatibility
+        
+        # Get target data and split
+        target_data = data[data[self.config.site_column] == target_site].copy()
+        
+        # Sample target data for training
+        target_train_size = int(len(target_data) * target_fraction)
+        target_train = target_data.sample(n=target_train_size, 
+                                         random_state=self.config.random_state)
+        target_train = target_train.copy()
+        target_train['subpop'] = '2'  # Character format for R compatibility
+        
+        # Remaining target data for testing
+        target_test = target_data.drop(target_train.index).copy()
+        
+        # Combine training data
+        train_data = pd.concat([source_data, target_train], ignore_index=True)
+        test_data = target_test
+        
+        # Generate metadata
+        metadata = self._generate_split_metadata(
+            train_data, test_data,
+            extra_info={
+                "source_site": source_site,
+                "target_site": target_site,
+                "target_fraction": target_fraction,
+                "source_samples": len(source_data),
+                "target_train_samples": len(target_train),
+                "target_test_samples": len(target_test),
+                "has_subpop_labels": True
+            }
+        )
+        
+        self.logger.info(f"Subpopulation split complete: {len(source_data)} source, "
+                        f"{len(target_train)} target train, {len(target_test)} target test")
         
         return SplitResult(train=train_data, test=test_data, metadata=metadata)
     

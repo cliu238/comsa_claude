@@ -25,7 +25,7 @@ class DataConfig(BaseModel):
     stratify_by_site: bool = Field(True, description="Enable site-based stratification")
     
     # Data splitting parameters
-    split_strategy: Literal["train_test", "cross_site", "stratified_site"] = Field(
+    split_strategy: Literal["train_test", "cross_site", "stratified_site", "subpopulation"] = Field(
         default="train_test", description="Strategy for splitting the data"
     )
     test_size: float = Field(
@@ -131,7 +131,7 @@ class DataConfig(BaseModel):
     @classmethod
     def validate_split_strategy(cls, v: str) -> str:
         """Validate split strategy is supported."""
-        valid_strategies = ["train_test", "cross_site", "stratified_site"]
+        valid_strategies = ["train_test", "cross_site", "stratified_site", "subpopulation"]
         if v not in valid_strategies:
             raise ValueError(f"split_strategy must be one of {valid_strategies}, got {v}")
         return v
